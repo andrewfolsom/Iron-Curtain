@@ -256,17 +256,21 @@ int check_keys(XEvent *e)
             //Movements and Gameplay
             case XK_a:
                 //moveLeft();
-                gl.keys[XK_a] = 1;
+                //gl.keys[XK_a] = 1;
+				g.testTank.angle++;
                 break;
             case XK_d:
                 //moveRight();
-                gl.keys[XK_d] = 1;
+                //gl.keys[XK_d] = 1;
+				g.testTank.angle--;
                 break;
             case XK_w:
-                gl.keys[XK_w] = 1;
+                //gl.keys[XK_w] = 1;
+				g.testTank.vel[0] += 0.8;
                 break;
             case XK_s:
-                gl.keys[XK_s] = 1;
+                //gl.keys[XK_s] = 1;
+				g.testTank.vel[0] -= 0.8;
                 break;
 
             case XK_space:
@@ -572,6 +576,7 @@ void render()
             e = e->nextShip;
         }
 		//Draw Tank
+		g.testTank.moveTank();
 		g.testTank.renderTank();
         
         for (int i = 0; i < g.nbullets; i++) {

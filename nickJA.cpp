@@ -394,6 +394,9 @@ void Tank::renderTurret()
 	Vec pt[50];
 	float angle = 0;
 	float angleInc = (2*PI)/50;
+
+	tPos[0] = pos[0];
+	tPos[1] = pos[1];
 	//tAngle is the current angle of the turret.
 	//tgtAngle is the angle it needs to reach to aim at the target.
 	//Increment number controls turret speed. At 0.25, the turret rotates
@@ -421,7 +424,8 @@ void Tank::renderTurret()
 	glEnd();
 	glPopMatrix();
 
-	//Create points to draw turret.
+	//Create points to draw turret
+	//'25' is the radius ot the turret.
 	for (int i = 0; i < 50; i++)
 	{
 		pt[i][0] = tPos[0] + (25 * cos(angle));
@@ -464,8 +468,8 @@ void Tank::renderTank()
 
 	glColor3fv(color);
 	glPushMatrix();
-	//glTranslatef(tank.pos[0], tank.pos[1], 0.0);
 	glTranslatef(pos[0], pos[1], 0.1);
+	glRotatef(angle, 0.0f, 0.0f, 0.1f);
 	glBegin(GL_QUADS);
 		glVertex2f(-30, -45);
 		glVertex2f( 30, -45);
@@ -477,4 +481,34 @@ void Tank::renderTank()
 	renderTurret();
 
 	//printf("Pos is (%f, %f)\n", tank.turret.tPos[0], tank.turret.tPos[1]);
+}
+
+void Tank::moveTank()
+{
+	float decelVal = 0.3;
+
+	float angleRad = ((angle + 90) * 2 * PI)/360;
+	float xDir = cos(angleRad);
+	float yDir = sin(angleRad);
+	//Speed Governor
+	if (vel[0] > maxVel)
+		vel[0] = maxVel;
+	if (vel[1] > maxVel)
+		vel[1] = maxVel;
+
+	pos[0] += vel[0] * xDir;
+	pos[1] += vel[0] * yDir;
+
+	//Deceleration
+	
+	if (vel[0] > 0)
+		vel[0] -= decelVal;
+	/*
+	if (vel[0] < 0)
+		vel[0] += decelVal;
+	if (vel[1] > 0)
+		vel[1] -= decelVal;
+	if (vel[1] < 0)
+		vel[1] += decelVal;
+	*/
 }
