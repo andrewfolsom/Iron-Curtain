@@ -294,7 +294,7 @@ void Reticle::update()
  */
 void Reticle::drawReticle(bool lock)
 {
-    int x, y;
+    int x, y, x1, y1;
     if (!lock) {
         glPushMatrix();
 	    glTranslatef(pos[0], pos[1], pos[2]);
@@ -307,10 +307,20 @@ void Reticle::drawReticle(bool lock)
 		    glVertex3f(x, y, 0.0);
 	    }
 	    glEnd();
+        glBegin(GL_LINES);
+        for (int i = 0; i < 4; i++) {
+            x = 30 * cos(convertToRads(angle + (i*90)));
+            y = 30 * sin(convertToRads(angle + (i*90)));
+            x1 = 50 * cos(convertToRads(angle + (i*90)));
+            y1 = 50 * sin(convertToRads(angle + (i*90)));
+            glVertex3f(x, y, 0.0);
+            glVertex3f(x1, y1, 0.0);
+        }
+        glEnd();
 	    glPopMatrix();
 
 	    if (angle < 90) {
-		    angle += 2.0;
+		    angle += 5.0;
 	    } else {
 		    angle = 0.0;
 	    }
@@ -320,19 +330,31 @@ void Reticle::drawReticle(bool lock)
 	    glColor3f(lockColor[0],lockColor[1],lockColor[2]);
 	    glLineWidth(2.0f);
 	    glBegin(GL_LINE_LOOP);
+        angle = 0.0;
 	    for (int i = 0; i < 120; i++) {
 		    x = 40 * cos(convertToRads(angle + (i*3)));
 		    y = 40 * sin(convertToRads(angle + (i*3)));
 		    glVertex3f(x, y, 0.0);
 	    }
 	    glEnd();
+        glBegin(GL_LINES);
+        for (int i = 0; i < 4; i++) {
+            x = 30 * cos(convertToRads(angle + (i*90)));
+            y = 30 * sin(convertToRads(angle + (i*90)));
+            x1 = 50 * cos(convertToRads(angle + (i*90)));
+            y1 = 50 * sin(convertToRads(angle + (i*90)));
+            glVertex3f(x, y, 0.0);
+            glVertex3f(x1, y1, 0.0);
+        }
+        glEnd();
+	
 	    glPopMatrix();
 
-	    if (angle < 90) {
-		    angle += 2.0;
+	    /*if (angle < 90) {
+		    angle += 5.0;
 	    } else {
 		    angle = 0.0;
-	    }
+	    }*/
     }
 }
 
