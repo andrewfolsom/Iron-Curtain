@@ -349,12 +349,6 @@ void Reticle::drawReticle(bool lock)
         glEnd();
 	
 	    glPopMatrix();
-
-	    /*if (angle < 90) {
-		    angle += 5.0;
-	    } else {
-		    angle = 0.0;
-	    }*/
     }
 }
 
