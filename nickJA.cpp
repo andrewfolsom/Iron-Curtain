@@ -401,7 +401,12 @@ void Tank::renderTurret()
 	//tgtAngle is the angle it needs to reach to aim at the target.
 	//Increment number controls turret speed. At 0.25, the turret rotates
 	//at around 15 degrees per second.
+	
 	if (tAngle != tgtAngle) {
+		if (tAngle > 135 && tgtAngle < 0)
+			tAngle -=360;
+		if (tAngle < 0 && tgtAngle > 135)
+			tAngle +=360;
 		if (tAngle > tgtAngle) {
 			tAngle -= 0.25;
 		}
