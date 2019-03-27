@@ -527,7 +527,4 @@ void Tank::moveTank()
 	tPos[0] = pos[0];
 	tPos[1] = pos[1];
 	updateTarget(tgt[0], tgt[1]);
-	printf("Tank Position is (%f, %f), velocity: %f \n", pos[0], pos[1], vel[0]);
-	printf("Turret position is (%f, %f)\nAngle to target is: %f\n", tPos[0], tPos[1], tgtAngle);
-	printf("Target position is (%f, %f)\n", tgt[0], tgt[1]);
 }
