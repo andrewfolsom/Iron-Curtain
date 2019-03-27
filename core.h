@@ -84,6 +84,7 @@ class Ship
 class Tank
 {
 	public:
+		bool moving;
 		float pos[3];
 		float tPos[3];
 		float color[3] = {0.33, 0.42, 0.18};

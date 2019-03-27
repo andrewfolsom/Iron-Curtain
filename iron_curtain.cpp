@@ -221,7 +221,9 @@ void check_mouse(XEvent *e)
 	if (savex != e->xbutton.x || savey != e->xbutton.y) {
 		savex = e->xbutton.x;
 		savey = e->xbutton.y;
-		g.testTank.updateTarget(savex, savey);
+		//g.testTank.updateTarget(savex, savey);
+		g.testTank.tgt[0] = savex;
+		g.testTank.tgt[1] = gl.yres - savey;
 	}
 }
 
@@ -266,11 +268,13 @@ int check_keys(XEvent *e)
                 break;
             case XK_w:
                 //gl.keys[XK_w] = 1;
-				g.testTank.vel[0] += 0.8;
+				g.testTank.vel[0] += 0.5;
+				g.testTank.moving = true;
                 break;
             case XK_s:
                 //gl.keys[XK_s] = 1;
-				g.testTank.vel[0] -= 0.8;
+				g.testTank.vel[0] -= 0.5;
+				g.testTank.moving = true;
                 break;
 
             case XK_space:
@@ -335,9 +339,11 @@ int check_keys(XEvent *e)
                 break;
             case XK_w:
                 gl.keys[XK_w] = 0;
+				g.testTank.moving = false;
                 break;
             case XK_s:
                 gl.keys[XK_s] = 0;
+				g.testTank.moving = false;
                 break;
             case XK_space:
                 gl.keys[XK_space] = 0;

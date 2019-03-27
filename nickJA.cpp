@@ -392,7 +392,7 @@ void EnemyShip::updatePosition()
 void Tank::renderTurret()
 {
 	Vec pt[50];
-	float angle = 0;
+	float circAngle = 0;
 	float angleInc = (2*PI)/50;
 
 	tPos[0] = pos[0];
@@ -428,9 +428,9 @@ void Tank::renderTurret()
 	//'25' is the radius ot the turret.
 	for (int i = 0; i < 50; i++)
 	{
-		pt[i][0] = tPos[0] + (25 * cos(angle));
-		pt[i][1] = tPos[1] + (25 * sin(angle));
-		angle += angleInc;
+		pt[i][0] = tPos[0] + (25 * cos(circAngle));
+		pt[i][1] = tPos[1] + (25 * sin(circAngle));
+		circAngle += angleInc;
 	}
 
 	//Draw Turret
@@ -453,13 +453,17 @@ void Tank::renderTurret()
 //Is suppled with cursor Coord in iron-curtain.cpp
 void Tank::updateTarget(int x, int y)
 {
+	float hyp = sqrt(((tgt[0]-tPos[0]) * (tgt[0] - tPos[0])) - ((tgt[1]-tPos[1]) * (tgt[1]-tPos[1])));
+
 	tgt[0] = x;
 	tgt[1] = y;
 	tgtAngle = atan((tgt[0] - tPos[0])/(tgt[1] - tPos[1]));
-	if (tgt[1] - tPos[1] < 0)
-		tgtAngle = (tgtAngle * 180) /PI;
+	
+	if (tgt[1] - tPos[1] > 0)
+		tgtAngle = -(tgtAngle * 180) /PI;
 	else
-		tgtAngle = 180 + (tgtAngle * 180) /PI;
+		tgtAngle = 180 - (tgtAngle * 180) /PI;
+
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
 
@@ -485,7 +489,7 @@ void Tank::renderTank()
 
 void Tank::moveTank()
 {
-	float decelVal = 0.3;
+	float decelVal = 0.01;
 
 	float angleRad = ((angle + 90) * 2 * PI)/360;
 	float xDir = cos(angleRad);
@@ -493,22 +497,32 @@ void Tank::moveTank()
 	//Speed Governor
 	if (vel[0] > maxVel)
 		vel[0] = maxVel;
-	if (vel[1] > maxVel)
-		vel[1] = maxVel;
+	if (vel[0] < -maxVel)
+		vel[0] = -maxVel;
+
 
 	pos[0] += vel[0] * xDir;
 	pos[1] += vel[0] * yDir;
 
 	//Deceleration
-	
-	if (vel[0] > 0)
-		vel[0] -= decelVal;
+	if (!moving) {
+		if (vel[0] > 0)
+			vel[0] -= decelVal;
+		if (vel[0] < 0)
+			vel[0] += decelVal;
+		if (abs(vel[0]) - 0 <= 0.01)
+			vel[0]=0;
+	}
 	/*
-	if (vel[0] < 0)
-		vel[0] += decelVal;
 	if (vel[1] > 0)
 		vel[1] -= decelVal;
 	if (vel[1] < 0)
 		vel[1] += decelVal;
 	*/
+	tPos[0] = pos[0];
+	tPos[1] = pos[1];
+	updateTarget(tgt[0], tgt[1]);
+	printf("Tank Position is (%f, %f), velocity: %f \n", pos[0], pos[1], vel[0]);
+	printf("Turret position is (%f, %f)\nAngle to target is: %f\n", tPos[0], tPos[1], tgtAngle);
+	printf("Target position is (%f, %f)\n", tgt[0], tgt[1]);
 }
