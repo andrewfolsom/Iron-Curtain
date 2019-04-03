@@ -259,8 +259,10 @@ int check_keys(XEvent *e)
                 return 1;
 
             case XK_m:
-                s->scnd->locked = true;
-                gl.keys[XK_m] = 1;
+                if (s->scnd->armed) {
+                    s->scnd->locked = true;
+                    gl.keys[XK_m] = 1;
+                }
                 break;
             case XK_1:
                 delete s->wpn;
