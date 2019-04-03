@@ -299,16 +299,20 @@ int check_keys(XEvent *e)
                 }
 				break;
             case XK_period:
-                if (s->scnd->reticle.e->nextShip != NULL)
-                    s->scnd->reticle.e = s->scnd->reticle.e->nextShip;
-                else
-                    s->scnd->reticle.e = headShip;
+                if ( s->scnd->locked != true) {
+                    if (s->scnd->reticle.e->nextShip != NULL)
+                        s->scnd->reticle.e = s->scnd->reticle.e->nextShip;
+                    else
+                        s->scnd->reticle.e = headShip;
+                }
                 break;
             case XK_comma:
-                if (s->scnd->reticle.e->prevShip != NULL)
-                    s->scnd->reticle.e = s->scnd->reticle.e->prevShip;
-                else
-                    s->scnd->reticle.e = tailShip;
+                if (s->scnd->locked != true) {
+                    if (s->scnd->reticle.e->prevShip != NULL)
+                        s->scnd->reticle.e = s->scnd->reticle.e->prevShip;
+                    else
+                        s->scnd->reticle.e = tailShip;
+                }
                 break;
             case XK_t:
                 eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
