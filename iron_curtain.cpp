@@ -294,7 +294,7 @@ int check_keys(XEvent *e)
                 }
 				break;
             case XK_period:
-                if ( s->scnd->locked != true) {
+                if (s->scnd->locked != true && s->scnd->armed) {
                     if (s->scnd->reticle.e->nextShip != NULL)
                         s->scnd->reticle.e = s->scnd->reticle.e->nextShip;
                     else
@@ -302,7 +302,7 @@ int check_keys(XEvent *e)
                 }
                 break;
             case XK_comma:
-                if (s->scnd->locked != true) {
+                if (s->scnd->locked != true && s->scnd->armed) {
                     if (s->scnd->reticle.e->prevShip != NULL)
                         s->scnd->reticle.e = s->scnd->reticle.e->prevShip;
                     else
