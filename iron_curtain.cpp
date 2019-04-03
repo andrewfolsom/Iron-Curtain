@@ -88,10 +88,6 @@ extern void displayErrorScreen();
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
-extern void spawnOpFor(int x, int y, int movType);
-extern void renderOpFor();
-extern void updatePosition();
-extern void configOpFor(int ID, int destOffSet);
 //-------------------------------------------------------------------------- 
 
 Image img[7] = {
@@ -149,7 +145,6 @@ int main()
 		physicsCountdown += timeSpan;
 		while (physicsCountdown >= physicsRate) {
 			physics();
-			updatePosition();
 			physicsCountdown -= physicsRate;
 		}
 		render();
@@ -588,8 +583,6 @@ void render()
         if (g.ship.scnd->armed)
             g.ship.scnd->reticle.drawReticle(g.ship.scnd->locked);
 
-        //Draw enemy ships
-        renderOpFor();
 
         for (int i = 0; i < g.nbullets; i++) {
             Bullet *b = &g.barr[i];

@@ -79,6 +79,36 @@ class Ship
 };
 
 /*
+ *Tank Class
+ *	Jackson
+ */
+ class Tank
+ {
+	public:
+		bool moving;
+		float pos[3];
+		float tPos[3];
+		float color[3] = {0.33, 0.42, 0.18};
+		float angle;
+		float tAngle;
+		float tgtAngle;
+		float tColor[3] = {0.33, 0.5, 0.18};
+		float maxVel = 1.0;
+		Vec vel = {0, 0, 0};
+		Vec tgt;
+		Tank();
+
+		Tank *nextTank;
+		Tank *prevTank;
+		Weapon *prm;
+
+		void renderTurret();
+		void renderTank();
+		void updateTarget(int x, int y);
+		void moveTank();
+ };
+
+/*
  *OPFOR Class
  *	Jackson
  */
