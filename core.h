@@ -97,6 +97,8 @@ class Tank
 		Vec tgt;
 		Tank();
 
+		Tank *nextTank;
+		Tank *prevTank;
 		Weapon *prm;
 
 
