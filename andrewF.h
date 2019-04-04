@@ -144,4 +144,15 @@ class Shield
 		Shield();
 		void drawShield(float* pos);
 };
+
+class Hud
+{
+	public:
+		GLuint life[4];
+	public:
+		Hud();
+		void genTextures();
+		void drawHud(int i);
+};
+
 #endif

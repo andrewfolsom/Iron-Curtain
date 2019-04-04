@@ -97,8 +97,10 @@ Image img[7] = {
     "./img/chad-egg.jpg",
     "./img/BGarza.jpg",
     "./img/ironImage.jpg",
-    "./img/verticalBackground.jpg"
+    "./img/verticalBackground.jpg",
 };
+
+Hud hud;
 
 Global& gl = Global::getInstance();
 
@@ -157,6 +159,7 @@ int main()
 
 void init_opengl(void)
 {
+	hud.genTextures();
 
     glViewport(0, 0, gl.xres, gl.yres);
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -567,6 +570,9 @@ void render()
 
         scrollingBackground();
         glDisable(GL_TEXTURE_2D);
+
+		//Draw HUD
+		hud.drawHud(g.ship.health);
         
         //Draw ships
         

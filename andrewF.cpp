@@ -16,7 +16,19 @@ extern float convertToRads(float angle);
 extern double getTimeSlice(timespec*);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 extern Game g;
+extern Image img;
 extern EnemyShip* headShip;
+extern unsigned char *buildAlphaData(Image *img);
+
+/**
+ * Image class containing image files for the HUD
+ */
+Image hudLife[4] = {
+	"./img/life-0.png",
+	"./img/life-1.png",
+	"./img/life-2.png",
+	"./img/life-3.png"
+};
 
 /**
  * Displays my picture and name
@@ -488,7 +500,8 @@ Shield::Shield()
 }
 
 // Render function for shield
-void Shield::drawShield(float *pos) {	
+void Shield::drawShield(float *pos)
+{	
 	glPushMatrix();
 	glTranslatef(pos[0], pos[1], pos[2]);
 	glColor3f(color[0],color[1],color[2]);
@@ -507,4 +520,46 @@ void Shield::drawShield(float *pos) {
 	} else {
 		angle = 0.0;
 	}
+}
+
+
+//===========================================================
+//				DEFINITION OF THE USER INTERFACE 
+//===========================================================
+
+// Hud class constructor
+Hud::Hud() { }
+
+void Hud::genTextures()
+{
+	for (int i = 0; i < 4; i++) {
+		glGenTextures(1, &life[i]);
+	}
+}
+
+void Hud::drawHud(int i)
+{
+	float resX = 128.0f;
+	float resY = 72.0f;
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, life[i]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *transData = buildAlphaData(&hudLife[i]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudLife[i].width, hudLife[i].height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(750.0, 928.0, 1.0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(-resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(resX, -resY);
+    glEnd();
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
