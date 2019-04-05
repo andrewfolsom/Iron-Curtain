@@ -458,8 +458,6 @@ void Tank::renderTurret()
 //Is suppled with cursor Coord in iron-curtain.cpp
 void Tank::updateTarget(int x, int y)
 {
-	float hyp = sqrt(((tgt[0]-tPos[0]) * (tgt[0] - tPos[0])) - ((tgt[1]-tPos[1]) * (tgt[1]-tPos[1])));
-
 	tgt[0] = x;
 	tgt[1] = y;
 	tgtAngle = atan((tgt[0] - tPos[0])/(tgt[1] - tPos[1]));
