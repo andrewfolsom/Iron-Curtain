@@ -149,6 +149,8 @@ class Hud
 {
 	public:
 		GLuint life[4];
+        GLuint weapon[3];
+        GLuint secondary;
 	public:
 		Hud();
 		void genTextures();

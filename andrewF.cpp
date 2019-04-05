@@ -1,4 +1,5 @@
 #include <GL/glx.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <cmath>
 #include "fonts.h"
