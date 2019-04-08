@@ -14,9 +14,13 @@ enum wpnType {
     scatter,
     ring,
     pinwheel,
-    missile,
+    miss,
     enemyStd,
     upgrade
+};
+
+enum scndType {
+    missile = 0
 };
 
 // Player Weapon Declarations
@@ -150,11 +154,12 @@ class Hud
 	public:
 		GLuint life[4];
         GLuint weapon[3];
+        GLuint display;
         GLuint secondary;
 	public:
 		Hud();
 		void genTextures();
-		void drawHud(int i);
+		void drawHud(int l, int w, int s);
 };
 
 #endif

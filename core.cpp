@@ -115,6 +115,8 @@ Ship::Ship() {
 	color[0] = color[1] = color[2] = 1.0;
 	detRadius = 25.0;
     health = 3;
+    equiped = basic;
+    altEquip = missile;
 	wpn = new Basic;
     scnd = new Secondary;
 	shield = new Shield;

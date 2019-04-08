@@ -22,7 +22,7 @@ extern EnemyShip* headShip;
 extern unsigned char *buildAlphaData(Image *img);
 
 /**
- * Image class containing image files for the HUD
+ * Image classes containing image files for the HUD
  */
 Image hudLife[4] = {
 	"./img/life-0.png",
@@ -30,6 +30,16 @@ Image hudLife[4] = {
 	"./img/life-2.png",
 	"./img/life-3.png"
 };
+
+Image hudWeapon[3] = {
+    "./img/basic.png",
+    "./img/rapid.png",
+    "./img/scatter.png"
+};
+
+Image hudSecond("./img/missile.png");
+
+Image hudDisplay("./img/weaponDisplay.png");
 
 /**
  * Displays my picture and name
@@ -536,19 +546,24 @@ void Hud::genTextures()
 	for (int i = 0; i < 4; i++) {
 		glGenTextures(1, &life[i]);
 	}
+    for (int i = 0; i < 3; i++) {
+        glGenTextures(1, &weapon[i]);
+    }
+    glGenTextures(1, &secondary);
+    glGenTextures(1, &display);
 }
 
-void Hud::drawHud(int i)
+void Hud::drawHud(int l, int w, int s)
 {
 	float resX = 128.0f;
 	float resY = 72.0f;
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0,255.0,255.0,255.0);
-	glBindTexture(GL_TEXTURE_2D, life[i]);
+	glBindTexture(GL_TEXTURE_2D, life[l]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	unsigned char *transData = buildAlphaData(&hudLife[i]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudLife[i].width, hudLife[i].height, 0,
+	unsigned char *transData = buildAlphaData(&hudLife[l]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudLife[l].width, hudLife[l].height, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transData);
 	free(transData);
 	glPushMatrix();
@@ -556,11 +571,84 @@ void Hud::drawHud(int i)
 	glAlphaFunc(GL_GREATER, 0.0f);
     glTranslatef(750.0, 928.0, 1.0);
     glBegin(GL_QUADS);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(-resX,-resY);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(-resX, resY);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i(resX, resY);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i(resX, -resY);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
+    glEnd();
+    glPopMatrix();
+
+	resX = 25.0f;
+    resY = 25.0f;
+    glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, weapon[w]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	transData = buildAlphaData(&hudWeapon[w]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudWeapon[w].width, hudWeapon[w].height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(75.0f, 75.0f, 1.0f);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
     glEnd();
     glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
+
+    resX = 12.0f;
+    resY = 12.0f;
+    glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, secondary);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	transData = buildAlphaData(&hudSecond);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudSecond.width, hudSecond.height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(105.0f, 45.0f, 1.0f);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
+    glEnd();
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+    resX = 50.0f;
+    resY = 50.0f;
+    glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, display);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	transData = buildAlphaData(&hudDisplay);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudDisplay.width, hudDisplay.height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(75.0f, 75.0f, 1.0f);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
+    glEnd();
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);    
 }

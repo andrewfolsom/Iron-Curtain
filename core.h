@@ -73,6 +73,8 @@ class Ship
 		float color[3];
 		float detRadius;
         int health;
+        wpnType equiped;
+        scndType altEquip;
 		Weapon *wpn;
 		Secondary *scnd;
 		Shield *shield;

@@ -265,14 +265,17 @@ int check_keys(XEvent *e)
             case XK_1:
                 delete s->wpn;
                 s->wpn = new Basic;
+                s->equiped = basic;
                 break;
             case XK_2:
                 delete s->wpn;
                 s->wpn = new Rapid;
+                s->equiped = rapid;
                 break;
             case XK_3:
                 delete s->wpn;
                 s->wpn = new Scatter;
+                s->equiped = scatter;
                 break;
             case XK_4:
                 delete s->wpn;
@@ -409,6 +412,8 @@ void physics()
             if (dist < (radius * radius)) {
                 memcpy(&g.marr[i], &g.marr[g.nmissiles - 1], sizeof(Missile));
                 g.nmissiles--;
+                s->scnd->armed = false;
+                s->scnd->locked = false;
                 continue;
             }
 
@@ -572,7 +577,7 @@ void render()
         glDisable(GL_TEXTURE_2D);
 
 		//Draw HUD
-		hud.drawHud(g.ship.health);
+		hud.drawHud(g.ship.health, g.ship.equiped, g.ship.altEquip);
         
         //Draw ships
         
