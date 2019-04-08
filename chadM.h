@@ -8,6 +8,7 @@ class EnemyShip : public Ship
 	public :
 		EnemyShip(int x, int y, int movType);
 		~EnemyShip();
+		double getTimeSlice(timespec *bt);
 		float getRadius();
 		void destroyShip();
 		//By JACKSON
@@ -25,6 +26,8 @@ class EnemyShip : public Ship
 		//
 		EnemyShip *nextShip;
 		EnemyShip *prevShip;
+		EnemyStd *eWpn;
+		struct timespec bulletTimer;
 	private :
 		int health;
 		// By Jackson

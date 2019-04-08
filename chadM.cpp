@@ -7,11 +7,14 @@
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <stdio.h>
+#include <cmath>
+#include <ctime>
 #include "core.h"
 #include "chadM.h"
 #include "fonts.h"
 
 extern Global& gl;
+extern double timeDiff(struct timespec *start, struct timespec *end);
 extern EnemyShip *headShip;
 extern EnemyShip *tailShip;
 
@@ -61,6 +64,7 @@ EnemyShip::EnemyShip(int x, int y, int movType)
 	color[0] = color[1] = color[2] = 0.35;
     health = 100;
     movPattern = movType;
+    eWpn = new EnemyStd();
     if (headShip == NULL) {
         headShip = tailShip = this;
         prevShip = nextShip = NULL;
@@ -121,4 +125,10 @@ void renderShip(Ship ship)
 	glVertex2f(20.0, -20.0);
 	glEnd();
 	glPopMatrix();
+}
+
+double EnemyShip::getTimeSlice(timespec *bt)
+{
+    clock_gettime(CLOCK_REALTIME, bt);
+    return timeDiff(&bulletTimer, bt);
 }

@@ -73,6 +73,7 @@ class Ship
 		float color[3];
 		float detRadius;
         int health;
+		timespec bulletTimer;
         wpnType equiped;
         scndType altEquip;
 		Weapon *wpn;
@@ -160,12 +161,13 @@ class Game
 {
     public:
 	Ship ship;
-	Bullet *barr;
+	Bullet *playerBarr;
+	Bullet *enemyBarr;
 	Missile *marr;
-	int nbullets;
+	int nPlayerBullets;
+	int nEnemyBullets;
 	int nmissiles;
 	Flt radius;
-	timespec bulletTimer;
 	timespec missileTimer;
 	timespec thrustTimer;
 	bool thrustOn;
