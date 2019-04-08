@@ -121,7 +121,7 @@ enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
 
 //Function Prototypes
-double getTimeSlice(timespec* bt);
+double getTimeSlice(Ship *ship, timespec* bt);
 float convertToRads(float angle);
 void init_opengl(void);
 void check_mouse(XEvent *e);
@@ -401,12 +401,26 @@ void physics()
     struct timespec bt;
     clock_gettime(CLOCK_REALTIME, &bt);
     int i = 0;
-    while (i < g.nbullets) {
-        Bullet *b = &g.barr[i];
+    while (i < g.nPlayerBullets) {
+        Bullet *b = &g.playerBarr[i];
         if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
                 b->pos[0] > gl.xres + 10 || b->pos[0] < -10.0) {
-            memcpy(&g.barr[i], &g.barr[g.nbullets - 1], sizeof(Bullet));
-            g.nbullets--;
+            memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
+            g.nPlayerBullets--;
+            continue;
+        }
+        b->pos[0] += b->vel[0];
+        b->pos[1] += b->vel[1];
+        i++;
+    }
+
+    i = 0;
+    while (i < g.nEnemyBullets) {
+        Bullet *b = &g.enemyBarr[i];
+        if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
+                b->pos[0] > gl.xres + 10 || b->pos[0] < -10.0) {
+            memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets - 1], sizeof(Bullet));
+            g.nEnemyBullets--;
             continue;
         }
         b->pos[0] += b->vel[0];
@@ -438,7 +452,9 @@ void physics()
             i++;
         }
     }
-    //Collision with bullets?
+    //==================================
+    //     ENEMY COLLISION DETECTION
+    //==================================
     //If collision detected:
     //     1. delete the bullet
     //     2. delete the ship 
@@ -446,8 +462,8 @@ void physics()
     while (e != NULL) {
         //is there a bullet within its radius?
         int i=0;
-        while (i < g.nbullets) {
-            Bullet *b = &g.barr[i];
+        while (i < g.nPlayerBullets) {
+            Bullet *b = &g.playerBarr[i];
             Flt d0 = b->pos[0] - e->pos[0];
             Flt d1 = b->pos[1] - e->pos[1];
             Flt dist = (d0*d0 + d1*d1);
@@ -455,8 +471,8 @@ void physics()
                 //delete the ship
                 e->destroyShip();
                 //delete the bullet
-                memcpy(&g.barr[i], &g.barr[g.nbullets-1], sizeof(Bullet));
-                g.nbullets--;
+                memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets-1], sizeof(Bullet));
+                g.nPlayerBullets--;
             }
 
             i++;
@@ -526,8 +542,15 @@ void physics()
         }
     }
 
-    if (gl.keys[XK_space])
+    if (gl.keys[XK_space]) {
         s->wpn->fire();
+    }
+
+    e = headShip;
+    while (e != NULL) {
+        headShip->eWpn->fire(e, 270);
+        e = e->nextShip;
+    }
 
     if (gl.keys[XK_m])
         s->scnd->fire();
@@ -608,8 +631,22 @@ void render()
             g.ship.scnd->reticle.drawReticle(g.ship.scnd->locked);
 
 
-        for (int i = 0; i < g.nbullets; i++) {
-            Bullet *b = &g.barr[i];
+        for (int i = 0; i < g.nPlayerBullets; i++) {
+            Bullet *b = &g.playerBarr[i];
+            glColor3fv(b->color);
+            glPushMatrix();
+            glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+            glBegin(GL_QUADS);
+            glVertex2f(-5.0, -5.0);
+            glVertex2f(-5.0, 5.0);
+            glVertex2f(5.0, 5.0);
+            glVertex2f(5.0, -5.0);
+            glEnd();
+            glPopMatrix();
+        }
+
+        for (int i = 0; i < g.nEnemyBullets; i++) {
+            Bullet *b = &g.enemyBarr[i];
             glColor3fv(b->color);
             glPushMatrix();
             glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
@@ -713,10 +750,10 @@ void render()
  * @param timespec *bt 	Pointer to a timespec struct
  * @return double ts 	Time slice representing the elapsed time
  */
-double getTimeSlice(timespec *bt)
+double getTimeSlice(Ship *ship, timespec *bt)
 {
     clock_gettime(CLOCK_REALTIME, bt);
-    double ts = timeDiff(&g.bulletTimer, bt);
+    double ts = timeDiff(&ship->bulletTimer, bt);
     return ts;
 }
 

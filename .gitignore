@@ -3,3 +3,7 @@ test.exe
 test*
 .vscode/launch.json
 .vscode/settings.json
+
+*.ipch
+
+*.bin
