@@ -124,6 +124,7 @@ enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 double getTimeSlice(timespec* bt);
 float convertToRads(float angle);
 void init_opengl(void);
+void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void physics();
 void render();
@@ -139,6 +140,7 @@ int main()
 	while (!done) {
 		while (x11.getXPending()) {
 			XEvent e = x11.getXNextEvent();
+			check_mouse(&e);
 			done = check_keys(&e);
 		}
 		clock_gettime(CLOCK_REALTIME, &timeCurrent);
@@ -205,7 +207,18 @@ void normalize2d(Vec v)
     v[0] *= len;
     v[1] *= len;
 }
-
+//CHECK MOUSE
+void check_mouse(XEvent *e) {
+	static int savex = 0;
+	static int savey = 0;
+	//static int lbuttonDown = 0;
+	//static int rbuttonDown = 0;
+	//If mouse moves, save new position.
+	if (savex != e->xbutton.x || savey != e->xbutton.y) {
+			savex = e->xbutton.x;
+			savey = e->xbutton.y;
+	}
+}
 int check_keys(XEvent *e)
 {
     Ship *s = &g.ship;
