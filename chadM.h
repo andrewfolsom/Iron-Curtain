@@ -27,7 +27,6 @@ class EnemyShip : public Ship
 		EnemyShip *nextShip;
 		EnemyShip *prevShip;
 		EnemyStd *eWpn;
-		struct timespec bulletTimer;
 	private :
 		int health;
 		// By Jackson

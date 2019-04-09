@@ -329,11 +329,13 @@ int check_keys(XEvent *e)
                 }
                 break;
             case XK_t:
-                eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
-                eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
-                tailShip->configStrafe(10, 90, 5, 2, -1);
-                eShip = new EnemyShip(200, 900, CIRCLING);
-                tailShip->configCircle(30, 90, 3, 2, -1);
+                if ( gl.gameState == 3) {
+                    eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
+                    eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
+                    tailShip->configStrafe(10, 90, 5, 2, -1);
+                    eShip = new EnemyShip(200, 900, CIRCLING);
+                    tailShip->configCircle(30, 90, 3, 2, -1);
+                }
                 break;
 
         }
@@ -458,11 +460,11 @@ void physics()
     //If collision detected:
     //     1. delete the bullet
     //     2. delete the ship 
-    e = headShip;
-    while (e != NULL) {
+    i = 0;
+    while (i < g.nPlayerBullets) {
         //is there a bullet within its radius?
-        int i=0;
-        while (i < g.nPlayerBullets) {
+        e = headShip;
+        while (e != NULL) {
             Bullet *b = &g.playerBarr[i];
             Flt d0 = b->pos[0] - e->pos[0];
             Flt d1 = b->pos[1] - e->pos[1];
@@ -475,15 +477,42 @@ void physics()
                 g.nPlayerBullets--;
             }
 
-            i++;
+            e = e->nextShip;
             if (headShip == NULL) {
                 break;
             }
         }
-        e = e->nextShip;
+        i++;
     }
 
+    //=================================
+    //  PLAYER COLLISION DETECTION
+    //=================================
     s = &g.ship;
+    i = 0;
+    while(i < g.nEnemyBullets){
+        while (i < g.nEnemyBullets) {
+            Bullet *b = &g.enemyBarr[i];
+            Flt d0 = b->pos[0] - s->pos[0];
+            Flt d1 = b->pos[1] - s->pos[1];
+            Flt dist = (d0*d0 + d1*d1);
+            if (dist < (s->detRadius*s->detRadius)) {
+                //take damage
+                (s->health)--;
+                //delete the bullet
+                memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1], sizeof(Bullet));
+                g.nEnemyBullets--;
+                if (s->health == 0) {
+                    gl.gameState = 0;
+                    s->health = 3;
+                }
+                
+            }
+
+            i++;
+        }
+    }
+    
 
     if (gl.keys[XK_a]) {
         s->pos[0] -= s->vel[0];
@@ -546,6 +575,7 @@ void physics()
         s->wpn->fire();
     }
 
+    i = 0;
     e = headShip;
     while (e != NULL) {
         headShip->eWpn->fire(e, 270);

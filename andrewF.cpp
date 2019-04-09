@@ -462,8 +462,8 @@ void Missile::tracking(float *target, float t)
  */
 EnemyStd::EnemyStd()
 {
-    bulletSpeed = -15.0;
-    fireRate = 0.5;
+    bulletSpeed = -5.0;
+    fireRate = 2.0;
 }
 
 /**
@@ -477,7 +477,6 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
 {
     struct timespec bt;
     double time = getTimeSlice(ship, &bt);
-    printf("%f\n", time);
     if (time > fireRate) {
         timeCopy(&ship->bulletTimer, &bt);
         if (g.nEnemyBullets < MAX_BULLETS) {
