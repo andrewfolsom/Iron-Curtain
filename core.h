@@ -73,7 +73,7 @@ class Ship
 		float color[3];
 		float detRadius;
         int health;
-		timespec bulletTimer;
+		struct timespec bulletTimer;
         wpnType equiped;
         scndType altEquip;
 		Weapon *wpn;

@@ -477,7 +477,6 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
 {
     struct timespec bt;
     double time = getTimeSlice(ship, &bt);
-    printf("%f\n", time);
     if (time > fireRate) {
         timeCopy(&ship->bulletTimer, &bt);
         if (g.nEnemyBullets < MAX_BULLETS) {
