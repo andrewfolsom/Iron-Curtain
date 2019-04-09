@@ -329,11 +329,13 @@ int check_keys(XEvent *e)
                 }
                 break;
             case XK_t:
-                eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
-                eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
-                tailShip->configStrafe(10, 90, 5, 2, -1);
-                eShip = new EnemyShip(200, 900, CIRCLING);
-                tailShip->configCircle(30, 90, 3, 2, -1);
+                if ( gl.gameState == 3) {
+                    eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
+                    eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
+                    tailShip->configStrafe(10, 90, 5, 2, -1);
+                    eShip = new EnemyShip(200, 900, CIRCLING);
+                    tailShip->configCircle(30, 90, 3, 2, -1);
+                }
                 break;
 
         }
@@ -458,10 +460,11 @@ void physics()
     //If collision detected:
     //     1. delete the bullet
     //     2. delete the ship 
-    e = headShip;
-    while (e != NULL) {
+    i = 0;
+    while (i < g.nPlayerBullets) {
         //is there a bullet within its radius?
-        while (i < g.nPlayerBullets) {
+        e = headShip;
+        while (e != NULL) {
             Bullet *b = &g.playerBarr[i];
             Flt d0 = b->pos[0] - e->pos[0];
             Flt d1 = b->pos[1] - e->pos[1];
@@ -474,12 +477,12 @@ void physics()
                 g.nPlayerBullets--;
             }
 
-            i++;
+            e = e->nextShip;
             if (headShip == NULL) {
                 break;
             }
         }
-        e = e->nextShip;
+        i++;
     }
 
     //=================================

@@ -462,8 +462,8 @@ void Missile::tracking(float *target, float t)
  */
 EnemyStd::EnemyStd()
 {
-    bulletSpeed = -15.0;
-    fireRate = 0.5;
+    bulletSpeed = -5.0;
+    fireRate = 2.0;
 }
 
 /**
