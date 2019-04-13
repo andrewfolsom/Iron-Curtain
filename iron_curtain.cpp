@@ -32,6 +32,9 @@ typedef float Flt;
 typedef float Vec[3];
 typedef Flt Matrix[4][4];
 
+//turn on sound
+#define SOUND
+
 //macros
 #define rnd() (((Flt)rand())/(Flt)RAND_MAX)
 #define random(a) (rand()%a)
@@ -74,6 +77,8 @@ extern void displayChad(float x, float y, GLuint texture);
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
 
+//Externs Spencer
+extern void soundTrack();
 extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
 extern void scrollingBackground();
@@ -547,6 +552,9 @@ void physics()
 
 void render()
 {
+    //start soundtrack
+    soundTrack();
+        
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
