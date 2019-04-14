@@ -8,6 +8,10 @@
 #include <math.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif //USE_OPENAL_SOUND
 
 extern Global& gl;
 
@@ -82,4 +86,81 @@ void scrollingBackground()
 
 }
 
+void soundTrack() {
+	
+	#ifdef USE_OPENAL_SOUND
+
+        alutInit(0, NULL);
+        if (alGetError() != AL_NO_ERROR) {
+                printf("ERROR: alutInit()\n");
+                return ;
+        }
+        //Clear error state.
+        alGetError();
+        //
+        //Setup the listener.
+        //Forward and up vectors are used.
+        float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
+        alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+        alListenerfv(AL_ORIENTATION, vec);
+        alListenerf(AL_GAIN, 1.0f);
+        //
+        //Buffer holds the sound information.
+        ALuint alBuffer[2];
+        alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
+       
+        alBuffer[1] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
+       	//
+        //Source refers to the sound.
+        ALuint alSource[2];
+        //Generate a source, and store it in a buffer.
+        alGenSources(2, alSource);
+        alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
+        
+        alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
+	//Set volume and pitch to normal, no looping of sound.
+        alSourcef(alSource[0], AL_GAIN, 1.0f);
+        alSourcef(alSource[0],AL_PITCH, 1.0f);
+
+	  alSourcei(alSource[0], AL_LOOPING, AL_TRUE);
+        if (alGetError() != AL_NO_ERROR) {
+                printf("ERROR: setting source\n");
+                return;
+        }
+
+	 alSourcef(alSource[1], AL_GAIN, 0.5f);
+        alSourcef(alSource[1], AL_PITCH, 1.0f);
+        alSourcei(alSource[1], AL_LOOPING, AL_TRUE);
+        if (alGetError() != AL_NO_ERROR) {
+                printf("ERROR: setting source\n");
+                return ;
+        }
+
+	alSourcePlay(alSource[1]);
+        for (int i=0; i<42; i++) {
+                alSourcePlay(alSource[0]);
+               // usleep(250000);
+        }
+        
+	//////This is the open Al cleanup///////
+	/*
+        //First delete the source.
+        alDeleteSources(1, &alSource);
+        //Delete the buffer.
+        alDeleteBuffers(1, &alBuffer);
+        //Close out OpenAL itself.
+        //Get active context.
+        ALCcontext *Context = alcGetCurrentContext();
+        //Get device for active context.
+        ALCdevice *Device = alcGetContextsDevice(Context);
+        //Disable context.
+        alcMakeContextCurrent(NULL);
+        //Release context(s).
+        alcDestroyContext(Context);
+        //Close device.
+        alcCloseDevice(Device);
+	*/	
+#endif //USE_OPENAL_SOUND
+    
+}
 

@@ -32,9 +32,6 @@ typedef float Flt;
 typedef float Vec[3];
 typedef Flt Matrix[4][4];
 
-//turn on sound
-#define SOUND
-
 //macros
 #define rnd() (((Flt)rand())/(Flt)RAND_MAX)
 #define random(a) (rand()%a)
@@ -78,7 +75,7 @@ extern void displayChad(float x, float y, GLuint texture);
 extern void displayAndrew(float x, float y, GLuint texture);
 
 //Externs Spencer
-//extern void soundTrack();
+extern void soundTrack();
 extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
 extern void scrollingBackground();
@@ -94,6 +91,7 @@ extern void displayErrorScreen();
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
 //-------------------------------------------------------------------------- 
+
 
 Image img[7] = {
     "./img/NICKJA.jpg",
@@ -135,12 +133,14 @@ void physics();
 void render();
 
 int main()
-{
+{	
+
 	init_opengl();
 	srand(time(NULL));
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+ 	soundTrack();	
 
 	while (!done) {
 		while (x11.getXPending()) {
@@ -156,6 +156,7 @@ int main()
 			physics();
 			physicsCountdown -= physicsRate;
 		}
+		
 		render();
 		x11.swapBuffers();
 		x11.clearWindow();
@@ -266,11 +267,13 @@ int check_keys(XEvent *e)
                 break;
             case XK_s:
                 gl.keys[XK_s] = 1;
-                break;
+                
+		break;
 
             case XK_space:
                 gl.keys[XK_space] = 1;
-                break;
+
+		break;
             case XK_Escape:
                 return 1;
 
@@ -531,9 +534,11 @@ void physics()
         }
     }
 
-    if (gl.keys[XK_space])
+    if (gl.keys[XK_space]){
         s->wpn->fire();
+        }
 
+    
     if (gl.keys[XK_m])
         s->scnd->fire();
 
@@ -552,8 +557,7 @@ void physics()
 
 void render()
 {
-
-        
+    
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
@@ -566,7 +570,7 @@ void render()
         glDisable(GL_TEXTURE_2D);
     
     } else if (gl.gameState == 1){ //Menu
-        
+       
         //init regular background
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, gl.ironImage);
@@ -707,6 +711,7 @@ void render()
         displayBenjamin(gl.xres/4, 3*gl.yres/4);
 
         glDisable(GL_TEXTURE_2D);
+	
     } else if (gl.gameState == 6) //Hidden Levels
         displayHiddenWorld();
     else
