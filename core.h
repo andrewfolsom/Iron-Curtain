@@ -79,6 +79,7 @@ class Ship
 		Secondary *scnd;
 		Shield *shield;
 		Ship();
+        ~Ship();
 };
 
 /*

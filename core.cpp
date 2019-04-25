@@ -122,6 +122,12 @@ Ship::Ship() {
 	shield = new Shield;
 }
 
+Ship::~Ship() {
+    delete wpn;
+    delete scnd;
+    delete shield;
+}
+
 /*
  * OpFor Class
  *	Jackson
