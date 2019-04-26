@@ -6,7 +6,7 @@
 #define CORE
 
 #include "andrewF.h"
-
+#include "benjaminG.cpp"
 typedef float Flt;
 typedef float Vec[3];
 
@@ -53,6 +53,7 @@ class Global
 	GLuint errorPage;
 	GLuint startScreen;
 	GLuint loadingScreen;
+	Benjamin ben;
 	static Global& getInstance();
     private:
 	Global();
