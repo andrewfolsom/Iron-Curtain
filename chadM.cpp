@@ -113,11 +113,11 @@ void EnemyShip::destroyShip() {
     Takes a Ship class as input and renders it to screen.
         used for both player ship and all enemy ships.
 */
-void renderShip(Ship ship)
+void renderShip(Ship* ship)
 {
-	glColor3fv(ship.color);
+	glColor3fv(ship->color);
 	glPushMatrix();
-	glTranslatef(ship.pos[0], ship.pos[1], ship.pos[2]);
+	glTranslatef(ship->pos[0], ship->pos[1], ship->pos[2]);
 	glBegin(GL_QUADS);
 	glVertex2f(-20.0f, -20.0f);
 	glVertex2f(-20.0f, 20.0f);
