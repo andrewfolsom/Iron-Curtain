@@ -470,8 +470,8 @@ void physics()
             Flt d1 = b->pos[1] - e->pos[1];
             Flt dist = (d0*d0 + d1*d1);
             if (dist < (e->getRadius()*e->getRadius())) {
-                //delete the ship
-                e->destroyShip();
+                //Take damage from bullet
+                e->takeDamage();
                 //delete the bullet
                 memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets-1], sizeof(Bullet));
                 g.nPlayerBullets--;

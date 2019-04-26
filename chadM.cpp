@@ -62,7 +62,7 @@ EnemyShip::EnemyShip(int x, int y, int movType)
     pos[1] = y;
     pos[2] = 1;
 	color[0] = color[1] = color[2] = 0.35;
-    health = 100;
+    health = 1;
     movPattern = movType;
     eWpn = new EnemyStd();
     if (headShip == NULL) {
@@ -107,6 +107,18 @@ float EnemyShip::getRadius() {
 */
 void EnemyShip::destroyShip() {
     delete this;
+}
+
+/*
+    Decreases ship health by one. If the health reaches zero the ship
+    explodes
+*/
+void EnemyShip::takeDamage() {
+    --health;
+    if (health == 0) {
+        destroyShip();
+    }
+    
 }
 
 /*

@@ -11,6 +11,7 @@ class EnemyShip : public Ship
 		double getTimeSlice(timespec *bt);
 		float getRadius();
 		void destroyShip();
+		void takeDamage();
 		//By JACKSON
 		void updateStrafe();
 		void configStrafe(float radius, float angleSet, float angleSpeed, float speed, int dir);
