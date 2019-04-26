@@ -70,6 +70,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //Externs -- Chad
 extern void renderShip(Ship* ship);
 extern void displayChad(float x, float y, GLuint texture);
+extern void mainLevel(double time);
 
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
@@ -136,6 +137,7 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+    double gameTime = 0.0;
  	soundTrack();	
 
 	while (!done) {
@@ -146,8 +148,10 @@ int main()
 		}
 		clock_gettime(CLOCK_REALTIME, &timeCurrent);
 		timeSpan = timeDiff(&timeStart, &timeCurrent);
+        gameTime += timeSpan;
 		timeCopy(&timeStart, &timeCurrent);
 		physicsCountdown += timeSpan;
+        mainLevel(gameTime);
 		while (physicsCountdown >= physicsRate) {
 			physics();
 			physicsCountdown -= physicsRate;
@@ -333,13 +337,6 @@ int check_keys(XEvent *e)
                 }
                 break;
             case XK_t:
-                if ( gl.gameState == 3) {
-                    eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
-                    eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
-                    tailShip->configStrafe(10, 90, 5, 2, -1);
-                    eShip = new EnemyShip(200, 900, CIRCLING);
-                    tailShip->configCircle(30, 90, 3, 2, -1);
-                }
                 break;
 
         }
@@ -404,6 +401,7 @@ void physics()
         s->scnd->reticle.update();
     }
     
+    //Delete player bullets that are offscreen
     struct timespec bt;
     clock_gettime(CLOCK_REALTIME, &bt);
     int i = 0;
@@ -421,6 +419,7 @@ void physics()
     }
 
     i = 0;
+    //Delete enemy bullets that are off screen
     while (i < g.nEnemyBullets) {
         Bullet *b = &g.enemyBarr[i];
         if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
@@ -475,6 +474,7 @@ void physics()
             Flt dist = (d0*d0 + d1*d1);
             if (dist < (e->getRadius()*e->getRadius())) {
                 //delete the ship
+                g.playerScore += e->getDeathScore();
                 e->destroyShip();
                 //delete the bullet
                 memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets-1], sizeof(Bullet));
@@ -489,6 +489,7 @@ void physics()
         i++;
     }
 
+    #ifndef DEBUG
     //=================================
     //  PLAYER COLLISION DETECTION
     //=================================
@@ -516,6 +517,7 @@ void physics()
             i++;
         }
     }
+    #endif
     
 
     if (gl.keys[XK_a]) {

@@ -162,6 +162,7 @@ Game::Game()
 	nPlayerBullets = nEnemyBullets= 0;
 	nmissiles = 0;
 	clock_gettime(CLOCK_REALTIME, &missileTimer);
+	playerScore = 0;
 }
 
 Game::~Game()

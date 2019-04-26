@@ -172,6 +172,7 @@ class Game
 	timespec missileTimer;
 	timespec thrustTimer;
 	bool thrustOn;
+	int playerScore;
 	//-----------------------------
 	//Jackson
 	opForShip opFor[100];

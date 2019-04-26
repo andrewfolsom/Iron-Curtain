@@ -3,13 +3,15 @@
  * The functions under By Jackson are located in nickJA.cpp since he wrote
  * 	them all and deserves credit
 */
-class EnemyShip : public Ship
-{
+#ifndef CHADM_H
+#define CHADM_H
+class EnemyShip : public Ship {
 	public :
 		EnemyShip(int x, int y, int movType);
 		~EnemyShip();
 		double getTimeSlice(timespec *bt);
 		float getRadius();
+		int getDeathScore();
 		void destroyShip();
 		//By JACKSON
 		void updateStrafe();
@@ -27,6 +29,8 @@ class EnemyShip : public Ship
 		EnemyShip *nextShip;
 		EnemyShip *prevShip;
 		EnemyStd *eWpn;
+	protected :
+		int deathScore;
 	private :
 		int health;
 		// By Jackson
@@ -45,8 +49,8 @@ class EnemyShip : public Ship
 		//
 };
 
-class Grunt : protected EnemyShip
-{
+class Grunt : public EnemyShip {
 	public:
-		Grunt();
+		Grunt(int x, int y, int movType);
 };
+#endif
