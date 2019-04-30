@@ -53,6 +53,7 @@ class Global
 	GLuint errorPage;
 	GLuint startScreen;
 	GLuint loadingScreen;
+    GLuint gameControls;
 	static Global& getInstance();
     private:
 	Global();
@@ -73,6 +74,7 @@ class Ship
 		float color[3];
 		float detRadius;
         int health;
+		struct timespec bulletTimer;
         wpnType equiped;
         scndType altEquip;
 		Weapon *wpn;
@@ -161,15 +163,17 @@ class Game
 {
     public:
 	Ship ship;
-	Bullet *barr;
+	Bullet *playerBarr;
+	Bullet *enemyBarr;
 	Missile *marr;
-	int nbullets;
+	int nPlayerBullets;
+	int nEnemyBullets;
 	int nmissiles;
 	Flt radius;
-	timespec bulletTimer;
 	timespec missileTimer;
 	timespec thrustTimer;
 	bool thrustOn;
+	int playerScore;
 	//-----------------------------
 	//Jackson
 	opForShip opFor[100];

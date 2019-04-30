@@ -125,7 +125,7 @@ class EnemyStd : public Basic
 {
     public:
         EnemyStd();
-        void fire(float angle);
+        void fire(EnemyShip *ship, float angle);
 };
 
 // Upgrade Declarations

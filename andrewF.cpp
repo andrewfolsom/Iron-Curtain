@@ -14,7 +14,7 @@
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
 extern float convertToRads(float angle);
-extern double getTimeSlice(timespec*);
+extern double getTimeSlice(Ship*, timespec*);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 extern Game g;
 extern Image img;
@@ -160,15 +160,15 @@ Basic::Basic()
 void Basic::fire()
 {
     struct timespec bt;
-    if (getTimeSlice(&bt) > fireRate) {
-        timeCopy(&g.bulletTimer, &bt);
-        if (g.nbullets < MAX_BULLETS) {
-            Bullet *b = &g.barr[g.nbullets];
+    if (getTimeSlice(&g.ship, &bt) > fireRate) {
+        timeCopy(&g.ship.bulletTimer, &bt);
+        if (g.nPlayerBullets < MAX_BULLETS) {
+            Bullet *b = &g.playerBarr[g.nPlayerBullets];
             timeCopy(&b->time, &bt);
             setPosition(g.ship.pos, b->pos);
             setVelocity(b->vel);
             setColor(b->color);
-            g.nbullets++;
+            g.nPlayerBullets++;
         }
     }
 }
@@ -218,18 +218,18 @@ void Scatter::fire()
 {
     temp = start;
     struct timespec bt;
-    if (getTimeSlice(&bt) > fireRate) {
-        timeCopy(&g.bulletTimer, &bt);
+    if (getTimeSlice(&g.ship, &bt) > fireRate) {
+        timeCopy(&g.ship.bulletTimer, &bt);
         for (int i = 0; i < shotsFired; i++) {
-            if(g.nbullets < MAX_BULLETS) {
-                Bullet *b = &g.barr[g.nbullets];
+            if(g.nPlayerBullets < MAX_BULLETS) {
+                Bullet *b = &g.playerBarr[g.nPlayerBullets];
                 timeCopy(&b->time, &bt);
                 setPosition(g.ship.pos, b->pos);
                 setVelocity(b->vel);
                 bulletSpread(b->vel);
                 setColor(b->color);
                 temp += increment;
-                g.nbullets++;
+                g.nPlayerBullets++;
             }
         }
     }
@@ -275,11 +275,11 @@ Pinwheel::Pinwheel()
 void Pinwheel::fire()
 {
     struct timespec bt;
-    if (getTimeSlice(&bt) > fireRate) {
-        timeCopy(&g.bulletTimer, &bt);
+    if (getTimeSlice(&g.ship, &bt) > fireRate) {
+        timeCopy(&g.ship.bulletTimer, &bt);
         for (int i = 0; i < shotsFired; i++) {
-            if(g.nbullets < MAX_BULLETS) {
-                Bullet *b = &g.barr[g.nbullets];
+            if(g.nPlayerBullets < MAX_BULLETS) {
+                Bullet *b = &g.playerBarr[g.nPlayerBullets];
                 timeCopy(&b->time, &bt);
                 setPosition(g.ship.pos, b->pos);
                 b->vel[0] = b->vel[1] = bulletSpeed;
@@ -287,7 +287,7 @@ void Pinwheel::fire()
                 b->vel[1] *= sin(convertToRads(spread));
                 setColor(b->color);
                 spread += 90.0;
-                g.nbullets++;
+                g.nPlayerBullets++;
             }
         }
     }
@@ -419,7 +419,7 @@ void Secondary::setVelocity(float *vel)
 void Secondary::fire()
 {
     struct timespec bt;
-    if (getTimeSlice(&bt) > fireRate) {
+    if (getTimeSlice(&g.ship, &bt) > fireRate) {
         timeCopy(&g.missileTimer, &bt);
         if (g.nmissiles < MAX_MISSILES) {
             Missile *m = &g.marr[g.nmissiles];
@@ -466,7 +466,8 @@ void Missile::tracking(float *target, float t)
  */
 EnemyStd::EnemyStd()
 {
-    bulletSpeed = -15.0;
+    bulletSpeed = -5.0;
+    fireRate = 2.0;
 }
 
 /**
@@ -476,20 +477,21 @@ EnemyStd::EnemyStd()
  * movement.
  * @param float angle   Angle determining weapon's firing direction
  */
-void EnemyStd::fire(float angle)
+void EnemyStd::fire(EnemyShip *ship, float angle)
 {
     struct timespec bt;
-    if (getTimeSlice(&bt) > fireRate) {
-        timeCopy(&g.bulletTimer, &bt);
-        if (g.nbullets < MAX_BULLETS) {
-            Bullet *b = &g.barr[g.nbullets];
+    double time = getTimeSlice(ship, &bt);
+    if (time > fireRate) {
+        timeCopy(&ship->bulletTimer, &bt);
+        if (g.nEnemyBullets < MAX_BULLETS) {
+            Bullet *b = &g.enemyBarr[g.nEnemyBullets];
             timeCopy(&b->time, &bt);
-            setPosition(g.ship.pos, b->pos);
+            setPosition(ship->pos, b->pos);
             setVelocity(b->vel);
-            b->vel[0] *= cos(convertToRads(angle));
-            b->vel[1] *= sin(convertToRads(angle));
+            // b->vel[0] *= cos(convertToRads(angle));
+            // b->vel[1] *= sin(convertToRads(angle));
             setColor(b->color);
-            g.nbullets++;
+            g.nEnemyBullets++;
         }
     }
 }

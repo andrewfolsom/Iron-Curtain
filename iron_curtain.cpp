@@ -70,6 +70,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //Externs -- Chad
 extern void renderShip(Ship* ship);
 extern void displayChad(float x, float y, GLuint texture);
+extern void mainLevel(double time);
 
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
@@ -78,6 +79,7 @@ extern void displayAndrew(float x, float y, GLuint texture);
 extern void soundTrack();
 extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
+extern void displayGameControls();
 extern void scrollingBackground();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
@@ -93,7 +95,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //-------------------------------------------------------------------------- 
 
 
-Image img[7] = {
+Image img[8] = {
     "./img/NICKJA.jpg",
     "./img/andrewimg.png",
     "./img/spencerA.jpg",
@@ -101,6 +103,7 @@ Image img[7] = {
     "./img/BGarza.jpg",
     "./img/ironImage.jpg",
     "./img/verticalBackground.jpg",
+    "./img/gameControls.jpg",
 };
 
 Hud hud;
@@ -122,7 +125,7 @@ enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
 
 //Function Prototypes
-double getTimeSlice(timespec* bt);
+double getTimeSlice(Ship *ship, timespec* bt);
 float convertToRads(float angle);
 void init_opengl(void);
 void check_mouse(XEvent *e);
@@ -138,6 +141,7 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+    double gameTime = 0.0;
  	soundTrack();	
 
 	while (!done) {
@@ -148,8 +152,10 @@ int main()
 		}
 		clock_gettime(CLOCK_REALTIME, &timeCurrent);
 		timeSpan = timeDiff(&timeStart, &timeCurrent);
+        gameTime += timeSpan;
 		timeCopy(&timeStart, &timeCurrent);
 		physicsCountdown += timeSpan;
+        mainLevel(gameTime);
 		while (physicsCountdown >= physicsRate) {
 			physics();
 			physicsCountdown -= physicsRate;
@@ -182,6 +188,7 @@ void init_opengl(void)
     glGenTextures(1, &gl.chadImage);
     glGenTextures(1, &gl.benImg);
 
+    glBindTexture(GL_TEXTURE_2D, gl.gameControls);
     glBindTexture(GL_TEXTURE_2D, gl.ironImage);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -250,7 +257,9 @@ int check_keys(XEvent *e)
 	    case XK_j:
                 gl.gameState = 6;
                 break;
-            
+        case XK_z:
+                gl.gameState = 7;
+                break;
             //Movements and Gameplay
             case XK_a:
                 //moveLeft();
@@ -335,11 +344,6 @@ int check_keys(XEvent *e)
                 }
                 break;
             case XK_t:
-                eShip = new EnemyShip(gl.xres / 3, 900, RUSH);
-                eShip = new EnemyShip(gl.xres / 2, 900, STRAFE);
-                tailShip->configStrafe(10, 90, 5, 2, -1);
-                eShip = new EnemyShip(200, 900, CIRCLING);
-                tailShip->configCircle(30, 90, 3, 2, -1);
                 break;
 
         }
@@ -404,15 +408,31 @@ void physics()
         s->scnd->reticle.update();
     }
     
+    //Delete player bullets that are offscreen
     struct timespec bt;
     clock_gettime(CLOCK_REALTIME, &bt);
     int i = 0;
-    while (i < g.nbullets) {
-        Bullet *b = &g.barr[i];
+    while (i < g.nPlayerBullets) {
+        Bullet *b = &g.playerBarr[i];
         if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
                 b->pos[0] > gl.xres + 10 || b->pos[0] < -10.0) {
-            memcpy(&g.barr[i], &g.barr[g.nbullets - 1], sizeof(Bullet));
-            g.nbullets--;
+            memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
+            g.nPlayerBullets--;
+            continue;
+        }
+        b->pos[0] += b->vel[0];
+        b->pos[1] += b->vel[1];
+        i++;
+    }
+
+    i = 0;
+    //Delete enemy bullets that are off screen
+    while (i < g.nEnemyBullets) {
+        Bullet *b = &g.enemyBarr[i];
+        if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
+                b->pos[0] > gl.xres + 10 || b->pos[0] < -10.0) {
+            memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets - 1], sizeof(Bullet));
+            g.nEnemyBullets--;
             continue;
         }
         b->pos[0] += b->vel[0];
@@ -444,36 +464,68 @@ void physics()
             i++;
         }
     }
-    //Collision with bullets?
+    //==================================
+    //     ENEMY COLLISION DETECTION
+    //==================================
     //If collision detected:
     //     1. delete the bullet
     //     2. delete the ship 
-    e = headShip;
-    while (e != NULL) {
+    i = 0;
+    while (i < g.nPlayerBullets) {
         //is there a bullet within its radius?
-        int i=0;
-        while (i < g.nbullets) {
-            Bullet *b = &g.barr[i];
+        e = headShip;
+        while (e != NULL) {
+            Bullet *b = &g.playerBarr[i];
             Flt d0 = b->pos[0] - e->pos[0];
             Flt d1 = b->pos[1] - e->pos[1];
             Flt dist = (d0*d0 + d1*d1);
             if (dist < (e->getRadius()*e->getRadius())) {
                 //delete the ship
+                g.playerScore += e->getDeathScore();
                 e->destroyShip();
                 //delete the bullet
-                memcpy(&g.barr[i], &g.barr[g.nbullets-1], sizeof(Bullet));
-                g.nbullets--;
+                memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets-1], sizeof(Bullet));
+                g.nPlayerBullets--;
             }
 
-            i++;
+            e = e->nextShip;
             if (headShip == NULL) {
                 break;
             }
         }
-        e = e->nextShip;
+        i++;
     }
 
+    #ifndef DEBUG
+    //=================================
+    //  PLAYER COLLISION DETECTION
+    //=================================
     s = &g.ship;
+    i = 0;
+    while(i < g.nEnemyBullets){
+        while (i < g.nEnemyBullets) {
+            Bullet *b = &g.enemyBarr[i];
+            Flt d0 = b->pos[0] - s->pos[0];
+            Flt d1 = b->pos[1] - s->pos[1];
+            Flt dist = (d0*d0 + d1*d1);
+            if (dist < (s->detRadius*s->detRadius)) {
+                //take damage
+                (s->health)--;
+                //delete the bullet
+                memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1], sizeof(Bullet));
+                g.nEnemyBullets--;
+                if (s->health == 0) {
+                    gl.gameState = 0;
+                    s->health = 3;
+                }
+                
+            }
+
+            i++;
+        }
+    }
+    #endif
+    
 
     if (gl.keys[XK_a]) {
         s->pos[0] -= s->vel[0];
@@ -532,9 +584,16 @@ void physics()
         }
     }
 
-    if (gl.keys[XK_space]){
+    if (gl.keys[XK_space]) {
         s->wpn->fire();
-        }
+    }
+
+    i = 0;
+    e = headShip;
+    while (e != NULL) {
+        headShip->eWpn->fire(e, 270);
+        e = e->nextShip;
+    }
 
     
     if (gl.keys[XK_m])
@@ -548,8 +607,8 @@ void physics()
             g.thrustOn = false;
     }
     //scrolling physics
-    gl.tex.xc[0] -=0.0006;
-    gl.tex.xc[1] -=0.0006;
+    gl.tex.xc[0] -=0.0005;
+    gl.tex.xc[1] -=0.0005;
     return;
 }
 
@@ -559,10 +618,10 @@ void render()
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
     
         displayStartScreen();
         glDisable(GL_TEXTURE_2D);
@@ -571,10 +630,10 @@ void render()
        
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
     
         displayMenu();
         glDisable(GL_TEXTURE_2D);
@@ -621,8 +680,22 @@ void render()
             s->scnd->reticle.drawReticle(s->scnd->locked);
 
 
-        for (int i = 0; i < g.nbullets; i++) {
-            Bullet *b = &g.barr[i];
+        for (int i = 0; i < g.nPlayerBullets; i++) {
+            Bullet *b = &g.playerBarr[i];
+            glColor3fv(b->color);
+            glPushMatrix();
+            glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+            glBegin(GL_QUADS);
+            glVertex2f(-5.0, -5.0);
+            glVertex2f(-5.0, 5.0);
+            glVertex2f(5.0, 5.0);
+            glVertex2f(5.0, -5.0);
+            glEnd();
+            glPopMatrix();
+        }
+
+        for (int i = 0; i < g.nEnemyBullets; i++) {
+            Bullet *b = &g.enemyBarr[i];
             glColor3fv(b->color);
             glPushMatrix();
             glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
@@ -714,8 +787,20 @@ void render()
 
         glDisable(GL_TEXTURE_2D);
 	
-    } else if (gl.gameState == 6) //Hidden Levels
+    } else if (gl.gameState == 6) {
         displayHiddenWorld();
+    } else if (gl.gameState == 7){
+        
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+    
+        
+        displayGameControls();
+        glDisable(GL_TEXTURE_2D);
+    }
     else
         displayErrorScreen(); //Error Screen
 }
@@ -727,10 +812,10 @@ void render()
  * @param timespec *bt 	Pointer to a timespec struct
  * @return double ts 	Time slice representing the elapsed time
  */
-double getTimeSlice(timespec *bt)
+double getTimeSlice(Ship *ship, timespec *bt)
 {
     clock_gettime(CLOCK_REALTIME, bt);
-    double ts = timeDiff(&g.bulletTimer, bt);
+    double ts = timeDiff(&ship->bulletTimer, bt);
     return ts;
 }
 

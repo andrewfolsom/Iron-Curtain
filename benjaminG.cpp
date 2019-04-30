@@ -83,7 +83,7 @@ void displayMenu() {
     ggprint16(&r, 16,c, " ");
     ggprint16(&r, 16,c, "G - Play Game");
     ggprint16(&r, 16,c, " ");
-    ggprint16(&r, 16,c, "O - Options");
+    ggprint16(&r, 16,c, "Z  - Game Controls");
     ggprint16(&r, 16,c, " ");
     ggprint16(&r, 16,c, "C - Credits Screen");
 

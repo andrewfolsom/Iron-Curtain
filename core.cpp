@@ -115,6 +115,7 @@ Ship::Ship() {
 	color[0] = color[1] = color[2] = 1.0;
 	detRadius = 25.0;
     health = 3;
+	clock_gettime(CLOCK_REALTIME, &bulletTimer);
     equiped = basic;
     altEquip = missile;
 	wpn = new Basic;
@@ -155,17 +156,18 @@ Bullet::Bullet() { }
 Game::Game()
 {
 	thrustOn = false;
-	barr = new Bullet[MAX_BULLETS];
+	playerBarr = new Bullet[MAX_BULLETS];
+	enemyBarr = new Bullet[MAX_BULLETS];
 	marr = new Missile[MAX_MISSILES];
-	nbullets = 0;
+	nPlayerBullets = nEnemyBullets= 0;
 	nmissiles = 0;
-	clock_gettime(CLOCK_REALTIME, &bulletTimer);
 	clock_gettime(CLOCK_REALTIME, &missileTimer);
+	playerScore = 0;
 }
 
 Game::~Game()
 {
-	delete [] barr;
+	delete [] playerBarr;
 	delete [] marr;
 }
 
