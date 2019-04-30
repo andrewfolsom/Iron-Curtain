@@ -39,7 +39,11 @@ Image hudWeapon[3] = {
 
 Image hudSecond("./img/missile.png");
 
+Image hudScore("./img/scoreboard.png");
+
 Image hudDisplay("./img/weaponDisplay.png");
+
+Image upgradePod("./img/upgrade.png");
 
 /**
  * Displays my picture and name
@@ -493,11 +497,38 @@ void EnemyStd::fire(float angle)
 /**
  * Upgrade class constructor
  */
-Upgrade::Upgrade()
-{
-    bulletSpeed = 5.0;
-    color[0] = color[1] = color[2] = 1.0;
+Upgrade::Upgrade() {
+	dropSpeed = 5.0;
+	w = 50.0;
+	h = 50.0;
+	cycle = 0;
+	glGenTextures(1, &pod);
 }
+
+void Upgrade::drawUpgrade() {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, pod);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *transData = buildAlphaData(&upgradePod);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, upgradePod.width, upgradePod.height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(450.0, 500.0, 1.0);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(w,-h);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(w, h);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, h);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-w, -h);
+    glEnd();
+    glPopMatrix();
+}
+
+//Upgrade::setPayload(int p) { }
 
 Shield::Shield()
 {
@@ -533,7 +564,6 @@ void Shield::drawShield(float *pos)
 	}
 }
 
-
 //===========================================================
 //				DEFINITION OF THE USER INTERFACE 
 //===========================================================
@@ -550,6 +580,7 @@ void Hud::genTextures()
         glGenTextures(1, &weapon[i]);
     }
     glGenTextures(1, &secondary);
+	glGenTextures(1, &score);
     glGenTextures(1, &display);
 }
 
@@ -603,8 +634,8 @@ void Hud::drawHud(int l, int w, int s)
 	glDisable(GL_TEXTURE_2D);
     glDisable(GL_TEXTURE_2D);
 
-    resX = 12.0f;
-    resY = 12.0f;
+    resX = 10.0f;
+    resY = 10.0f;
     glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0,255.0,255.0,255.0);
 	glBindTexture(GL_TEXTURE_2D, secondary);
@@ -627,6 +658,29 @@ void Hud::drawHud(int l, int w, int s)
     glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 
+    resX = 135.0f;
+    resY = 45.0f;
+    glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0,255.0,255.0,255.0);
+	glBindTexture(GL_TEXTURE_2D, score);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	transData = buildAlphaData(&hudScore);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudScore.width, hudScore.height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, transData);
+	free(transData);
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+    glTranslatef(175.0f, 925.0f, 1.0f);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
+    glEnd();
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
     resX = 50.0f;
     resY = 50.0f;
@@ -650,5 +704,23 @@ void Hud::drawHud(int l, int w, int s)
         glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
     glEnd();
     glPopMatrix();
-	glDisable(GL_TEXTURE_2D);    
+	glDisable(GL_TEXTURE_2D);
+
+	int score, num, place, space;
+	GLvoid* font = GLUT_BITMAP_HELVETICA_18;
+	score = s;
+	num = 0;
+	space = 18;
+	place = 0;
+
+	while (score > 9) {
+		num = score % 10;
+		glRasterPos3f(210 - (place*space_char), 925.0, 1.0);
+		glutBitmapCharacter(font, 48+num);
+		place++;
+		score /= 10;
+	}
+	glRasterPos3f(210 - (place*space_char), 925.0, 1.0);
+	glutBitmapCharacter(font, 48+score);
+
 }

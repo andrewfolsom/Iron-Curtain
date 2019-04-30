@@ -130,9 +130,18 @@ class EnemyStd : public Basic
 
 // Upgrade Declarations
 
-class Upgrade : public Basic {
+class Upgrade {
+	public:
+		GLuint pod;
+		float dropSpeed;
+		float w, h;
+		float pos[3];
+		int payload;
+		int cycle;
     public:
         Upgrade();
+		void drawUpgrade();
+		//void setPayload(int p);
 };
 
 class Shield
@@ -155,6 +164,7 @@ class Hud
 		GLuint life[4];
         GLuint weapon[3];
         GLuint display;
+		GLuint score;
         GLuint secondary;
 	public:
 		Hud();

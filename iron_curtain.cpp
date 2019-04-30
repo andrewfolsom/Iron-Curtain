@@ -105,6 +105,8 @@ Image img[7] = {
 
 Hud hud;
 
+Upgrade up;
+
 Global& gl = Global::getInstance();
 
 Game g;
@@ -596,6 +598,9 @@ void render()
 
         scrollingBackground();
         glDisable(GL_TEXTURE_2D);
+
+		//Draw Upgrade
+		up.drawUpgrade();
 
 		//Draw HUD
 		hud.drawHud(s->health, s->equiped, s->altEquip);
