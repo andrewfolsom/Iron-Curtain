@@ -53,6 +53,7 @@ class Global
 	GLuint errorPage;
 	GLuint startScreen;
 	GLuint loadingScreen;
+    GLuint gameControls;
 	static Global& getInstance();
     private:
 	Global();

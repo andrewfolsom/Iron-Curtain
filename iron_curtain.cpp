@@ -79,6 +79,7 @@ extern void displayAndrew(float x, float y, GLuint texture);
 extern void soundTrack();
 extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
+extern void displayGameControls();
 extern void scrollingBackground();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
@@ -94,7 +95,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //-------------------------------------------------------------------------- 
 
 
-Image img[7] = {
+Image img[8] = {
     "./img/NICKJA.jpg",
     "./img/andrewimg.png",
     "./img/spencerA.jpg",
@@ -102,6 +103,7 @@ Image img[7] = {
     "./img/BGarza.jpg",
     "./img/ironImage.jpg",
     "./img/verticalBackground.jpg",
+    "./img/gameControls.jpg",
 };
 
 Hud hud;
@@ -184,6 +186,7 @@ void init_opengl(void)
     glGenTextures(1, &gl.chadImage);
     glGenTextures(1, &gl.benImg);
 
+    glBindTexture(GL_TEXTURE_2D, gl.gameControls);
     glBindTexture(GL_TEXTURE_2D, gl.ironImage);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -252,7 +255,9 @@ int check_keys(XEvent *e)
 	    case XK_j:
                 gl.gameState = 6;
                 break;
-            
+        case XK_z:
+                gl.gameState = 7;
+                break;
             //Movements and Gameplay
             case XK_a:
                 //moveLeft();
@@ -777,8 +782,20 @@ void render()
 
         glDisable(GL_TEXTURE_2D);
 	
-    } else if (gl.gameState == 6) //Hidden Levels
+    } else if (gl.gameState == 6) {
         displayHiddenWorld();
+    } else if (gl.gameState == 7){
+        
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+    
+        
+        displayGameControls();
+        glDisable(GL_TEXTURE_2D);
+    }
     else
         displayErrorScreen(); //Error Screen
 }
