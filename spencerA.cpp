@@ -80,12 +80,12 @@ void displayGameControls()
     glColor3f(1.0,1.0,1.0);
 
     glBindTexture(GL_TEXTURE_2D, gl.gameControls);
-    glBegin(GL_QUADS);
+    /*glBegin(GL_QUADS);
          glTexCoord2f(0.0f,1.0f);glVertex2i(0,0);
          glTexCoord2f(0.0f,0.0f); glVertex2i(0,gl.yres);
          glTexCoord2f(1.0f,0.0f); glVertex2i(gl.xres,gl.yres);
          glTexCoord2f(1.0f,1.0f); glVertex2i(gl.xres,0);
-
+*/
 	glEnd();
 
     Rect r;
@@ -96,11 +96,19 @@ void displayGameControls()
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c, "C - Credits Screen");
     ggprint16(&r, 16,c," ");
-    ggprint16(&r, 16,c,"G/g - Return to Main Screen");
+    ggprint16(&r, 16,c,"G/g - Play Game");
     ggprint16(&r, 16,c," ");
-    ggprint16(&r, 16,c,"P - Play Game");
-    ggprint16(&r, 16,c," ");
-    ggprint16(&r, 16,c, "Z - Game Controls");
+    ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
+
+    Rect r2;
+    unsigned int d = 0x00ffff44;
+    r2.bot = gl.yres-500;
+    r2.left = 400;
+    r2.center = 0;
+    
+    ggprint16(&r2, 16,d,"Test ");
+
+    
 }
 void scrollingBackground()
 {
