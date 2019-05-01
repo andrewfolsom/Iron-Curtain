@@ -186,14 +186,12 @@ void EnemyShip::configBank(float x, float y, float speed)
 }
 
 //5 - Diagonal Rush
-//Enemy will follow a diagonal line from its spawn to the bottom of the screen.
+//Enemy will follow a line following the angle from its current point to the specified point.
 //EnemyShip Compatible
 void EnemyShip::updateDiagRush()
 {
-	pos[1] += (speedMul * sin((3*PI/2) - angle));
-	pos[0] += (speedMul * cos((3*PI/2) - angle));
-
-	printf("Angle is %f, x is %f, y is %f\n", angle, pos[0], pos[1]);
+	pos[1] += (speedMul * sin(angle));
+	pos[0] += (speedMul * cos(angle));
 }
 
 
@@ -203,7 +201,12 @@ void EnemyShip::configDiagRush(float x, float y, float speed)
 
 	spawnPos[0] = pos[0];
 	spawnPos[1] = pos[1];
-	angle = atan((x-spawnPos[0]) / (y-spawnPos[1]));
+	angle = atan((y-pos[1]) / (x-pos[0]));
+	if (x - pos[0] > 0) 
+	angle = angle;
+	else
+	angle = PI + angle;
+
 	speedMul = speed;
 }
 
