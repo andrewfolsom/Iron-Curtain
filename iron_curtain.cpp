@@ -87,6 +87,7 @@ extern void displayLoadingScreen();
 extern void displayPauseMenu();
 extern void displayHiddenWorld();
 extern void displayErrorScreen();
+extern void serverConnect(const int scores);
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);

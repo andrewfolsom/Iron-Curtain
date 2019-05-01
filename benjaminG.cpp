@@ -185,102 +185,95 @@ void displayErrorScreen() {
 }
 
 
-class Leaderboard {
-    public:
-        int sendCall(const char[3] intials, const int score) {
-            return serverConnect(intials, score);
-        }
-    private:
-        const int MAX_READ_ERRORS = 100;
-        const string USERAGENT = "CMPS-3350";
-        int serverConnect(const char[3] intials, const int score) {
-            BIO *ssl_setup_bio(void);
-            void show_cert_data(SSL *ssl, BIO *outbio, const char *hostname);
-            void set_non_blocking(const int sock);
-            int sd;
-            struct hostent *host;
-            struct sockaddr_in addr;
-            BIO *outbio = NULL;
-            SSL_CTX *ctx;
-            SSL *ssl;
-            char req[1000];
-            int req_len;
-            char hostname[256] = "odin.cs.csub.edu";
-            char pagename[256];  
-            sprintf(pagename,"/~saustin/public_html/3350/highScores.php?param=%c%c%c?param=%d",
-                                 initials[0], intials[1], intials[2], score);
-            int port = 443;
-            int bytes, nreads, nerrs;
-            char buf[256];
-            int ret;
-            //Setup the SSL BIO
-            outbio = ssl_setup_bio();
-            //Initialize the SSL library
-            if (SSL_library_init() < 0)
-                BIO_printf(outbio, "Could not initialize the OpenSSL library !\n");
-            //Const added to match const assigned to const
-            const SSL_METHOD *method = SSLv23_client_method();
-            ctx = SSL_CTX_new(method);
-            SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
-            //next 2 lines of code are not currently needed.
-            //SSL_MODE_AUTO_RETRY flag of the SSL_CTX_set_mode call.
-            //SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+const int MAX_READ_ERRORS = 100;
+const string USERAGENT = "CMPS-3350";
+int serverConnect(const int score) {
+    BIO *ssl_setup_bio(void);
+    void show_cert_data(SSL *ssl, BIO *outbio, const char *hostname);
+    void set_non_blocking(const int sock);
+    int sd;
+    struct hostent *host;
+    struct sockaddr_in addr;
+    BIO *outbio = NULL;
+    SSL_CTX *ctx;
+    SSL *ssl;
+    char req[1000];
+    int req_len;
+    char hostname[256] = "odin.cs.csub.edu";
+    char pagename[256];  
+    sprintf(pagename,"/~saustin/public_html/3350/highScores.php?param=%d",
+	    score);
+    int port = 443;
+    int bytes, nreads, nerrs;
+    char buf[256];
+    int ret;
+    //Setup the SSL BIO
+    outbio = ssl_setup_bio();
+    //Initialize the SSL library
+    if (SSL_library_init() < 0)
+	BIO_printf(outbio, "Could not initialize the OpenSSL library !\n");
+    //Const added to match const assigned to const
+    const SSL_METHOD *method = SSLv23_client_method();
+    ctx = SSL_CTX_new(method);
+    SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
+    //next 2 lines of code are not currently needed.
+    //SSL_MODE_AUTO_RETRY flag of the SSL_CTX_set_mode call.
+    //SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
 
-            //Setup the socket used for connection.
-            host = gethostbyname(hostname);
-            sd = socket(AF_INET, SOCK_STREAM, 0);
-            memset(&addr, 0, sizeof(addr));
-            addr.sin_family = AF_INET;
-            addr.sin_port = htons(port);
-            addr.sin_addr.s_addr = *(long*)(host->h_addr);
-            if (connect(sd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-                BIO_printf(outbio, "%s: Cannot connect to host %s [%s] on port %d.\n",
-                        argv[0], hostname, inet_ntoa(addr.sin_addr), port);
-            }
+    //Setup the socket used for connection.
+    host = gethostbyname(hostname);
+    sd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = *(long*)(host->h_addr);
+    if (connect(sd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+	BIO_printf(outbio, "%s: Cannot connect to host %s [%s] on port %d.\n",
+		argv[0], hostname, inet_ntoa(addr.sin_addr), port);
+    }
 
-            //Connect using the SSL certificate.
-            ssl = SSL_new(ctx);
-            SSL_set_fd(ssl, sd);
-            SSL_connect(ssl);
+    //Connect using the SSL certificate.
+    ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, sd);
+    SSL_connect(ssl);
 
-            //Send the http request to the host server.
-            sprintf(req, "GET /%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: %s\r\n\r\n",
-                    pagename, hostname, USERAGENT);
-            req_len = strlen(req);
-            ret = SSL_write(ssl, req, req_len);
+    //Send the http request to the host server.
+    sprintf(req, "GET /%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: %s\r\n\r\n",
+	    pagename, hostname, USERAGENT);
+    req_len = strlen(req);
+    ret = SSL_write(ssl, req, req_len);
 
-            //Correction: two statments were were separated into two lines and bracketed
-            if (ret <= 0) {
-                fprintf(stderr, "ERROR: SSL_write\n");
-                fflush(stderr);
-            }
+    //Correction: two statments were were separated into two lines and bracketed
+    if (ret <= 0) {
+	fprintf(stderr, "ERROR: SSL_write\n");
+	fflush(stderr);
+    }
 
-            //Get data returned from the server.
-            //First, do priming read.
-            //We can take this approach because our socket is non-blocking.
-            //Start with an error condition.
-            bytes = -1;
-            memset(buf, '\0', sizeof(buf));
-            while (bytes <= 0) {
-                bytes = SSL_read(ssl, buf, sizeof(buf));
-                //A slight pause can cause fewer reads to be needed.
-                usleep(10000);
-            }
-            return 0;
-        }
+    //Get data returned from the server.
+    //First, do priming read.
+    //We can take this approach because our socket is non-blocking.
+    //Start with an error condition.
+    bytes = -1;
+    memset(buf, '\0', sizeof(buf));
+    while (bytes <= 0) {
+	bytes = SSL_read(ssl, buf, sizeof(buf));
+	//A slight pause can cause fewer reads to be needed.
+	usleep(10000);
+    }
+    return 0;
+}
 
-        void set_non_blocking(const int sock) {
-            //Set a socket to be non-blocking.
-            int opts;
-            opts = fcntl(sock, F_GETFL);
-            if (opts < 0) {
-                perror("ERROR: fcntl(F_GETFL)");
-                exit(EXIT_FAILURE);
-            }
-            opts = (opts | O_NONBLOCK);
-            if (fcntl(sock, F_SETFL, opts) < 0) {
-                perror("ERROR: fcntl(O_NONBLOCK)");
-                exit(EXIT_FAILURE);
-            }
-        }
+void set_non_blocking(const int sock) {
+    //Set a socket to be non-blocking.
+    int opts;
+    opts = fcntl(sock, F_GETFL);
+    if (opts < 0) {
+	perror("ERROR: fcntl(F_GETFL)");
+	exit(EXIT_FAILURE);
+    }
+    opts = (opts | O_NONBLOCK);
+    if (fcntl(sock, F_SETFL, opts) < 0) {
+	perror("ERROR: fcntl(O_NONBLOCK)");
+	exit(EXIT_FAILURE);
+    }
 }
