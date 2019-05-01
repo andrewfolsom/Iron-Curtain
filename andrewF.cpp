@@ -143,7 +143,7 @@ void Weapon::setColor(float *c)
  */
 Basic::Basic()
 {
-    fireRate = 0.5;
+    fireRate = 0.25;
     bulletSpeed = 15.0;
     color[0] = 1.0;
     color[1] = 0.0;
@@ -174,7 +174,7 @@ void Basic::fire()
  */
 Rapid::Rapid()
 {
-    fireRate = 0.25;
+    fireRate = 0.125;
 }
 
 /**
