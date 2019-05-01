@@ -175,7 +175,7 @@ void mainLevel(double gameTime) {
             xSpawn = getRandSpawn();
         }
         if (gameTime > 30.0 && gameTime < 100.0) {
-            eShip = new EnemyShip(xSpawn, ySpawn, STRAFE);
+            eShip = new Grunt(xSpawn, ySpawn, STRAFE);
             tailShip->configStrafe(20, 90, 3, 2, -1);
             // eShip = new EnemyShip(600, 1050, RUSH);            
         }
