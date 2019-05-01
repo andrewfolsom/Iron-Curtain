@@ -47,7 +47,7 @@ void displayStartScreen()
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
 
-    glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+    glBindTexture(GL_TEXTURE_2D, gl.gameControls);
     glBegin(GL_QUADS);
          glTexCoord2f(0.0f,1.0f);glVertex2i(0,0);
          glTexCoord2f(0.0f,0.0f); glVertex2i(0,gl.yres);
@@ -79,13 +79,13 @@ void displayGameControls()
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
 
-    glBindTexture(GL_TEXTURE_2D, gl.gameControls);
-    /*glBegin(GL_QUADS);
+    glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+    glBegin(GL_QUADS);
          glTexCoord2f(0.0f,1.0f);glVertex2i(0,0);
          glTexCoord2f(0.0f,0.0f); glVertex2i(0,gl.yres);
          glTexCoord2f(1.0f,0.0f); glVertex2i(gl.xres,gl.yres);
          glTexCoord2f(1.0f,1.0f); glVertex2i(gl.xres,0);
-*/
+
 	glEnd();
 
     Rect r;
@@ -102,11 +102,37 @@ void displayGameControls()
 
     Rect r2;
     unsigned int d = 0x00ffff44;
-    r2.bot = gl.yres-500;
-    r2.left = 400;
+    r2.bot = gl.yres-150;
+    r2.left = 10;
     r2.center = 0;
     
-    ggprint16(&r2, 16,d,"Test ");
+        
+    ggprint16(&r2, 16,d,"****** Game Controls****** ");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"A/a ------ Move left");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"D/d ------ Move right");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"W/w ------ Move up");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"X/x ------ Move down");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"Spacebar ------ Shoot");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"M/m -------- Lock On Target");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"B/b ----------- Shield");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"1 ----------- Basic Weapon");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"2 ----------- Rapid Fire");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"3 ----------- Scatter Fire");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"4 ----------- Ring Spatial Fire");
+    ggprint16(&r2, 16,d," ");
+    ggprint16(&r2, 16,d,"5 ----------- Pinwhell Fire");
+
 
     
 }
@@ -136,30 +162,26 @@ void soundTrack() {
                 printf("ERROR: alutInit()\n");
                 return ;
         }
-        //Clear error state.
+
         alGetError();
-        //
-        //Setup the listener.
-        //Forward and up vectors are used.
+
         float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
         alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
         alListenerfv(AL_ORIENTATION, vec);
         alListenerf(AL_GAIN, 1.0f);
-        //
-        //Buffer holds the sound information.
+
         ALuint alBuffer[2];
         alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
        
         alBuffer[1] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
-       	//
-        //Source refers to the sound.
+
         ALuint alSource[2];
-        //Generate a source, and store it in a buffer.
+
         alGenSources(2, alSource);
         alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
         
         alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
-	//Set volume and pitch to normal, no looping of sound.
+        
         alSourcef(alSource[0], AL_GAIN, 1.0f);
         alSourcef(alSource[0],AL_PITCH, 1.0f);
 
@@ -182,25 +204,7 @@ void soundTrack() {
                 alSourcePlay(alSource[0]);
                // usleep(250000);
         }
-        
-	//////This is the open Al cleanup///////
-	/*
-        //First delete the source.
-        alDeleteSources(1, &alSource);
-        //Delete the buffer.
-        alDeleteBuffers(1, &alBuffer);
-        //Close out OpenAL itself.
-        //Get active context.
-        ALCcontext *Context = alcGetCurrentContext();
-        //Get device for active context.
-        ALCdevice *Device = alcGetContextsDevice(Context);
-        //Disable context.
-        alcMakeContextCurrent(NULL);
-        //Release context(s).
-        alcDestroyContext(Context);
-        //Close device.
-        alcCloseDevice(Device);
-	*/	
+        	
 #endif //USE_OPENAL_SOUND
     
 }

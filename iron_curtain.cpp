@@ -605,8 +605,8 @@ void physics()
             g.thrustOn = false;
     }
     //scrolling physics
-    gl.tex.xc[0] -=0.0006;
-    gl.tex.xc[1] -=0.0006;
+    gl.tex.xc[0] -=0.0005;
+    gl.tex.xc[1] -=0.0005;
     return;
 }
 
@@ -616,10 +616,10 @@ void render()
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
     
         displayStartScreen();
         glDisable(GL_TEXTURE_2D);
@@ -628,10 +628,10 @@ void render()
        
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
     
         displayMenu();
         glDisable(GL_TEXTURE_2D);
@@ -790,7 +790,7 @@ void render()
         glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
     
         
         displayGameControls();
