@@ -12,6 +12,7 @@ enum wpnType {
     basic = 0,
     rapid,
     scatter,
+    shield,
     ring,
     pinwheel,
     miss,
@@ -137,11 +138,10 @@ class Upgrade {
 		float w, h;
 		float pos[3];
 		int payload;
-		int cycle;
     public:
         Upgrade(float x, float y);
 		void drawUpgrade();
-		//void setPayload(int p);
+        int detectCollision(float x, float y);
 };
 
 class Shield

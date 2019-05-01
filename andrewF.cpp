@@ -528,8 +528,8 @@ Upgrade::Upgrade(float x, float y) {
 	h = 50.0;
     pos[0] = x;
     pos[1] = y;
-	cycle = 0;
 	glGenTextures(1, &pod);
+    payload = rand() % 3 + 1;
 }
 
 void Upgrade::drawUpgrade() {
@@ -556,7 +556,17 @@ void Upgrade::drawUpgrade() {
     pos[1] -= dropSpeed;
 }
 
-//Upgrade::setPayload(int p) { }
+int Upgrade::detectCollision(float x, float y)
+{
+    float distX = x - pos[0];
+    float distY = y - pos[1];
+    float totalDist = (distX*distX + distY*distY);
+    float range = w*w;
+    if (totalDist < range)
+       return payload; 
+    else
+       return 0;
+}
 
 Shield::Shield()
 {
