@@ -865,6 +865,10 @@ void resetGame() {
         --(g.nEnemyBullets);
     }
 
+    while (g.nPlayerBullets > 0) {
+        --(g.nPlayerBullets);
+    }
+
     g.ship.health = 3;
     g.ship.pos[0] = gl.xres / 2;
     g.ship.pos[1] = 100;
