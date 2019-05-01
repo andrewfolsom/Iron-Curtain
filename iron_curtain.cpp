@@ -1,26 +1,26 @@
-/* Source:	iron-curtain.cpp                                                                          
- * Origin:	asteroids.cpp                                                     
- * Author:  Gordon Griesel                                                    
- * Date:    2014 - 2018                                                       
+/* Source:	iron-curtain.cpp
+ * Origin:	asteroids.cpp
+ * Author:  Gordon Griesel
+ * Date:    2014 - 2018
  * Mods:
  * 	Spring 2015:
- * 		G. Greisel - added constructors                                        
+ * 		G. Greisel - added constructors
  * 	Spring 2019:
- * 		B. Garza   - 
- * 		C. Manning - 
+ * 		B. Garza   -
+ * 		C. Manning -
  *		S. Austin  -
- *		N. Jackson - 
- */            
+ *		N. Jackson -
+ */
 
-#include <iostream>                                                          
-#include <cstdlib>                                                           
-#include <cstring>                                                           
-#include <unistd.h>                                                          
-#include <ctime>                                                             
-#include <cmath>                                                             
-#include <X11/Xlib.h>                                                        
-#include <X11/keysym.h>                                                      
-#include <GL/glx.h>                                                          
+#include <iostream>
+#include <cstdlib>
+#include <cstring>
+#include <unistd.h>
+#include <ctime>
+#include <cmath>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <GL/glx.h>
 #include "fonts.h"
 #include <stdio.h>
 #include "core.h"
@@ -55,15 +55,15 @@ float radius = 8.0;
 float step = 0.0;
 float d0, d1, dist;
 
-//-------------------------------------------------------------------------- :                                                                         
-//Setup timers                                                               
-const double physicsRate = 1.0 / 60.0;                                       
-const double oobillion = 1.0 / 1e9;                                          
-extern struct timespec timeStart, timeCurrent;                               
-extern struct timespec timePause;                                            
-extern double physicsCountdown;                                              
-extern double timeSpan;                                                      
-extern double timeDiff(struct timespec *start, struct timespec *end);        
+//-------------------------------------------------------------------------- :
+//Setup timers
+const double physicsRate = 1.0 / 60.0;
+const double oobillion = 1.0 / 1e9;
+extern struct timespec timeStart, timeCurrent;
+extern struct timespec timePause;
+extern double physicsCountdown;
+extern double timeSpan;
+extern double timeDiff(struct timespec *start, struct timespec *end);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 //
 extern void displayNick(float x, float y, GLuint texture);
@@ -91,7 +91,7 @@ extern void displayErrorScreen();
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
-//-------------------------------------------------------------------------- 
+//--------------------------------------------------------------------------
 
 
 Image img[7] = {
@@ -116,6 +116,8 @@ EnemyShip *headShip = NULL;
 EnemyShip *tailShip = NULL;
 EnemyShip *eShip = NULL;
 EnemyShip *e = NULL;
+double gameTime = 0.0;
+
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
 
@@ -128,17 +130,17 @@ void check_mouse(XEvent *e);
 int check_keys(XEvent *e);
 void physics();
 void render();
+void resetGame();
 
 int main()
-{	
+{
 
 	init_opengl();
 	srand(time(NULL));
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
-    double gameTime = 0.0;
- 	soundTrack();	
+ 	soundTrack();
 
 	while (!done) {
 		while (x11.getXPending()) {
@@ -146,17 +148,22 @@ int main()
 			check_mouse(&e);
 			done = check_keys(&e);
 		}
-		clock_gettime(CLOCK_REALTIME, &timeCurrent);
-		timeSpan = timeDiff(&timeStart, &timeCurrent);
-        gameTime += timeSpan;
-		timeCopy(&timeStart, &timeCurrent);
-		physicsCountdown += timeSpan;
-        mainLevel(gameTime);
-		while (physicsCountdown >= physicsRate) {
-			physics();
-			physicsCountdown -= physicsRate;
-		}
-		
+        if (gl.gameState == 4 || gl.gameState == 0) {
+            clock_gettime(CLOCK_REALTIME, &timeStart);
+        } else {
+            clock_gettime(CLOCK_REALTIME, &timeCurrent);
+            timeSpan = timeDiff(&timeStart, &timeCurrent);
+            gameTime += timeSpan;
+            timeCopy(&timeStart, &timeCurrent);
+            physicsCountdown += timeSpan;
+            mainLevel(gameTime);
+            while (physicsCountdown >= physicsRate) {
+                physics();
+                physicsCountdown -= physicsRate;
+            }
+        }
+
+
 		render();
 		x11.swapBuffers();
 		x11.clearWindow();
@@ -188,16 +195,16 @@ void init_opengl(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
-    
+
     //Clear the screen to black
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    
+
     ///scrolling background
 	gl.tex.xc[0] = 0.0;
 	gl.tex.xc[1] = 0.25;
 	gl.tex.yc[0] = 0.0;
 	gl.tex.yc[1] = 1.0;
-    
+
 }
 
 
@@ -252,7 +259,7 @@ int check_keys(XEvent *e)
 	    case XK_j:
                 gl.gameState = 6;
                 break;
-            
+
             //Movements and Gameplay
             case XK_a:
                 //moveLeft();
@@ -267,7 +274,7 @@ int check_keys(XEvent *e)
                 break;
             case XK_s:
                 gl.keys[XK_s] = 1;
-                
+
 		break;
 
             case XK_space:
@@ -383,16 +390,17 @@ void physics()
         s->pos[1] = gl.yres - 20.0;
     }
 
-    e = headShip;
     //Update positions of all enemy ships
+    e = headShip;
     while(e != NULL){
         e->updatePosition();
         e = e->nextShip;
     }
 
+    // Delete ships that go off screen
     if (headShip != NULL && headShip->pos[1] < -20) {
         e = headShip;
-        headShip = headShip->nextShip;        
+        headShip = headShip->nextShip;
         delete e;
     }
 
@@ -400,7 +408,7 @@ void physics()
     if (s->scnd->armed) {
         s->scnd->reticle.update();
     }
-    
+
     //Delete player bullets that are offscreen
     struct timespec bt;
     clock_gettime(CLOCK_REALTIME, &bt);
@@ -424,7 +432,8 @@ void physics()
         Bullet *b = &g.enemyBarr[i];
         if (b->pos[1] > gl.yres + 10 || b->pos[1] < -10.0 ||
                 b->pos[0] > gl.xres + 10 || b->pos[0] < -10.0) {
-            memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets - 1], sizeof(Bullet));
+            memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets - 1],
+             sizeof(Bullet));
             g.nEnemyBullets--;
             continue;
         }
@@ -462,7 +471,7 @@ void physics()
     //==================================
     //If collision detected:
     //     1. delete the bullet
-    //     2. delete the ship 
+    //     2. delete the ship
     i = 0;
     while (i < g.nPlayerBullets) {
         //is there a bullet within its radius?
@@ -505,20 +514,21 @@ void physics()
                 //take damage
                 (s->health)--;
                 //delete the bullet
-                memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1], sizeof(Bullet));
+                memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+                 sizeof(Bullet));
                 g.nEnemyBullets--;
                 if (s->health == 0) {
-                    gl.gameState = 0;
-                    s->health = 3;
+                    printf("Game Over!\n Score = %d\n", g.playerScore);
+                    resetGame();
                 }
-                
+
             }
 
             i++;
         }
     }
     #endif
-    
+
 
     if (gl.keys[XK_a]) {
         s->pos[0] -= s->vel[0];
@@ -588,7 +598,7 @@ void physics()
         e = e->nextShip;
     }
 
-    
+
     if (gl.keys[XK_m])
         s->scnd->fire();
 
@@ -607,7 +617,7 @@ void physics()
 
 void render()
 {
-    
+
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
@@ -615,32 +625,32 @@ void render()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
-    
+
         displayStartScreen();
         glDisable(GL_TEXTURE_2D);
-    
+
     } else if (gl.gameState == 1){ //Menu
-       
+
         //init regular background
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, gl.ironImage);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
-    
-        displayMenu();
+
+        // displayMenu();
         glDisable(GL_TEXTURE_2D);
-   
+
     } else if (gl.gameState == 2){ //Loading
-       
-        displayLoadingScreen();
-   
+
+        // displayLoadingScreen();
+
     } else if (gl.gameState == 3) { //Gameplay
 		Ship* s = &g.ship;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        
+
         //scrolling background
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, gl.verticalBackground);
@@ -653,9 +663,9 @@ void render()
 
 		//Draw HUD
 		hud.drawHud(s->health, s->equiped, s->altEquip);
-        
+
         //Draw ships
-        
+
         renderShip(s);
 		if (s->shield->status)
 			s->shield->drawShield(s->pos);
@@ -712,21 +722,20 @@ void render()
             glPopMatrix();
         }
 
-        glDisable(GL_DEPTH_TEST);    
+        glDisable(GL_DEPTH_TEST);
     } else if (gl.gameState == 4){ //Pause
-        
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, gl.ironImage);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
-    
-        
-        
-        
+
+
+
         displayPauseMenu();
         glDisable(GL_TEXTURE_2D);
-    } else if (gl.gameState == 5) { //Credits 
+    } else if (gl.gameState == 5) { //Credits
     //If 'c' was pressed then render credit screen
         int w = img[0].width;
         int h = img[0].height;
@@ -769,14 +778,14 @@ void render()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        displaySpencer( 700  , 250, gl.spencerImage); 
+        displaySpencer( 700  , 250, gl.spencerImage);
         displayNick(gl.xres/2, gl.yres/2, gl.nickImage);
         displayAndrew(gl.xres/4, gl.yres/4, gl.andrewImage);
-        displayChad( 700, gl.yres/2 + 250, gl.chadImage); 
+        displayChad( 700, gl.yres/2 + 250, gl.chadImage);
         displayBenjamin(gl.xres/4, 3*gl.yres/4);
 
         glDisable(GL_TEXTURE_2D);
-	
+
     } else if (gl.gameState == 6) //Hidden Levels
         displayHiddenWorld();
     else
@@ -806,4 +815,32 @@ float convertToRads(float angle)
 {
     float rads = angle * (PI / 180);
     return rads;
+}
+
+/**
+ * Resets the game back to starting conditions
+*/
+void resetGame() {
+    gl.gameState = 0;
+    gameTime = 0.0;
+    g.playerScore = 0;
+
+    e = headShip;
+    while (e != NULL) {
+        e->destroyShip();
+        e = e->nextShip;
+    }
+
+    int i = 0;
+    while (g.nEnemyBullets > 0) {
+        --(g.nEnemyBullets);
+    }
+
+    g.ship.health = 3;
+    g.ship.pos[0] = gl.xres / 2;
+    g.ship.pos[1] = 100;
+    for (int i = 0; i < 4; i++) {
+        g.ship.vel[i] = 0.0;
+    }
+
 }
