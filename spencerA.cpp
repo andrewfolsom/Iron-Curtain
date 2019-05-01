@@ -101,9 +101,9 @@ void displayGameControls()
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
 
     Rect r2;
-    unsigned int d = 0x00cc0000;
-    r2.bot = gl.yres-150;
-    r2.left = 39;
+    unsigned int d = 0x00000000;
+    r2.bot = gl.yres-500;
+    r2.left = 350;
     r2.center = 0;
     
         

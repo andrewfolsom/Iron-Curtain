@@ -2,7 +2,7 @@
  * Chad Manning's file for Iron Curtain
  * @author: Chad Manning
  * Course: CMPS 3350
- * Instructor: Gordon Griesel 
+ * Instructor: Gordon Griesel
 */
 #include <GL/glx.h>
 #include <X11/Xlib.h>
@@ -59,7 +59,7 @@ void displayChad (float x , float y, GLuint textid) {
     If you want to make the ship behave differently call the config class
         from nickJA.cpp to modify path.
 
-    Ex. 
+    Ex.
         eShip = new EnemyShip(x, y, movType);
         tailShip->config$NAME_OF_PATTERN$;
 */
@@ -148,7 +148,7 @@ double EnemyShip::getTimeSlice(timespec *bt) {
 }
 
 Grunt::Grunt(int x, int y, int movType) : EnemyShip(x, y, movType) {
-    deathScore = 20;
+    deathScore = 10;
 }
 
 /*
@@ -157,6 +157,10 @@ Grunt::Grunt(int x, int y, int movType) : EnemyShip(x, y, movType) {
 */
 int getRandSpawn() {
     return rand() % 800 + 50;
+}
+
+void resetSpawnTimer() {
+    lastSpawnTime = 0.0;
 }
 
 /*
@@ -175,9 +179,9 @@ void mainLevel(double gameTime) {
             xSpawn = getRandSpawn();
         }
         if (gameTime > 30.0 && gameTime < 100.0) {
-            eShip = new EnemyShip(xSpawn, ySpawn, STRAFE);
+            eShip = new Grunt(xSpawn, ySpawn, STRAFE);
             tailShip->configStrafe(20, 90, 3, 2, -1);
-            // eShip = new EnemyShip(600, 1050, RUSH);            
+            // eShip = new EnemyShip(600, 1050, RUSH);
         }
     }
     // eShip = new EnemyShip(200, 900, CIRCLING);

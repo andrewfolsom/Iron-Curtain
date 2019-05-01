@@ -542,7 +542,6 @@ void physics()
     }
     #endif
 
-<<<<<<< HEAD
     // Did the ship hit an upgrade container?
     if (up != NULL) {
        int drop = up->detectCollision(s->pos[0], s->pos[1]);
@@ -570,8 +569,6 @@ void physics()
                break;
        }
     }
-=======
->>>>>>> ac6bc9b37b2df39e2bcd776c15155a180e0ec1a5
 
     if (gl.keys[XK_a]) {
         s->pos[0] -= s->vel[0];
