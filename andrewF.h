@@ -130,9 +130,18 @@ class EnemyStd : public Basic
 
 // Upgrade Declarations
 
-class Upgrade : public Basic {
+class Upgrade {
+	public:
+		GLuint pod;
+		float dropSpeed;
+		float w, h;
+		float pos[3];
+		int payload;
+		int cycle;
     public:
         Upgrade();
+		void drawUpgrade();
+		//void setPayload(int p);
 };
 
 class Shield
@@ -149,13 +158,27 @@ class Shield
 		void drawShield(float* pos);
 };
 
+class Digit
+{
+    public:
+        GLuint digits[10];
+        float resX, resY;
+        float posX, posY;
+    public:
+        Digit();
+        ~Digit();
+        void displayDigit(char ch, float x, float y);
+};
+
 class Hud
 {
 	public:
 		GLuint life[4];
         GLuint weapon[3];
         GLuint display;
+		GLuint score;
         GLuint secondary;
+        Digit nums[10];
 	public:
 		Hud();
 		void genTextures();

@@ -79,6 +79,7 @@ extern void displayAndrew(float x, float y, GLuint texture);
 extern void soundTrack();
 extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
+extern void displayGameControls();
 extern void scrollingBackground();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
@@ -94,7 +95,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //--------------------------------------------------------------------------
 
 
-Image img[7] = {
+Image img[8] = {
     "./img/NICKJA.jpg",
     "./img/andrewimg.png",
     "./img/spencerA.jpg",
@@ -102,9 +103,12 @@ Image img[7] = {
     "./img/BGarza.jpg",
     "./img/ironImage.jpg",
     "./img/verticalBackground.jpg",
+    "./img/gameControls.jpg",
 };
 
 Hud hud;
+
+Upgrade up;
 
 Global& gl = Global::getInstance();
 
@@ -148,7 +152,7 @@ int main()
 			check_mouse(&e);
 			done = check_keys(&e);
 		}
-        if (gl.gameState == 4 || gl.gameState == 0) {
+        if (gl.gameState != 3) {
             clock_gettime(CLOCK_REALTIME, &timeStart);
         } else {
             clock_gettime(CLOCK_REALTIME, &timeCurrent);
@@ -191,6 +195,7 @@ void init_opengl(void)
     glGenTextures(1, &gl.chadImage);
     glGenTextures(1, &gl.benImg);
 
+    glBindTexture(GL_TEXTURE_2D, gl.gameControls);
     glBindTexture(GL_TEXTURE_2D, gl.ironImage);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -259,7 +264,9 @@ int check_keys(XEvent *e)
 	    case XK_j:
                 gl.gameState = 6;
                 break;
-
+        case XK_z:
+                gl.gameState = 7;
+                break;
             //Movements and Gameplay
             case XK_a:
                 //moveLeft();
@@ -610,8 +617,8 @@ void physics()
             g.thrustOn = false;
     }
     //scrolling physics
-    gl.tex.xc[0] -=0.0006;
-    gl.tex.xc[1] -=0.0006;
+    gl.tex.xc[0] -=0.0005;
+    gl.tex.xc[1] -=0.0005;
     return;
 }
 
@@ -621,10 +628,10 @@ void render()
     if (gl.gameState == 0){ //Startup
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
 
         displayStartScreen();
         glDisable(GL_TEXTURE_2D);
@@ -633,12 +640,12 @@ void render()
 
         //init regular background
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, gl.ironImage);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
 
-        // displayMenu();
+        displayMenu();
         glDisable(GL_TEXTURE_2D);
 
     } else if (gl.gameState == 2){ //Loading
@@ -657,12 +664,14 @@ void render()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
-
         scrollingBackground();
         glDisable(GL_TEXTURE_2D);
 
+		//Draw Upgrade
+		//up.drawUpgrade();
+
 		//Draw HUD
-		hud.drawHud(s->health, s->equiped, s->altEquip);
+		hud.drawHud(s->health, s->equiped, g.playerScore);
 
         //Draw ships
 
@@ -786,8 +795,20 @@ void render()
 
         glDisable(GL_TEXTURE_2D);
 
-    } else if (gl.gameState == 6) //Hidden Levels
+    } else if (gl.gameState == 6) {
         displayHiddenWorld();
+    } else if (gl.gameState == 7){
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, gl.gameControls);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3,img[5].width,img[5].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[5].data);
+
+
+        displayGameControls();
+        glDisable(GL_TEXTURE_2D);
+    }
     else
         displayErrorScreen(); //Error Screen
 }
