@@ -158,6 +158,18 @@ class Shield
 		void drawShield(float* pos);
 };
 
+class Digit
+{
+    public:
+        GLuint digits[10];
+        float resX, resY;
+        float posX, posY;
+    public:
+        Digit();
+        ~Digit();
+        void displayDigit(char ch, float x, float y);
+};
+
 class Hud
 {
 	public:
@@ -166,6 +178,7 @@ class Hud
         GLuint display;
 		GLuint score;
         GLuint secondary;
+        Digit nums[10];
 	public:
 		Hud();
 		void genTextures();
