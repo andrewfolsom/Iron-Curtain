@@ -70,6 +70,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //Externs -- Chad
 extern void renderShip(Ship* ship);
 extern void displayChad(float x, float y, GLuint texture);
+extern void resetSpawnTimer();
 extern void mainLevel(double time);
 
 //Externs -- Andrew
@@ -675,7 +676,7 @@ void render()
 		//Draw Upgrade
         if (up != NULL) {
             up->drawUpgrade();
-        }    
+        }
 
 		//Draw HUD
 		hud.drawHud(s->health, s->equiped, g.playerScore);
@@ -851,6 +852,7 @@ float convertToRads(float angle)
 void resetGame() {
     gl.gameState = 0;
     gameTime = 0.0;
+    resetSpawnTimer();
     g.playerScore = 0;
 
     e = headShip;
@@ -859,7 +861,6 @@ void resetGame() {
         e = e->nextShip;
     }
 
-    int i = 0;
     while (g.nEnemyBullets > 0) {
         --(g.nEnemyBullets);
     }

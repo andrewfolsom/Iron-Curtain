@@ -159,6 +159,10 @@ int getRandSpawn() {
     return rand() % 800 + 50;
 }
 
+void resetSpawnTimer() {
+    lastSpawnTime = 0.0;
+}
+
 /*
     Main level for the game, determines which enemy to spawn at certain
         times.
