@@ -107,6 +107,15 @@ void angularAdjustment(float *vel, float angle)
     vel[1] = vel[1] * sin(convertToRads(angle));
 }
 
+int generateUpgrade()
+{
+    int value = rand() % 101;
+    value = value % 10;
+    if (value == 0)
+        return 1;
+    else
+        return 0;
+}
 
 //===========================================================
 //    DEFINITION OF WEAPON CLASS AND IT'S DERIVED CLASSES
@@ -513,10 +522,12 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
 /**
  * Upgrade class constructor
  */
-Upgrade::Upgrade() {
+Upgrade::Upgrade(float x, float y) {
 	dropSpeed = 5.0;
 	w = 50.0;
 	h = 50.0;
+    pos[0] = x;
+    pos[1] = y;
 	cycle = 0;
 	glGenTextures(1, &pod);
 }
@@ -534,7 +545,7 @@ void Upgrade::drawUpgrade() {
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(450.0, 500.0, 1.0);
+    glTranslatef(pos[0], pos[1], 1.0);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(w,-h);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(w, h);
@@ -542,6 +553,7 @@ void Upgrade::drawUpgrade() {
         glTexCoord2f(0.0f, 1.0f); glVertex2i(-w, -h);
     glEnd();
     glPopMatrix();
+    pos[1] -= dropSpeed;
 }
 
 //Upgrade::setPayload(int p) { }

@@ -139,7 +139,7 @@ class Upgrade {
 		int payload;
 		int cycle;
     public:
-        Upgrade();
+        Upgrade(float x, float y);
 		void drawUpgrade();
 		//void setPayload(int p);
 };
