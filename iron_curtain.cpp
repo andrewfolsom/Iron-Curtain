@@ -654,15 +654,14 @@ void render()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
-
         scrollingBackground();
         glDisable(GL_TEXTURE_2D);
 
 		//Draw Upgrade
-		up.drawUpgrade();
+		//up.drawUpgrade();
 
 		//Draw HUD
-		hud.drawHud(s->health, s->equiped, s->altEquip);
+		hud.drawHud(s->health, s->equiped, g.playerScore);
         
         //Draw ships
         

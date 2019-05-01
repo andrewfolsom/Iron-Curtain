@@ -37,6 +37,19 @@ Image hudWeapon[3] = {
     "./img/scatter.png"
 };
 
+Image digits[10] = {
+	"./img/zero.png",
+	"./img/one.png",
+	"./img/two.png",
+	"./img/three.png",
+	"./img/four.png",
+	"./img/five.png",
+	"./img/six.png",
+	"./img/seven.png",
+	"./img/eight.png",
+	"./img/nine.png"
+};
+
 Image hudSecond("./img/missile.png");
 
 Image hudScore("./img/scoreboard.png");
@@ -707,22 +720,4 @@ void Hud::drawHud(int l, int w, int s)
     glEnd();
     glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-	int score, num, place, space;
-	GLvoid* font = GLUT_BITMAP_HELVETICA_18;
-	score = s;
-	num = 0;
-	space = 18;
-	place = 0;
-
-	while (score > 9) {
-		num = score % 10;
-		glRasterPos3f(210 - (place*space_char), 925.0, 1.0);
-		glutBitmapCharacter(font, 48+num);
-		place++;
-		score /= 10;
-	}
-	glRasterPos3f(210 - (place*space_char), 925.0, 1.0);
-	glutBitmapCharacter(font, 48+score);
-
 }
