@@ -171,19 +171,21 @@ void resetSpawnTimer() {
 void mainLevel(double gameTime) {
     //gl.xres == 900
     const int ySpawn = 1050;
-    int xSpawn = getRandSpawn();
-    if ((gameTime - lastSpawnTime) > 2.5) {
+    int xSpawn = 0;
+    if (gameTime - lastSpawnTime > 2) {
+        xSpawn = getRandSpawn();
         lastSpawnTime = gameTime;
-        if (gameTime > 3.0 && gameTime < 40.0) {
+        if ((int) gameTime % 5 == 0)
             eShip = new Grunt(xSpawn, ySpawn, RUSH);
-            xSpawn = getRandSpawn();
+        if (gameTime < 1.0) {
+            eShip = new Grunt(100, ySpawn, DIAG_RUSH);
+            tailShip->configDiagRush(gl.xres, 0, 1);
+            eShip = new Grunt(gl.xres, ySpawn, DIAG_RUSH);
+            tailShip->configDiagRush(0, 0, 1);
         }
-        if (gameTime > 30.0 && gameTime < 100.0) {
-            eShip = new Grunt(xSpawn, ySpawn, STRAFE);
-            tailShip->configStrafe(20, 90, 3, 2, -1);
-            // eShip = new EnemyShip(600, 1050, RUSH);
+        else if (gameTime < 50) {
+            eShip = new Grunt(200, ySpawn, CIRCLING);
+            tailShip->configCircle(50, 90, 20, 1, -1);
         }
     }
-    // eShip = new EnemyShip(200, 900, CIRCLING);
-    // tailShip->configCircle(30, 90, 3, 2, -1);
 }
