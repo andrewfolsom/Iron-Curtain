@@ -74,6 +74,7 @@ extern void mainLevel(double time);
 
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
+extern int generateUpgrade();
 
 //Externs Spencer
 extern void soundTrack();
@@ -108,7 +109,7 @@ Image img[8] = {
 
 Hud hud;
 
-Upgrade up;
+Upgrade* up = NULL;
 
 Global& gl = Global::getInstance();
 
@@ -489,6 +490,10 @@ void physics()
             Flt d1 = b->pos[1] - e->pos[1];
             Flt dist = (d0*d0 + d1*d1);
             if (dist < (e->getRadius()*e->getRadius())) {
+                //determine if upgrade drops
+                if(generateUpgrade() && up == NULL) {
+                    up = new Upgrade(e->pos[0], e->pos[1]);
+                }
                 //delete the ship
                 g.playerScore += e->getDeathScore();
                 e->destroyShip();
@@ -668,7 +673,9 @@ void render()
         glDisable(GL_TEXTURE_2D);
 
 		//Draw Upgrade
-		//up.drawUpgrade();
+        if (up != NULL) {
+            up->drawUpgrade();
+        }    
 
 		//Draw HUD
 		hud.drawHud(s->health, s->equiped, g.playerScore);
