@@ -152,10 +152,14 @@ class Shield
 		float radius;
 		float x, y;
 		float color[3];
+        float time;
 		bool status;
+        struct timespec shieldTimer;
 	public:
 		Shield();
 		void drawShield(float* pos);
+        void checkTime();
+        bool detectCollision(float dist);
 };
 
 class Digit
