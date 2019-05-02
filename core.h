@@ -115,32 +115,6 @@ class Ship
  };
 
 /*
- *OPFOR Class
- *	Jackson
- */
-class opForShip
-{
-    public:
-	Vec pos;
-	float vel[4];
-	float speed;
-	float color[3] = {255.0, 0.0, 0.0};
-	int weaponType;
-	int movPattern = 1;
-	int speedMul = 1;
-	//Currently needed for movement
-	float angle = 90.0;
-	float slope;
-	float t = 0.0;
-	Vec spawnPos;
-	int destOffset = 0.0;
-	//
-	opForShip();
-	opForShip(const opForShip&);
-	opForShip& operator= (const opForShip&);
-};
-
-/*
  * Bullet Class
  */
 
@@ -176,8 +150,7 @@ class Game
 	int playerScore;
 	//-----------------------------
 	//Jackson
-	opForShip opFor[100];
-	int numOpFor;
+	Tank playerTank;
 	//------------------------------
     public:
 	Game();

@@ -129,20 +129,13 @@ Ship::~Ship() {
     delete shield;
 }
 
-/*
- * OpFor Class
- *	Jackson
+/* 
+ * TANK CLASS
  */
-opForShip::opForShip() {
-
-}
-/*
-opForShip::opForShip(const opForShip& target) {
-	memcpy(pos, target.pos, 3);
-	memcpy(vel, target.vel, 4);
-	memcpy(color, target.color, 3);
-}
-*/
+ Tank:: Tank() {
+	pos[0] = gl.xres/2;
+	pos[1] = gl.yres/4;
+ }
 /*
  * Bullet Class
  */
