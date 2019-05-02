@@ -326,16 +326,17 @@ int check_keys(XEvent *e)
                 delete s->wpn;
                 s->wpn = new EnemyStd;
                 break;
-	    	case XK_b:
-				s->shield->status = !s->shield->status;
-				break;
-			case XK_Shift_R:
-                if (headShip != NULL) {
-			        s->scnd->armed = true;
-                    s->scnd->reticle.e = headShip;
-                    s->scnd->reticle.update();
+	    case XK_b:
+		s->shield->status = !s->shield->status;
+		clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
+		break;
+	    case XK_Shift_R:
+		if (headShip != NULL) {
+		    s->scnd->armed = true;
+		    s->scnd->reticle.e = headShip;
+		    s->scnd->reticle.update();
                 }
-				break;
+		break;
             case XK_period:
                 if (s->scnd->locked != true && s->scnd->armed) {
                     if (s->scnd->reticle.e->nextShip != NULL)
@@ -536,9 +537,11 @@ void physics()
                 }
 
             }
-            if (s->shield->status && s->shield->detectCollision(dist))
+            if (s->shield->status && s->shield->detectCollision(dist)) {
                 memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
                         sizeof(Bullet));
+                g.nEnemyBullets--;
+	    }
 
             i++;
         }
