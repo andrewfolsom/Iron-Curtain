@@ -46,6 +46,7 @@ class Basic : public Weapon
 public:
 	Basic();
 	void fire();
+	void fire(float angle);
 };
 
 class Rapid : public Basic

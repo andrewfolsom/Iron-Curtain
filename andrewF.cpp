@@ -200,6 +200,30 @@ void Basic::fire()
 }
 
 /**
+ * Overload fire function with angular functionality
+ */
+void Basic::fire(float angle)
+{
+    Ship* ship = &g.ship;
+    struct timespec bt;
+    double time = getTimeSlice(ship, &bt);
+    if (time > fireRate) {
+        timeCopy(&ship->bulletTimer, &bt);
+        if (g.nPlayerBullets < MAX_BULLETS) {
+            Bullet *b = &g.playerBarr[g.nPlayerBullets];
+            timeCopy(&b->time, &bt);
+            setPosition(ship->pos, b->pos);
+            setVelocity(b->vel);
+	    angularAdjustment(b->vel, angle);
+            //b->vel[0] *= cos(convertToRads(angle));
+            //b->vel[1] *= sin(convertToRads(angle));
+            setColor(b->color);
+            g.nPlayerBullets++;
+        }
+    }
+}
+
+/**
  * Rapid weapon class constructor
  */
 Rapid::Rapid()
@@ -494,6 +518,9 @@ EnemyStd::EnemyStd()
 {
     bulletSpeed = -5.0;
     fireRate = 2.0;
+    color[0] = 0.5;
+    color[1] = 1.0;
+    color[2] = 0.5;
 }
 
 /**
@@ -627,7 +654,7 @@ bool Shield::detectCollision(float dist)
 }
 
 //===========================================================
-//				DEFINITION OF THE DIGITS CLASS 
+//		DEFINITION OF THE DIGITS CLASS 
 //===========================================================
 
 Digit::Digit()
@@ -666,7 +693,7 @@ void Digit::displayDigit(char ch, float x, float y) {
 }
 
 //===========================================================
-//				DEFINITION OF THE USER INTERFACE 
+//		DEFINITION OF THE USER INTERFACE 
 //===========================================================
 
 // Hud class constructor
