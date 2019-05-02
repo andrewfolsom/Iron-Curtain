@@ -315,7 +315,7 @@ int check_keys(XEvent *e)
 				if (gl.gameState == 3)
 					gl.keys[XK_s] = 1;
 				if (gl.gameState == 8 ) {
-					t->vel[0] += 0.5;
+					t->vel[0] -= 0.5;
 					t->moving = true;
 				}
 				break;
