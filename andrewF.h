@@ -154,11 +154,11 @@ class Shield
 		float color[3];
         float time;
 		bool status;
-        //struct timepsec shieldTimer;
+        struct timespec shieldTimer;
 	public:
 		Shield();
 		void drawShield(float* pos);
-        //void checkTime();
+        void checkTime();
 };
 
 class Digit

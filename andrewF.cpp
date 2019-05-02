@@ -19,6 +19,7 @@ const int MAX_MISSILES = 1;
 extern float convertToRads(float angle);
 extern double getTimeSlice(Ship*, timespec*);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
+extern double timeDiff(struct timespec *start, struct timespec *end);
 extern Game g;
 extern Image img;
 extern EnemyShip* headShip;
@@ -606,14 +607,14 @@ void Shield::drawShield(float *pos)
 }
 
 // Function to check elapsed time since shield activation
-/*void Shield::checkTime()
+void Shield::checkTime()
 {
     struct timespec st;
     clock_gettime(CLOCK_REALTIME, &st);
-    float diff = timeDiff(&shieldTimer, &st);
+    double diff = timeDiff(&shieldTimer, &st);
     if (diff > time)
         status = false;
-}*/
+}
 
 //===========================================================
 //				DEFINITION OF THE DIGITS CLASS 
