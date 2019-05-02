@@ -771,7 +771,7 @@ void Hud::drawHud(int l, int w, int s)
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(175.0f, 925.0f, 0.75f);
+    glTranslatef(175.0f, 925.0f, 1.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
@@ -795,7 +795,7 @@ void Hud::drawHud(int l, int w, int s)
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(75.0f, 75.0f, 0.75f);
+    glTranslatef(75.0f, 75.0f, 1.0f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
