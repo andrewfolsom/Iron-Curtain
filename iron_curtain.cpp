@@ -564,11 +564,15 @@ void physics()
                break;
            case 3:
                s->shield->status = true;
+               //clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
                delete up;
                up = NULL;
                break;
        }
     }
+
+    // Is the shield out of power?
+    //s->shield->checkTime();
 
     if (gl.keys[XK_a]) {
         s->pos[0] -= s->vel[0];

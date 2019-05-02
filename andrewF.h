@@ -152,10 +152,13 @@ class Shield
 		float radius;
 		float x, y;
 		float color[3];
+        float time;
 		bool status;
+        //struct timepsec shieldTimer;
 	public:
 		Shield();
 		void drawShield(float* pos);
+        //void checkTime();
 };
 
 class Digit

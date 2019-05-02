@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <time.h>
 #include "fonts.h"
 #include "andrewF.h"
 #include "core.h"
@@ -12,6 +13,7 @@
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0];(c)[1]=(a)[1]-(b)[1];\
 (c)[2]=(a)[2]-(b)[2]
 
+struct timepsec;
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
 extern float convertToRads(float angle);
@@ -523,7 +525,7 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
  * Upgrade class constructor
  */
 Upgrade::Upgrade(float x, float y) {
-	dropSpeed = 5.0;
+	dropSpeed = 0.5;
 	w = 50.0;
 	h = 50.0;
     pos[0] = x;
@@ -545,7 +547,7 @@ void Upgrade::drawUpgrade() {
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(pos[0], pos[1], 1.0);
+    glTranslatef(pos[0], pos[1], 0.5);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(w,-h);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(w, h);
@@ -576,6 +578,7 @@ Shield::Shield()
 	color[0] = 1.0;
 	color[1] = 0.5;
 	color[2] = 0.25;
+    time = 20.0;
 	status = false;
 }
 
@@ -601,6 +604,16 @@ void Shield::drawShield(float *pos)
 		angle = 0.0;
 	}
 }
+
+// Function to check elapsed time since shield activation
+/*void Shield::checkTime()
+{
+    struct timespec st;
+    clock_gettime(CLOCK_REALTIME, &st);
+    float diff = timeDiff(&shieldTimer, &st);
+    if (diff > time)
+        status = false;
+}*/
 
 //===========================================================
 //				DEFINITION OF THE DIGITS CLASS 
@@ -758,7 +771,7 @@ void Hud::drawHud(int l, int w, int s)
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(175.0f, 925.0f, 1.0f);
+    glTranslatef(175.0f, 925.0f, 0.75f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
@@ -782,7 +795,7 @@ void Hud::drawHud(int l, int w, int s)
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(75.0f, 75.0f, 1.0f);
+    glTranslatef(75.0f, 75.0f, 0.75f);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
