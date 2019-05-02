@@ -1,4 +1,4 @@
-LFLAGS = -lrt -lX11 -lGLU -lGL -pthread -lm
+LFLAGS = -lrt -lX11 -lGLU -lGL -pthread -lm -lssl -lcrypto
 
 all: test testdbg
 
