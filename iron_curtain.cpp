@@ -91,6 +91,7 @@ extern void displayLoadingScreen();
 extern void displayPauseMenu();
 extern void displayHiddenWorld();
 extern void displayErrorScreen();
+extern void serverConnect(int);
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
@@ -568,6 +569,7 @@ void physics()
 				 sizeof(Bullet));
 				g.nEnemyBullets--;
 				if (s->health == 0) {
+					serverConnect(g.playerScore);
 					printf("Game Over!\n Score = %d\n", g.playerScore);
 					resetGame();
 				}
