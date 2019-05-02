@@ -159,6 +159,7 @@ class Shield
 		Shield();
 		void drawShield(float* pos);
         void checkTime();
+        bool detectCollision(float dist);
 };
 
 class Digit

@@ -536,6 +536,9 @@ void physics()
                 }
 
             }
+            if (s->shield->status && s->shield->detectCollision(dist))
+                memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+                        sizeof(Bullet));
 
             i++;
         }

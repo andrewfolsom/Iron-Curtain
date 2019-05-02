@@ -616,6 +616,16 @@ void Shield::checkTime()
         status = false;
 }
 
+// Collision detection for shield
+bool Shield::detectCollision(float dist)
+{
+    float area = radius*radius;
+    if (dist < area)
+        return true;
+    else
+        return false;
+}
+
 //===========================================================
 //				DEFINITION OF THE DIGITS CLASS 
 //===========================================================
