@@ -658,8 +658,8 @@ void physics()
             g.thrustOn = false;
     }
     //scrolling physics
-    gl.tex.xc[0] -=0.0005;
-    gl.tex.xc[1] -=0.0005;
+    gl.tex.xc[0] -=0.0002;
+    gl.tex.xc[1] -=0.0002;
     return;
 }
 
