@@ -26,6 +26,7 @@
 #include "core.h"
 #include "andrewF.h"
 #include "chadM.h"
+#include "nickJA.h"
 
 //defined types
 typedef float Flt;
@@ -116,6 +117,8 @@ Global& gl = Global::getInstance();
 
 Game g;
 
+SpriteList SPR;
+
 X11_wrapper x11;
 
 EnemyShip *headShip = NULL;
@@ -163,7 +166,7 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			//mainLevel(gameTime);
+			mainLevel(gameTime);
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -321,6 +324,9 @@ int check_keys(XEvent *e)
 				break;
 			case XK_space:
 				gl.keys[XK_space] = 1;
+				if (gl.gameState == 8) {
+					//t->prm->fire((float)g.playerTank.tAngle);
+				}
 				break;
 
 			case XK_Escape:
@@ -750,7 +756,8 @@ void render()
 
 		//Draw ships
 
-		renderShip(s);
+		//renderShip(s);
+		SPR.drawPhantom(s->pos[0], s->pos[1]);
 		if (s->shield->status)
 			s->shield->drawShield(s->pos);
 

@@ -6,6 +6,7 @@
 #define CORE
 
 #include "andrewF.h"
+//#include "nickJA.h"
 
 typedef float Flt;
 typedef float Vec[3];
@@ -103,6 +104,7 @@ class Ship
 		Vec vel = {0, 0, 0};
 		Vec tgt;
 		Tank();
+		~Tank();
 
 		Tank *nextTank;
 		Tank *prevTank;
