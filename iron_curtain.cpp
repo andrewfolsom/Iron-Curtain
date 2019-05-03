@@ -92,6 +92,7 @@ extern void displayLoadingScreen();
 extern void displayPauseMenu();
 extern void displayHiddenWorld();
 extern void displayErrorScreen();
+extern void serverConnect(int);
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
@@ -366,6 +367,7 @@ int check_keys(XEvent *e)
 				break;
 			case XK_b:
 				s->shield->status = !s->shield->status;
+			   	clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
 				break;
 			case XK_Shift_R:
 				if (headShip != NULL) {
@@ -573,10 +575,16 @@ void physics()
 				 sizeof(Bullet));
 				g.nEnemyBullets--;
 				if (s->health == 0) {
+					serverConnect(g.playerScore);
 					printf("Game Over!\n Score = %d\n", g.playerScore);
 					resetGame();
 				}
 
+			}
+			if (s->shield->status && s->shield->detectCollision(dist)) {
+				memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+				 sizeof(Bullet));
+				g.nEnemyBullets--;
 			}
 
 			i++;
@@ -606,11 +614,16 @@ void physics()
 			   break;
 		   case 3:
 			   s->shield->status = true;
+			   clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
 			   delete up;
 			   up = NULL;
 			   break;
 	   }
 	}
+
+	// Is shield out of power?
+	if (s->shield->status)
+	    s->shield->checkTime();
 
 	if (gl.keys[XK_a]) {
 		s->pos[0] -= s->vel[0];
