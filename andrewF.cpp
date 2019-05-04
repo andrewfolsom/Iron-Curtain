@@ -1,7 +1,7 @@
 #include <GL/glx.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
+#include <cstring>
 #include <cmath>
 #include <time.h>
 #include "fonts.h"
@@ -16,6 +16,7 @@
 struct timepsec;
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
+const int MAX_PARTICLES = 3000;
 extern float convertToRads(float angle);
 extern double getTimeSlice(Ship*, timespec*);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
@@ -61,6 +62,8 @@ Image hudScore("./img/scoreboard.png");
 Image hudDisplay("./img/weaponDisplay.png");
 
 Image upgradePod("./img/upgrade.png");
+
+Image boom("./img/explosion.png");
 
 /**
  * Displays my picture and name
@@ -602,7 +605,7 @@ Shield::Shield()
 {
 	angle = 0.0;
 	increment = 30.0;
-	radius = 60.0;
+	radius = 90.0;
 	color[0] = 1.0;
 	color[1] = 0.5;
 	color[2] = 0.25;
@@ -842,4 +845,84 @@ void Hud::drawHud(int l, int w, int s)
     glEnd();
     glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+}
+
+// Particle Function
+Particle::Particle() { }
+
+// Explosion renderer
+void createExplosion(float x, float y)
+{
+	int vel1, vel2, angle;
+	if (g.nParticles < MAX_PARTICLES) {
+		for (int i = 0; i < 30; i++) {
+			Particle* p = &g.parr[g.nParticles];
+			clock_gettime(CLOCK_REALTIME, &p->pTimer);
+			p->pos[0] = x;
+			p->pos[1] = y;
+			p->pos[2] = 1.0;
+            p->color[0] = 1.0;
+            p->color[1] = 1.0;
+            p->color[2] = 0.0;
+			vel1 = rand() % 3 + 1;
+			vel2 = rand() % 3 + 1;
+			angle = rand() % 360;
+			p->vel[0] = (float)vel1;
+			p->vel[1] = (float)vel2;
+			angularAdjustment(p->vel, (float)angle);
+			g.nParticles++;
+		}
+	}
+}
+
+void updateExplosion()
+{
+	int i = 0;
+	Particle* p;
+	while (i < g.nParticles) {
+		p = &g.parr[i];
+		p->pos[0] += p->vel[0];
+		p->pos[1] += p->vel[1];
+
+        for (int j = 0; j < 2; j++) {
+            if (j == 1)
+                p->color[j] -= 0.02;
+            else
+                p->color[j] -= 0.01;
+            
+            if (p->color[j] < 0.0)
+                p->color[j] = 0.0;
+        }
+
+    	struct timespec pt;
+    	clock_gettime(CLOCK_REALTIME, &pt);
+    	double diff = timeDiff(&p->pTimer, &pt);
+
+		if (diff > 2.0) {
+			memcpy(p, &g.parr[g.nParticles-1], sizeof(Particle));
+			g.nParticles--;
+		}
+		i++;
+	}
+}
+
+void renderExplosion() {
+    int i = 0;
+    float resX = 1.0;
+    float resY = 1.0;
+    Particle* p;
+    while (i < g.nParticles) {
+        p = &g.parr[i];
+        glPushMatrix();
+        glTranslatef(p->pos[0], p->pos[1], p->pos[2]);
+        glBegin(GL_QUADS);
+            glColor3f(p->color[0], p->color[1], p->color[2]);
+            glVertex2f(resX, resY);
+            glVertex2f(resX, -resY);
+            glVertex2f(-resX, -resY);
+            glVertex2f(-resX, resY);
+        glEnd();
+        glPopMatrix();
+        i++;
+    }
 }

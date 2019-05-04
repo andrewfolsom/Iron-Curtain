@@ -51,6 +51,7 @@ const float gravity = -0.2f;
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
 const float MAX_VELOCITY = 15;
+const int MAX_PARTICLES = 3000;
 float test[3] = {450.0, 900.0, 0.0};
 float radius = 8.0;
 float step = 0.0;
@@ -77,6 +78,9 @@ extern void mainLevel(double time);
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
 extern int generateUpgrade();
+extern void createExplosion(float x, float y);
+extern void updateExplosion();
+extern void renderExplosion();
 
 //Externs Spencer
 extern void soundTrack();
@@ -109,6 +113,8 @@ Image img[8] = {
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
 };
+
+Particle p[MAX_PARTICLES];
 
 Hud hud;
 
@@ -504,6 +510,11 @@ void physics()
 			d1 = s->scnd->reticle.e->pos[1] - m->pos[1];
 			dist = (d0*d0 + d1*d1);
 			if (dist < (radius * radius)) {
+                //Generate explosion
+                createExplosion(e->pos[0], e->pos[1]);
+                //Destroy enemy ship
+				g.playerScore += e->getDeathScore();
+				e->destroyShip();
 				memcpy(&g.marr[i], &g.marr[g.nmissiles - 1], sizeof(Missile));
 				g.nmissiles--;
 				s->scnd->armed = false;
@@ -539,6 +550,8 @@ void physics()
 				if(generateUpgrade() && up == NULL) {
 					up = new Upgrade(e->pos[0], e->pos[1]);
 				}
+                //generate explosion
+                createExplosion(e->pos[0], e->pos[1]);
 				//delete the ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -704,6 +717,10 @@ void physics()
 		if (tdif < -0.3)
 			g.thrustOn = false;
 	}
+
+    //Update Explosions
+    updateExplosion();
+
 	//scrolling physics
 	gl.tex.xc[0] -=0.0005;
 	gl.tex.xc[1] -=0.0005;
@@ -783,6 +800,8 @@ void render()
 		if (s->scnd->armed)
 			s->scnd->reticle.drawReticle(s->scnd->locked);
 
+        //Render explosions
+        renderExplosion();
 
 		for (int i = 0; i < g.nPlayerBullets; i++) {
 			Bullet *b = &g.playerBarr[i];

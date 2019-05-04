@@ -190,4 +190,15 @@ class Hud
 		void drawHud(int l, int w, int s);
 };
 
+class Particle
+{
+	public:
+		struct timespec pTimer;
+		float color[3];
+		float pos[3];
+		float vel[3];
+	public:
+		Particle();
+};
+
 #endif

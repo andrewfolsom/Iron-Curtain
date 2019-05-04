@@ -10,6 +10,7 @@
 #include "fonts.h"
 #include "core.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "chadM.h"
 #include "nickJA.h"
