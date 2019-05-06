@@ -100,45 +100,67 @@ void displayGameControls()
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
 
-    Rect r2;
+    Rect r3;
     unsigned int d = 0x00000000;
-    r2.bot = gl.yres-500;
-    r2.left = 350;
-    r2.center = 0;
+    r3.bot = gl.yres-400;
+    r3.left = 350;
+    r3.center = 0;
+    ggprint16(&r3, 16,d,"****** How To Play ****** ");
+    ggprint16(&r3, 16,d," ");
     
-        
-    ggprint16(&r2, 16,d,"****** Game Controls****** ");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"A/a ------ Move left");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"D/d ------ Move right");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"W/w ------ Move up");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"X/x ------ Move down");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"Spacebar ------ Shoot");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"M/m -------- Lock On Target");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"B/b ----------- Shield");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"1 ----------- Basic Weapon");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"2 ----------- Rapid Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"3 ----------- Scatter Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"4 ----------- Ring Spatial Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"5 ----------- Pinwhell Fire");
+    Rect r2;
+    unsigned int e = 0x00000000;
+    r2.bot = gl.yres-500;
+    r2.left = 10;
 
+    r2.center = 0;
+    ggprint16(&r2, 16,e,"---Basic Ship Movement---");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"A/a ------ Move left");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"D/d ------ Move right");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"W/w ------ Move up");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"X/x ------ Move down");
+    ggprint16(&r2, 16,e," ");
+    
+    Rect r4;
+    unsigned int f = 0x00000000;
+    r4.bot = gl.yres-500;
+    r4.left = 350;
+    r4.center = 0;
+    ggprint16(&r4, 16,f,"--- How to Kill Enemies---");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"Spacebar ------ Shoot");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"1 ----------- Basic Weapon");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"2 ----------- Rapid Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"3 ----------- Scatter Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"4 ----------- Ring Spatial Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"5 ----------- Pinwhell Fire");
 
+    Rect r5;
+    unsigned int g = 0x00000000;
+    r5.bot = gl.yres-500;
+    r5.left = 650;
+    r5.center = 0;
+    ggprint16(&r5, 16,g,"---- Special Mods ----");
+    ggprint16(&r5, 16,g," ");
+    ggprint16(&r5, 16,g,"M/m -------- Lock On Target");
+    ggprint16(&r5, 16,g," ");
+    ggprint16(&r5, 16,g,"B/b ----------- Shield");
+    ggprint16(&r5, 16,g," ");
     
 }
+
 void scrollingBackground()
 {
-  
+      
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
 
