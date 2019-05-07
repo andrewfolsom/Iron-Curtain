@@ -28,6 +28,12 @@
 #include "chadM.h"
 #include "nickJA.h"
 
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif //USE_OPENAL_SOUND
+ 
+
+
 //defined types
 typedef float Flt;
 typedef float Vec[3];
@@ -88,6 +94,7 @@ extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
 extern void displayGameControls();
 extern void scrollingBackground();
+extern void cannonFire();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -156,6 +163,11 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+
+#ifdef USE_OPENAL_SOUND
+
+	alutInit(0, NULL);
+#endif
 	soundTrack();
 
 
@@ -334,6 +346,7 @@ int check_keys(XEvent *e)
 				if (gl.gameState == 8) {
 					//t->prm->fire((float)g.playerTank.tAngle);
 				}
+			
 				break;
 
 			case XK_Escape:
@@ -697,6 +710,7 @@ void physics()
 
 	if (gl.keys[XK_space]) {
 		s->wpn->fire();
+		cannonFire();
 	}
 
 	i = 0;
@@ -926,6 +940,7 @@ void render()
 	else if (gl.gameState == 8) {
 
 		Tank *t = &g.playerTank;
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
