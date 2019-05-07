@@ -48,7 +48,8 @@ class Global
 	GLuint chadImage;
 	GLuint benImg;
 	GLuint ironImage;
-    GLuint verticalBackground;
+        GLuint verticalBackground;
+	GLuint clouds;
 	GLuint pauseScreen;
 	GLuint hiddenWorld;
 	GLuint errorPage;

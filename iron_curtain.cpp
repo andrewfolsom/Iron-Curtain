@@ -97,6 +97,7 @@ extern void scrollingBackground();
 extern void cannonFire();
 extern void explodeShip();
 extern void killSound();
+extern void scrollingBackground2();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -112,7 +113,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //--------------------------------------------------------------------------
 
 
-Image img[8] = {
+Image img[9] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -121,6 +122,8 @@ Image img[8] = {
 	"./img/ironImage.jpg",
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
+	"./img/clouds.jpg" ,
+
 };
 
 Particle p[MAX_PARTICLES];
@@ -794,7 +797,15 @@ void render()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
+
+		
+/*		glBindTexture(GL_TEXTURE_2D, gl.clouds);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[8].width,img[8].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
+*/		
 		scrollingBackground();
+		scrollingBackground2();
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Upgrade

@@ -175,6 +175,25 @@ void scrollingBackground()
 
 }
 
+
+void scrollingBackground2()
+{  
+   // glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0,1.0,1.0);
+    	
+
+    glBindTexture(GL_TEXTURE_2D, gl.clouds);
+    glBegin(GL_QUADS);
+		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[0]); glVertex2i(0, 0);
+		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[0]); glVertex2i(0, gl.yres);
+		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[1]); glVertex2i(gl.xres, gl.yres);
+		glTexCoord2f(gl.tex.xc[1], gl.tex.yc[1]); glVertex2i(gl.xres, 0);
+
+	glEnd();
+
+}
+
+
 void soundTrack() 
 {	
 	#ifdef USE_OPENAL_SOUND
