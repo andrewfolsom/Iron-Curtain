@@ -10,9 +10,11 @@ class SpriteList {
 	public:
 		SpriteList();
 		GLuint phantom;
+		GLuint mig;
 
 
 		void drawPhantom(float x, float y);
+		void drawMig(float x, float y, float angle);
 };
 
 //Enemy Tank Class Def.

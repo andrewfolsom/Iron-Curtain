@@ -807,7 +807,8 @@ void render()
 
 		EnemyShip *e = headShip;
 		while(e != NULL){
-			renderShip(e);
+			//renderShip(e);
+			SPR.drawMig(e->pos[0], e->pos[1], 180);
 			e = e->nextShip;
 		}
 

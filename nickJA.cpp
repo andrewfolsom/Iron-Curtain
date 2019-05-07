@@ -28,8 +28,9 @@ const Flt PI = 3.141592653589793;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[1]{
-"./img/Phantom_1a.png"
+Image Sprites[2]{
+"./img/Phantom_1a.png",
+"./img/MiG-21_a.png"
 };
 
 //DISPLAY
@@ -90,6 +91,36 @@ void SpriteList::drawPhantom(float x, float y) {
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+}
+
+void SpriteList::drawMig(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, mig);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[0].width, Sprites[0].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 99;
+	float w = 48;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 1.0);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
 }
 
 
