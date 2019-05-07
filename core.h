@@ -103,12 +103,9 @@ class Ship
 		float maxVel = 1.0;
 		Vec vel = {0, 0, 0};
 		Vec tgt;
+		Weapon *prm;
 		Tank();
 		~Tank();
-
-		Tank *nextTank;
-		Tank *prevTank;
-		Weapon *prm;
 
 		void renderTurret();
 		void renderTank();

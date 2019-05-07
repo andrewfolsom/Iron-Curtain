@@ -14,3 +14,13 @@ class SpriteList {
 
 		void drawPhantom(float x, float y);
 };
+
+//Enemy Tank Class Def.
+
+class EnemyTank : public Tank {
+	public:
+		EnemyTank(float x, float y, int faction);
+		EnemyTank *nextTank;
+		EnemyTank *prevTank;
+
+};

@@ -326,7 +326,7 @@ int check_keys(XEvent *e)
 			case XK_space:
 				gl.keys[XK_space] = 1;
 				if (gl.gameState == 8) {
-					//t->prm->fire((float)g.playerTank.tAngle);
+					//t->prm->fire((float)270.0);
 				}
 				break;
 

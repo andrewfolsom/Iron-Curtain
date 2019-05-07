@@ -424,3 +424,9 @@ void Tank::moveTank()
 	tPos[1] = pos[1];
 	updateTarget(tgt[0], tgt[1]);
 }
+
+
+//******** ENEMY TANK CLASS ********
+	EnemyTank::EnemyTank(float x, float y, int faction) {
+		
+	}
