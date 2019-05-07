@@ -139,9 +139,11 @@ class Game
 	Bullet *playerBarr;
 	Bullet *enemyBarr;
 	Missile *marr;
+	Particle *parr;
 	int nPlayerBullets;
 	int nEnemyBullets;
 	int nmissiles;
+	int nParticles;
 	Flt radius;
 	timespec missileTimer;
 	timespec thrustTimer;

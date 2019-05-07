@@ -28,6 +28,12 @@
 #include "chadM.h"
 #include "nickJA.h"
 
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif //USE_OPENAL_SOUND
+ 
+
+
 //defined types
 typedef float Flt;
 typedef float Vec[3];
@@ -51,6 +57,7 @@ const float gravity = -0.2f;
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
 const float MAX_VELOCITY = 15;
+const int MAX_PARTICLES = 3000;
 float test[3] = {450.0, 900.0, 0.0};
 float radius = 8.0;
 float step = 0.0;
@@ -77,6 +84,9 @@ extern void mainLevel(double time);
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
 extern int generateUpgrade();
+extern void createExplosion(float x, float y);
+extern void updateExplosion();
+extern void renderExplosion();
 
 //Externs Spencer
 extern void soundTrack();
@@ -84,6 +94,7 @@ extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
 extern void displayGameControls();
 extern void scrollingBackground();
+extern void cannonFire();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -109,6 +120,8 @@ Image img[8] = {
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
 };
+
+Particle p[MAX_PARTICLES];
 
 Hud hud;
 
@@ -150,6 +163,11 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+
+#ifdef USE_OPENAL_SOUND
+
+	alutInit(0, NULL);
+#endif
 	soundTrack();
 
 
@@ -328,6 +346,7 @@ int check_keys(XEvent *e)
 				if (gl.gameState == 8) {
 					//t->prm->fire((float)270.0);
 				}
+			
 				break;
 
 			case XK_Escape:
@@ -504,6 +523,11 @@ void physics()
 			d1 = s->scnd->reticle.e->pos[1] - m->pos[1];
 			dist = (d0*d0 + d1*d1);
 			if (dist < (radius * radius)) {
+                //Generate explosion
+                createExplosion(e->pos[0], e->pos[1]);
+                //Destroy enemy ship
+				g.playerScore += e->getDeathScore();
+				e->destroyShip();
 				memcpy(&g.marr[i], &g.marr[g.nmissiles - 1], sizeof(Missile));
 				g.nmissiles--;
 				s->scnd->armed = false;
@@ -539,6 +563,8 @@ void physics()
 				if(generateUpgrade() && up == NULL) {
 					up = new Upgrade(e->pos[0], e->pos[1]);
 				}
+                //generate explosion
+                createExplosion(e->pos[0], e->pos[1]);
 				//delete the ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -684,6 +710,7 @@ void physics()
 
 	if (gl.keys[XK_space]) {
 		s->wpn->fire();
+		cannonFire();
 	}
 
 	i = 0;
@@ -704,6 +731,10 @@ void physics()
 		if (tdif < -0.3)
 			g.thrustOn = false;
 	}
+
+    //Update Explosions
+    updateExplosion();
+
 	//scrolling physics
 	gl.tex.xc[0] -=0.0005;
 	gl.tex.xc[1] -=0.0005;
@@ -783,6 +814,8 @@ void render()
 		if (s->scnd->armed)
 			s->scnd->reticle.drawReticle(s->scnd->locked);
 
+        //Render explosions
+        renderExplosion();
 
 		for (int i = 0; i < g.nPlayerBullets; i++) {
 			Bullet *b = &g.playerBarr[i];
@@ -907,6 +940,7 @@ void render()
 	else if (gl.gameState == 8) {
 
 		Tank *t = &g.playerTank;
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);

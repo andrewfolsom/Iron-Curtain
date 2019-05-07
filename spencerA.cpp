@@ -100,45 +100,67 @@ void displayGameControls()
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
 
-    Rect r2;
+    Rect r3;
     unsigned int d = 0x00000000;
-    r2.bot = gl.yres-500;
-    r2.left = 350;
-    r2.center = 0;
+    r3.bot = gl.yres-400;
+    r3.left = 350;
+    r3.center = 0;
+    ggprint16(&r3, 16,d,"****** How To Play ****** ");
+    ggprint16(&r3, 16,d," ");
     
-        
-    ggprint16(&r2, 16,d,"****** Game Controls****** ");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"A/a ------ Move left");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"D/d ------ Move right");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"W/w ------ Move up");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"X/x ------ Move down");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"Spacebar ------ Shoot");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"M/m -------- Lock On Target");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"B/b ----------- Shield");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"1 ----------- Basic Weapon");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"2 ----------- Rapid Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"3 ----------- Scatter Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"4 ----------- Ring Spatial Fire");
-    ggprint16(&r2, 16,d," ");
-    ggprint16(&r2, 16,d,"5 ----------- Pinwhell Fire");
+    Rect r2;
+    unsigned int e = 0x00000000;
+    r2.bot = gl.yres-500;
+    r2.left = 10;
 
+    r2.center = 0;
+    ggprint16(&r2, 16,e,"---Basic Ship Movement---");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"A/a ------ Move left");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"D/d ------ Move right");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"W/w ------ Move up");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"X/x ------ Move down");
+    ggprint16(&r2, 16,e," ");
+    
+    Rect r4;
+    unsigned int f = 0x00000000;
+    r4.bot = gl.yres-500;
+    r4.left = 350;
+    r4.center = 0;
+    ggprint16(&r4, 16,f,"--- How to Kill Enemies---");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"Spacebar ------ Shoot");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"1 ----------- Basic Weapon");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"2 ----------- Rapid Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"3 ----------- Scatter Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"4 ----------- Ring Spatial Fire");
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"5 ----------- Pinwhell Fire");
 
+    Rect r5;
+    unsigned int g = 0x00000000;
+    r5.bot = gl.yres-500;
+    r5.left = 650;
+    r5.center = 0;
+    ggprint16(&r5, 16,g,"---- Special Mods ----");
+    ggprint16(&r5, 16,g," ");
+    ggprint16(&r5, 16,g,"M/m -------- Lock On Target");
+    ggprint16(&r5, 16,g," ");
+    ggprint16(&r5, 16,g,"B/b ----------- Shield");
+    ggprint16(&r5, 16,g," ");
     
 }
+
 void scrollingBackground()
 {
-  
+      
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
 
@@ -157,9 +179,9 @@ void soundTrack() {
 	
 	#ifdef USE_OPENAL_SOUND
 
-        alutInit(0, NULL);
+        //alutInit(0, NULL);
         if (alGetError() != AL_NO_ERROR) {
-                printf("ERROR: alutInit()\n");
+                printf("");
                 return ;
         }
 
@@ -191,7 +213,7 @@ void soundTrack() {
                 return;
         }
 
-	 alSourcef(alSource[1], AL_GAIN, 0.5f);
+	alSourcef(alSource[1], AL_GAIN, 0.5f);
         alSourcef(alSource[1], AL_PITCH, 1.0f);
         alSourcei(alSource[1], AL_LOOPING, AL_TRUE);
         if (alGetError() != AL_NO_ERROR) {
@@ -208,4 +230,101 @@ void soundTrack() {
 #endif //USE_OPENAL_SOUND
     
 }
+void cannonFire() 
+{
+#ifdef USE_OPENAL_SOUND
+
+
+	//Clear error state.
+
+	alGetError();
+
+	//
+
+	//Setup the listener.
+
+	//Forward and up vectors are used.
+
+	//The person listening is facing forward toward the sound.
+
+	//The first 3 components of vec are 0,0,1
+
+	//this means that the person is facing x=0, y=0, z=1, forward.
+
+	//The second 3 components means that up is x=0,y=1,z=0, straight up!
+
+	float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
+
+	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+
+	alListenerfv(AL_ORIENTATION, vec);
+
+	alListenerf(AL_GAIN, 1.0f);
+
+	//
+
+	//Buffers hold the sound information.
+
+	ALuint alBuffer[2];
+
+	alBuffer[0] = alutCreateBufferFromFile("./sounds/cannonFire.wav");
+
+	/*
+	//let's create a looping sound.
+
+	alBuffer[1] = alutCreateBufferFromFile("./sounds/cannonFire.wav");
+
+
+
+	*/
+
+	//Source refers to the sound.
+
+	ALuint alSource[1];
+
+	//Generate 2 sources, and store in the matching buffers.
+
+	alGenSources(1, alSource);
+
+	alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
+
+	//alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
+
+	//
+
+	//FirstSet volume and pitch to normal, no looping of sound.
+
+	alSourcef(alSource[0], AL_GAIN, 1.0f);
+
+	alSourcef(alSource[0], AL_PITCH, 1.0f);
+
+	alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
+
+	if (alGetError() != AL_NO_ERROR) {
+
+		printf("ERROR: setting source\n");
+
+		return ;
+
+	}
+
+
+	alSourcePlay(alSource[1]);
+
+	for (int i=0; i<1; i++) {
+
+		alSourcePlay(alSource[0]);
+
+		//usleep(500000);
+
+	}
+
+#endif //USE_OPENAL_SOUND
+
+	return;
+
+}
+
+
+
 

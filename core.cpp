@@ -19,6 +19,7 @@ typedef float Vec[3];
 
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
+const int MAX_PARTICLES = 3000;
 extern Global& gl;
 
 /*
@@ -156,6 +157,7 @@ Game::Game()
 	playerBarr = new Bullet[MAX_BULLETS];
 	enemyBarr = new Bullet[MAX_BULLETS];
 	marr = new Missile[MAX_MISSILES];
+	parr = new Particle[MAX_PARTICLES];
 	nPlayerBullets = nEnemyBullets= 0;
 	nmissiles = 0;
 	clock_gettime(CLOCK_REALTIME, &missileTimer);
@@ -165,7 +167,9 @@ Game::Game()
 Game::~Game()
 {
 	delete [] playerBarr;
+	delete [] enemyBarr;
 	delete [] marr;
+	delete [] parr;
 }
 
 /*
