@@ -175,51 +175,43 @@ void scrollingBackground()
 
 }
 
-void soundTrack() {
-	
+void soundTrack() 
+{	
 	#ifdef USE_OPENAL_SOUND
 
-        //alutInit(0, NULL);
+       //alutInit(0, NULL);
         if (alGetError() != AL_NO_ERROR) {
                 printf("");
                 return ;
         }
 
         alGetError();
-
         float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
         alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
         alListenerfv(AL_ORIENTATION, vec);
         alListenerf(AL_GAIN, 1.0f);
-
         ALuint alBuffer[2];
-        alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
-       
+	alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
         alBuffer[1] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
-
         ALuint alSource[2];
-
-        alGenSources(2, alSource);
+	alGenSources(2, alSource);
         alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
-        
         alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
-        
         alSourcef(alSource[0], AL_GAIN, 1.0f);
         alSourcef(alSource[0],AL_PITCH, 1.0f);
-
-	  alSourcei(alSource[0], AL_LOOPING, AL_TRUE);
-        if (alGetError() != AL_NO_ERROR) {
-                printf("ERROR: setting source\n");
-                return;
-        }
+	alSourcei(alSource[0], AL_LOOPING, AL_TRUE);
+        	if (alGetError() != AL_NO_ERROR) {
+                	printf("ERROR: setting source\n");
+                	return;
+        	}
 
 	alSourcef(alSource[1], AL_GAIN, 0.5f);
         alSourcef(alSource[1], AL_PITCH, 1.0f);
         alSourcei(alSource[1], AL_LOOPING, AL_TRUE);
-        if (alGetError() != AL_NO_ERROR) {
-                printf("ERROR: setting source\n");
-                return ;
-        }
+        	if (alGetError() != AL_NO_ERROR) {
+                	printf("ERROR: setting source\n");
+                	return ;
+        	}
 
 	alSourcePlay(alSource[1]);
         for (int i=0; i<42; i++) {
@@ -228,79 +220,27 @@ void soundTrack() {
         }
         	
 #endif //USE_OPENAL_SOUND
-    
+  
 }
 void cannonFire() 
 {
 #ifdef USE_OPENAL_SOUND
 
-
-	//Clear error state.
-
 	alGetError();
-
-	//
-
-	//Setup the listener.
-
-	//Forward and up vectors are used.
-
-	//The person listening is facing forward toward the sound.
-
-	//The first 3 components of vec are 0,0,1
-
-	//this means that the person is facing x=0, y=0, z=1, forward.
-
-	//The second 3 components means that up is x=0,y=1,z=0, straight up!
-
 	float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
-
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-
 	alListenerfv(AL_ORIENTATION, vec);
-
 	alListenerf(AL_GAIN, 1.0f);
-
-	//
-
-	//Buffers hold the sound information.
-
 	ALuint alBuffer[2];
-
 	alBuffer[0] = alutCreateBufferFromFile("./sounds/cannonFire.wav");
-
-	/*
-	//let's create a looping sound.
-
-	alBuffer[1] = alutCreateBufferFromFile("./sounds/cannonFire.wav");
-
-
-
-	*/
-
-	//Source refers to the sound.
-
 	ALuint alSource[1];
-
-	//Generate 2 sources, and store in the matching buffers.
-
 	alGenSources(1, alSource);
-
 	alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
-
-	//alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
-
-	//
-
-	//FirstSet volume and pitch to normal, no looping of sound.
-
 	alSourcef(alSource[0], AL_GAIN, 1.0f);
-
 	alSourcef(alSource[0], AL_PITCH, 1.0f);
-
 	alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
 
-	if (alGetError() != AL_NO_ERROR) {
+		if (alGetError() != AL_NO_ERROR) {
 
 		printf("ERROR: setting source\n");
 
@@ -308,21 +248,13 @@ void cannonFire()
 
 	}
 
-
 	alSourcePlay(alSource[1]);
-
 	for (int i=0; i<1; i++) {
-
 		alSourcePlay(alSource[0]);
-
-		//usleep(500000);
-
 	}
 
 #endif //USE_OPENAL_SOUND
-
 	return;
-
 }
 
 
