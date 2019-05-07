@@ -95,6 +95,8 @@ extern void displayStartScreen();
 extern void displayGameControls();
 extern void scrollingBackground();
 extern void cannonFire();
+extern void explodeShip();
+extern void killSound();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -351,6 +353,8 @@ int check_keys(XEvent *e)
 
 			case XK_Escape:
 				return 1;
+				break;
+
 			case XK_m:
 				if (s->scnd->armed) {
 					s->scnd->locked = true;
@@ -525,6 +529,7 @@ void physics()
 			if (dist < (radius * radius)) {
                 //Generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		
                 //Destroy enemy ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -565,6 +570,7 @@ void physics()
 				}
                 //generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		explodeShip();
 				//delete the ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -579,6 +585,7 @@ void physics()
 			}
 		}
 		i++;
+
 	}
 
 	#ifndef DEBUG
