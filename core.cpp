@@ -133,7 +133,7 @@ Ship::~Ship() {
 
 /*
  * TANK CLASS
- */
+ 
  Tank::Tank() {
 	pos[0] = gl.xres/2;
 	pos[1] = gl.yres/4;
