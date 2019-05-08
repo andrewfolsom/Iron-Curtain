@@ -21,7 +21,11 @@ extern EnemyShip *tailShip;
 extern EnemyShip *eShip;
 
 //Global variables
-enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
+enum MOVETYPE { RUSH,
+                STRAFE,
+                CIRCLING,
+                BANK,
+                DIAG_RUSH };
 double lastSpawnTime = 0.0;
 
 
@@ -68,7 +72,7 @@ EnemyShip::EnemyShip(int x, int y, int movType) {
     pos[1] = y;
     pos[2] = 1;
 	color[0] = color[1] = color[2] = 0.35;
-    health = 100;
+    health = 1;
     deathScore = 10;
     movPattern = movType;
     eWpn = new EnemyStd();
@@ -106,6 +110,10 @@ float EnemyShip::getRadius() {
     return detRadius;
 }
 
+int EnemyShip::getHealth() {
+    return health;
+}
+
 /*
     Returns deathScore for each this type of ship
 */
@@ -120,6 +128,13 @@ int EnemyShip::getDeathScore() {
 */
 void EnemyShip::destroyShip() {
     delete this;
+}
+
+/*
+    Deducts damage from this ship
+*/
+void EnemyShip::takeDamage(int damageTaken) {
+    health -= damageTaken;
 }
 
 /*
@@ -147,16 +162,36 @@ double EnemyShip::getTimeSlice(timespec *bt) {
     return timeDiff(&bulletTimer, bt);
 }
 
+/*
+    Constructor for lowest level of enemies spawned
+*/
 Grunt::Grunt(int x, int y, int movType) : EnemyShip(x, y, movType) {
     deathScore = 10;
+}
+
+/*
+    Constructor for final boss of level, can take multiple hits
+*/
+Boss::Boss(int x, int y, int movType) : Grunt(x, y, movType) {
+    deathScore = 1000;
+    health = 50;
+    eWpn = new Pinwheel();
 }
 
 /*
     Helper function for mainLevel, gets x-coord that is within
         game bounds
 */
-int getRandSpawn() {
+int getRandXSpawn() {
     return rand() % 800 + 50;
+}
+
+/*
+    Helper function for mainLevel, gets x-coord that is within
+        game bounds
+*/
+int getRandYSpawn() {
+    return rand() % 900 + 20;
 }
 
 void resetSpawnTimer() {
@@ -168,24 +203,42 @@ void resetSpawnTimer() {
         times.
     @param gameTime total elapsed time in the game
 */
-void mainLevel(double gameTime) {
+bool mainLevel(double gameTime) {
     //gl.xres == 900
-    const int ySpawn = 1050;
-    int xSpawn = 0;
+    //g.yres == 1000
+    const int ySpawn = 1060;
+    static bool bossSpawned = false;
+
     if (gameTime - lastSpawnTime > 2) {
-        xSpawn = getRandSpawn();
         lastSpawnTime = gameTime;
-        if ((int) gameTime % 5 == 0)
-            eShip = new Grunt(xSpawn, ySpawn, RUSH);
-        if (gameTime < 1.0) {
+        // if ((int) gameTime % 5 == 0)
+        //     eShip = new Grunt(getRandXSpawn(), ySpawn, RUSH);
+        if (gameTime < 10.0) {
             eShip = new Grunt(100, ySpawn, DIAG_RUSH);
             tailShip->configDiagRush(gl.xres, 0, 1);
-            eShip = new Grunt(gl.xres, ySpawn, DIAG_RUSH);
+            eShip = new Grunt(gl.xres, ySpawn+10, DIAG_RUSH);
             tailShip->configDiagRush(0, 0, 1);
         }
-        else if (gameTime < 50) {
-            eShip = new Grunt(200, ySpawn, CIRCLING);
-            tailShip->configCircle(50, 90, 20, 1, -1);
+        else if ( gameTime > 20 && gameTime < 50) {
+            eShip = new Grunt(getRandXSpawn(), ySpawn, CIRCLING);
+            tailShip->configCircle(50, 90, 1, 1, -1);
+            eShip = new Grunt(getRandXSpawn(), ySpawn, CIRCLING);
+            tailShip->configCircle(100, 90, 1.5, 1, 1);
+        }
+        else if (gameTime > 60 && gameTime < 80) {
+            eShip = new Grunt(-15, 700, DIAG_RUSH);
+            tailShip->configDiagRush(1000, -20, 2);
+            eShip = new Grunt(915, 800, DIAG_RUSH);
+            tailShip->configDiagRush(-100, -20, 2);
+        }
+        else if (gameTime > 90) {
+            if (!bossSpawned) {
+                eShip = new Boss(gl.xres / 2, ySpawn, DIAG_RUSH);
+                tailShip->configDiagRush(gl.xres / 2, 700, -1);
+                bossSpawned = true;
+            }
+            if (tailShip->pos[1] < 400)
+                tailShip->configDiagRush(gl.xres / 3, 700, 1);
         }
     }
 }
