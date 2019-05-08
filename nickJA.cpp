@@ -28,8 +28,11 @@ const Flt PI = 3.141592653589793;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[1]{
-"./img/Phantom_1a.png"
+Image Sprites[4]{
+"./img/Phantom_1a.png",
+"./img/MiG-21_a.png",
+"./img/M60Hull.png",
+"./img/M60_Turret_2.png"
 };
 
 //DISPLAY
@@ -62,9 +65,13 @@ void displayNick(float x, float y, GLuint texture)
 //***********SPRITES DISPLAY*****************
 SpriteList::SpriteList()  {
 	glGenTextures(1, &phantom);
+	glGenTextures(1, &mig);
+	glGenTextures(1, &M60Hull);
+	glGenTextures(1, &M60Trt);
 }
-
-void SpriteList::drawPhantom(float x, float y) {
+//Function to render our F-4 Phantom image
+//X & Y are position components, angle determines rotation.
+void SpriteList::drawPhantom(float x, float y, float angle) {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, phantom);
@@ -82,6 +89,7 @@ void SpriteList::drawPhantom(float x, float y) {
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
 	glTranslatef(x, y, 1.0);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
 		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
 		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
@@ -92,6 +100,98 @@ void SpriteList::drawPhantom(float x, float y) {
 	glDisable(GL_TEXTURE_2D);
 }
 
+//Function to render our MiG-21 image
+//X & Y are position components, angle determines rotation.
+void SpriteList::drawMig(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, mig);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[1].width, Sprites[1].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 99;
+	float w = 48;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 0.9);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void SpriteList::drawM60Turret(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, M60Trt);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[3]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[0].width, Sprites[0].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 130;
+	float w = 110;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 1.0);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+
+void SpriteList::drawM60Hull(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, M60Hull);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[2]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[2].width, Sprites[2].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 90;
+	float w = 68;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 0.8);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
 
 //************MOVEMENT TYPES*****************
 //Press 't' to test this mid game.
@@ -288,11 +388,11 @@ void EnemyShip::updatePosition()
 
 //*************TANK MOVEMENT*****************
 
-void Tank::renderTurret()
+void Tank::renderTurret(SpriteList SPR)
 {
-	Vec pt[50];
-	float circAngle = 0;
-	float angleInc = (2*PI)/50;
+	//Vec pt[50];
+	//float circAngle = 0;
+	//float angleInc = (2*PI)/50;
 
 	tPos[0] = pos[0];
 	tPos[1] = pos[1];
@@ -314,7 +414,7 @@ void Tank::renderTurret()
 		}
 		//printf("Called %i times", calledCount);
 	}
-	
+	/*
 	//Draw Gun
 	glColor3f(0.0, 0.0, 0.1);
 	glPushMatrix();
@@ -338,6 +438,7 @@ void Tank::renderTurret()
 	}
 
 	//Draw Turret
+	
 	glColor3fv(tColor);
 	glPushMatrix();
 	//glTranslatef(tPos[0], tPos[1], 1.0);
@@ -350,7 +451,8 @@ void Tank::renderTurret()
 		}
 		glVertex3f(pt[0][0], pt[0][1], 1.0);
 	glEnd();
-	glPopMatrix();
+	glPopMatrix();*/
+	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
 	//printf("tgtAngle is %f, tAngle is %f\n", tgtAngle, tAngle);
 }
 //Function is fed an X, Y value to target.
@@ -369,9 +471,9 @@ void Tank::updateTarget(int x, int y)
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
 
-void Tank::renderTank() 
+void Tank::renderTank(SpriteList SPR) 
 {
-
+/*
 	glColor3fv(color);
 	glPushMatrix();
 	glTranslatef(pos[0], pos[1], 0.1);
@@ -383,8 +485,9 @@ void Tank::renderTank()
 		glVertex2f(-30,  45);
 	glEnd();
 	glPopMatrix();
-
-	renderTurret();
+*/
+	SPR.drawM60Hull(pos[0], pos[1], angle);
+	renderTurret(SPR);
 
 	//printf("Pos is (%f, %f)\n", tank.turret.tPos[0], tank.turret.tPos[1]);
 }
@@ -425,3 +528,9 @@ void Tank::moveTank()
 	tPos[1] = pos[1];
 	updateTarget(tgt[0], tgt[1]);
 }
+
+
+//******** ENEMY TANK CLASS ********
+	EnemyTank::EnemyTank(float x, float y, int faction) {
+		
+	}

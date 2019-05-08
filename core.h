@@ -7,7 +7,6 @@
 
 #include "andrewF.h"
 //#include "nickJA.h"
-
 typedef float Flt;
 typedef float Vec[3];
 
@@ -48,7 +47,8 @@ class Global
 	GLuint chadImage;
 	GLuint benImg;
 	GLuint ironImage;
-    GLuint verticalBackground;
+        GLuint verticalBackground;
+	GLuint clouds;
 	GLuint pauseScreen;
 	GLuint hiddenWorld;
 	GLuint errorPage;
@@ -88,7 +88,7 @@ class Ship
 /*
  *Tank Class
  *	Jackson
- */
+ 
  class Tank
  {
 	public:
@@ -103,18 +103,15 @@ class Ship
 		float maxVel = 1.0;
 		Vec vel = {0, 0, 0};
 		Vec tgt;
+		Weapon *prm;
 		Tank();
 		~Tank();
 
-		Tank *nextTank;
-		Tank *prevTank;
-		Weapon *prm;
-
-		void renderTurret();
-		void renderTank();
+		void renderTurret(SpriteList SPR);
+		void renderTank(SpriteList SPR);
 		void updateTarget(int x, int y);
 		void moveTank();
- };
+ };*/
 
 /*
  * Bullet Class
@@ -154,7 +151,7 @@ class Game
 	int playerScore;
 	//-----------------------------
 	//Jackson
-	Tank playerTank;
+	//Tank playerTank;
 	//------------------------------
     public:
 	Game();

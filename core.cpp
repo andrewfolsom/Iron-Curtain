@@ -13,6 +13,7 @@
 #include "core.h"
 #include "andrewF.h"
 #include "chadM.h"
+#include "nickJA.h"
 
 typedef float Flt;
 typedef float Vec[3];

@@ -28,6 +28,12 @@
 #include "chadM.h"
 #include "nickJA.h"
 
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif //USE_OPENAL_SOUND
+ 
+
+
 //defined types
 typedef float Flt;
 typedef float Vec[3];
@@ -88,6 +94,11 @@ extern void displaySpencer(float x, float y, GLuint texture);
 extern void displayStartScreen();
 extern void displayGameControls();
 extern void scrollingBackground();
+extern void cannonFire();
+extern void explodeShip();
+extern void killSound();
+extern void scrollingBackground2();
+extern void shieldSound();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -103,7 +114,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //--------------------------------------------------------------------------
 
 
-Image img[8] = {
+Image img[9] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -112,6 +123,8 @@ Image img[8] = {
 	"./img/ironImage.jpg",
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
+	"./img/clouds.jpg" ,
+
 };
 
 Particle p[MAX_PARTICLES];
@@ -125,6 +138,7 @@ Global& gl = Global::getInstance();
 Game g;
 
 SpriteList SPR;
+Tank playerTank;
 
 X11_wrapper x11;
 
@@ -156,6 +170,11 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+
+#ifdef USE_OPENAL_SOUND
+
+	alutInit(0, NULL);
+#endif
 	soundTrack();
 
 
@@ -245,7 +264,7 @@ void check_mouse(XEvent *e) {
 	static int savey = 0;
 	//static int lbuttonDown = 0;
 	//static int rbuttonDown = 0;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	//If mouse moves, save new position.
 	if (savex != e->xbutton.x || savey != e->xbutton.y) {
 			savex = e->xbutton.x;
@@ -259,7 +278,7 @@ void check_mouse(XEvent *e) {
 int check_keys(XEvent *e)
 {
 	Ship *s = &g.ship;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	if (e->type != KeyPress && e->type != KeyRelease)
 		return 0;
 	int key = XLookupKeysym(&e->xkey, 0);
@@ -332,12 +351,15 @@ int check_keys(XEvent *e)
 			case XK_space:
 				gl.keys[XK_space] = 1;
 				if (gl.gameState == 8) {
-					//t->prm->fire((float)g.playerTank.tAngle);
+					//t->prm->fire((float)270.0);
 				}
+				cannonFire();
 				break;
 
 			case XK_Escape:
 				return 1;
+				break;
+
 			case XK_m:
 				if (s->scnd->armed) {
 					s->scnd->locked = true;
@@ -374,6 +396,7 @@ int check_keys(XEvent *e)
 			case XK_b:
 				s->shield->status = !s->shield->status;
 			   	clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
+				shieldSound();
 				break;
 			case XK_Shift_R:
 				if (headShip != NULL) {
@@ -438,7 +461,7 @@ void physics()
 {
 	//float spdLeft, spdRight, spdUp, spdDown;
 	Ship *s = &g.ship;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	if (s->pos[0] < 20.0) {
 		s->pos[0] = 20.0;
 	} else if (s->pos[0] > gl.xres - 20.0) {
@@ -512,6 +535,7 @@ void physics()
 			if (dist < (radius * radius)) {
                 //Generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		
                 //Destroy enemy ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -552,6 +576,7 @@ void physics()
 				}
                 //generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		explodeShip();
 				//delete the ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -566,6 +591,7 @@ void physics()
 			}
 		}
 		i++;
+
 	}
 
 	#ifndef DEBUG
@@ -697,6 +723,7 @@ void physics()
 
 	if (gl.keys[XK_space]) {
 		s->wpn->fire();
+		//cannonFire();
 	}
 
 	i = 0;
@@ -722,8 +749,8 @@ void physics()
     updateExplosion();
 
 	//scrolling physics
-	gl.tex.xc[0] -=0.0005;
-	gl.tex.xc[1] -=0.0005;
+	gl.tex.xc[0] -=0.0007;
+	gl.tex.xc[1] -=0.0007;
 
 	if (gl.gameState == 8) {
 		t->moveTank();
@@ -773,7 +800,15 @@ void render()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
+
+		
+/*		glBindTexture(GL_TEXTURE_2D, gl.clouds);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[8].width,img[8].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
+*/		
 		scrollingBackground();
+		scrollingBackground2();
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Upgrade
@@ -787,13 +822,14 @@ void render()
 		//Draw ships
 
 		//renderShip(s);
-		SPR.drawPhantom(s->pos[0], s->pos[1]);
+		SPR.drawPhantom(s->pos[0], s->pos[1], 0);
 		if (s->shield->status)
 			s->shield->drawShield(s->pos);
 
 		EnemyShip *e = headShip;
 		while(e != NULL){
-			renderShip(e);
+			//renderShip(e);
+			SPR.drawMig(e->pos[0], e->pos[1], 180);
 			e = e->nextShip;
 		}
 
@@ -925,7 +961,8 @@ void render()
 	}
 	else if (gl.gameState == 8) {
 
-		Tank *t = &g.playerTank;
+		Tank *t = &playerTank;
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
@@ -940,7 +977,7 @@ void render()
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Tank
-		t->renderTank();
+		t->renderTank(SPR);
 
 		//Draw Upgrade
 		if (up != NULL) {
