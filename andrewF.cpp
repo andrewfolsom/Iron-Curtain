@@ -447,6 +447,7 @@ Secondary::Secondary()
 	reticle.lockColor[1] = 0.0;
 	reticle.lockColor[2] = 0.0;
 	reticle.angle = 0.0;
+    ready = true;
 	armed = false;
     locked = false;
 }
@@ -471,6 +472,7 @@ void Secondary::fire()
 {
     struct timespec bt;
     if (getTimeSlice(&g.ship, &bt) > fireRate) {
+        clock_gettime(CLOCK_REALTIME, &sTimer);
         timeCopy(&g.missileTimer, &bt);
         if (g.nmissiles < MAX_MISSILES) {
             Missile *m = &g.marr[g.nmissiles];
@@ -481,6 +483,15 @@ void Secondary::fire()
             g.nmissiles++;
         }
     }
+}
+
+void Secondary::reload()
+{
+    struct timespec currentTime;
+    clock_gettime(CLOCK_REALTIME, &currentTime);
+    double diff = timeDiff(&sTimer, &currentTime);
+    if (diff > 10.0)
+        ready = true;
 }
 
 /**
@@ -617,7 +628,7 @@ Shield::Shield()
 	color[0] = 1.0;
 	color[1] = 0.5;
 	color[2] = 0.25;
-    time = 20.0;
+    time = 10.0;
 	status = false;
 }
 
@@ -753,9 +764,9 @@ void Hud::genTextures()
  * Renders the componenets of the HUD
  * @param   int l   Players current lives
  * @param   int w   Players currently equiped weapon
- * @param   int s   Players currently equiped secondary weapon
+ * @param   int s   Players current score
  */
-void Hud::drawHud(int l, int w, int s)
+void Hud::drawHud(int l, int w, int s, bool r)
 {
 	float resX = 128.0f;
 	float resY = 72.0f;
@@ -805,29 +816,31 @@ void Hud::drawHud(int l, int w, int s)
 	glDisable(GL_TEXTURE_2D);
     glDisable(GL_TEXTURE_2D);
 
-    resX = 10.0f;
-    resY = 10.0f;
-    glEnable(GL_TEXTURE_2D);
-	glColor4ub(255.0,255.0,255.0,255.0);
-	glBindTexture(GL_TEXTURE_2D, secondary);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	transData = buildAlphaData(&hudSecond);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudSecond.width, hudSecond.height, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, transData);
-	free(transData);
-	glPushMatrix();
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(105.0f, 45.0f, 1.0f);
-    glBegin(GL_QUADS);
-        glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
-        glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
-        glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
-        glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
-    glEnd();
-    glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
+    if (r) {
+        resX = 10.0f;
+        resY = 10.0f;
+        glEnable(GL_TEXTURE_2D);
+        glColor4ub(255.0,255.0,255.0,255.0);
+        glBindTexture(GL_TEXTURE_2D, secondary);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        transData = buildAlphaData(&hudSecond);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hudSecond.width, hudSecond.height, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE, transData);
+        free(transData);
+        glPushMatrix();
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.0f);
+        glTranslatef(105.0f, 45.0f, 1.0f);
+        glBegin(GL_QUADS);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(resX,-resY);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(resX, resY);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(-resX, resY);
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(-resX, -resY);
+        glEnd();
+        glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+    }
 
     char buffer[32];
     sprintf(buffer, "%d", s);

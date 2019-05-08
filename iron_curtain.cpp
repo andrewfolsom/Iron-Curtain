@@ -399,7 +399,7 @@ int check_keys(XEvent *e)
 				shieldSound();
 				break;
 			case XK_Shift_R:
-				if (headShip != NULL) {
+				if (headShip != NULL && s->scnd->ready) {
 					s->scnd->armed = true;
 					s->scnd->reticle.e = headShip;
 					s->scnd->reticle.update();
@@ -734,8 +734,10 @@ void physics()
 	}
 
 
-	if (gl.keys[XK_m])
+	if (gl.keys[XK_m]) {
 		s->scnd->fire();
+        s->scnd->ready = false;
+    }
 
 	if (g.thrustOn) {
 		struct timespec mtt;
@@ -747,6 +749,11 @@ void physics()
 
     //Update Explosions
     updateExplosion();
+
+    //Check to see if missile is reloaded
+    if (!s->scnd->ready) {
+        s->scnd->reload();
+    }
 
 	//scrolling physics
 	gl.tex.xc[0] -=0.0007;
@@ -817,7 +824,7 @@ void render()
 		}
 
 		//Draw HUD
-		hud.drawHud(s->health, s->equiped, g.playerScore);
+		hud.drawHud(s->health, s->equiped, g.playerScore, s->scnd->ready);
 
 		//Draw ships
 
