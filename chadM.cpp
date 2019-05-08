@@ -101,6 +101,8 @@ EnemyShip::~EnemyShip() {
     } else {
         tailShip = prevShip;
     }
+
+	delete eWpn;
 }
 
 /*
