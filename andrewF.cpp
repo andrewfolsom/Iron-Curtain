@@ -1,8 +1,9 @@
 #include <GL/glx.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
+#include <cstring>
 #include <cmath>
+#include <time.h>
 #include "fonts.h"
 #include "andrewF.h"
 #include "core.h"
@@ -12,11 +13,14 @@
 #define VecSub(a,b,c) (c)[0]=(a)[0]-(b)[0];(c)[1]=(a)[1]-(b)[1];\
 (c)[2]=(a)[2]-(b)[2]
 
+struct timepsec;
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
+const int MAX_PARTICLES = 3000;
 extern float convertToRads(float angle);
 extern double getTimeSlice(Ship*, timespec*);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
+extern double timeDiff(struct timespec *start, struct timespec *end);
 extern Game g;
 extern Image img;
 extern EnemyShip* headShip;
@@ -58,6 +62,8 @@ Image hudScore("./img/scoreboard.png");
 Image hudDisplay("./img/weaponDisplay.png");
 
 Image upgradePod("./img/upgrade.png");
+
+Image boom("./img/explosion.png");
 
 /**
  * Displays my picture and name
@@ -190,6 +196,30 @@ void Basic::fire()
             timeCopy(&b->time, &bt);
             setPosition(g.ship.pos, b->pos);
             setVelocity(b->vel);
+            setColor(b->color);
+            g.nPlayerBullets++;
+        }
+    }
+}
+
+/**
+ * Overload fire function with angular functionality
+ */
+void Basic::fire(float angle)
+{
+    Ship* ship = &g.ship;
+    struct timespec bt;
+    double time = getTimeSlice(ship, &bt);
+    if (time > fireRate) {
+        timeCopy(&ship->bulletTimer, &bt);
+        if (g.nPlayerBullets < MAX_BULLETS) {
+            Bullet *b = &g.playerBarr[g.nPlayerBullets];
+            timeCopy(&b->time, &bt);
+            setPosition(ship->pos, b->pos);
+            setVelocity(b->vel);
+	    angularAdjustment(b->vel, angle);
+            //b->vel[0] *= cos(convertToRads(angle));
+            //b->vel[1] *= sin(convertToRads(angle));
             setColor(b->color);
             g.nPlayerBullets++;
         }
@@ -491,6 +521,9 @@ EnemyStd::EnemyStd()
 {
     bulletSpeed = -5.0;
     fireRate = 2.0;
+    color[0] = 0.5;
+    color[1] = 1.0;
+    color[2] = 0.5;
 }
 
 /**
@@ -523,7 +556,7 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
  * Upgrade class constructor
  */
 Upgrade::Upgrade(float x, float y) {
-	dropSpeed = 5.0;
+	dropSpeed = 0.5;
 	w = 50.0;
 	h = 50.0;
     pos[0] = x;
@@ -545,7 +578,7 @@ void Upgrade::drawUpgrade() {
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-    glTranslatef(pos[0], pos[1], 1.0);
+    glTranslatef(pos[0], pos[1], 0.5);
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 1.0f); glVertex2i(w,-h);
         glTexCoord2f(1.0f, 0.0f); glVertex2i(w, h);
@@ -572,10 +605,11 @@ Shield::Shield()
 {
 	angle = 0.0;
 	increment = 30.0;
-	radius = 60.0;
+	radius = 90.0;
 	color[0] = 1.0;
 	color[1] = 0.5;
 	color[2] = 0.25;
+    time = 20.0;
 	status = false;
 }
 
@@ -602,8 +636,28 @@ void Shield::drawShield(float *pos)
 	}
 }
 
+// Function to check elapsed time since shield activation
+void Shield::checkTime()
+{
+    struct timespec st;
+    clock_gettime(CLOCK_REALTIME, &st);
+    double diff = timeDiff(&shieldTimer, &st);
+    if (diff > time)
+        status = false;
+}
+
+// Collision detection for shield
+bool Shield::detectCollision(float dist)
+{
+    float area = radius*radius;
+    if (dist < area)
+        return true;
+    else
+        return false;
+}
+
 //===========================================================
-//				DEFINITION OF THE DIGITS CLASS 
+//		DEFINITION OF THE DIGITS CLASS 
 //===========================================================
 
 Digit::Digit()
@@ -642,7 +696,7 @@ void Digit::displayDigit(char ch, float x, float y) {
 }
 
 //===========================================================
-//				DEFINITION OF THE USER INTERFACE 
+//		DEFINITION OF THE USER INTERFACE 
 //===========================================================
 
 // Hud class constructor
@@ -791,4 +845,84 @@ void Hud::drawHud(int l, int w, int s)
     glEnd();
     glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+}
+
+// Particle Function
+Particle::Particle() { }
+
+// Explosion renderer
+void createExplosion(float x, float y)
+{
+	int vel1, vel2, angle;
+	if (g.nParticles < MAX_PARTICLES) {
+		for (int i = 0; i < 30; i++) {
+			Particle* p = &g.parr[g.nParticles];
+			clock_gettime(CLOCK_REALTIME, &p->pTimer);
+			p->pos[0] = x;
+			p->pos[1] = y;
+			p->pos[2] = 1.0;
+            p->color[0] = 1.0;
+            p->color[1] = 1.0;
+            p->color[2] = 0.0;
+			vel1 = rand() % 3 + 1;
+			vel2 = rand() % 3 + 1;
+			angle = rand() % 360;
+			p->vel[0] = (float)vel1;
+			p->vel[1] = (float)vel2;
+			angularAdjustment(p->vel, (float)angle);
+			g.nParticles++;
+		}
+	}
+}
+
+void updateExplosion()
+{
+	int i = 0;
+	Particle* p;
+	while (i < g.nParticles) {
+		p = &g.parr[i];
+		p->pos[0] += p->vel[0];
+		p->pos[1] += p->vel[1];
+
+        for (int j = 0; j < 2; j++) {
+            if (j == 1)
+                p->color[j] -= 0.02;
+            else
+                p->color[j] -= 0.01;
+            
+            if (p->color[j] < 0.0)
+                p->color[j] = 0.0;
+        }
+
+    	struct timespec pt;
+    	clock_gettime(CLOCK_REALTIME, &pt);
+    	double diff = timeDiff(&p->pTimer, &pt);
+
+		if (diff > 2.0) {
+			memcpy(p, &g.parr[g.nParticles-1], sizeof(Particle));
+			g.nParticles--;
+		}
+		i++;
+	}
+}
+
+void renderExplosion() {
+    int i = 0;
+    float resX = 1.0;
+    float resY = 1.0;
+    Particle* p;
+    while (i < g.nParticles) {
+        p = &g.parr[i];
+        glPushMatrix();
+        glTranslatef(p->pos[0], p->pos[1], p->pos[2]);
+        glBegin(GL_QUADS);
+            glColor3f(p->color[0], p->color[1], p->color[2]);
+            glVertex2f(resX, resY);
+            glVertex2f(resX, -resY);
+            glVertex2f(-resX, -resY);
+            glVertex2f(-resX, resY);
+        glEnd();
+        glPopMatrix();
+        i++;
+    }
 }

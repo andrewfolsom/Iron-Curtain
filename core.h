@@ -6,6 +6,7 @@
 #define CORE
 
 #include "andrewF.h"
+//#include "nickJA.h"
 
 typedef float Flt;
 typedef float Vec[3];
@@ -103,6 +104,7 @@ class Ship
 		Vec vel = {0, 0, 0};
 		Vec tgt;
 		Tank();
+		~Tank();
 
 		Tank *nextTank;
 		Tank *prevTank;
@@ -113,32 +115,6 @@ class Ship
 		void updateTarget(int x, int y);
 		void moveTank();
  };
-
-/*
- *OPFOR Class
- *	Jackson
- */
-class opForShip
-{
-    public:
-	Vec pos;
-	float vel[4];
-	float speed;
-	float color[3] = {255.0, 0.0, 0.0};
-	int weaponType;
-	int movPattern = 1;
-	int speedMul = 1;
-	//Currently needed for movement
-	float angle = 90.0;
-	float slope;
-	float t = 0.0;
-	Vec spawnPos;
-	int destOffset = 0.0;
-	//
-	opForShip();
-	opForShip(const opForShip&);
-	opForShip& operator= (const opForShip&);
-};
 
 /*
  * Bullet Class
@@ -166,9 +142,11 @@ class Game
 	Bullet *playerBarr;
 	Bullet *enemyBarr;
 	Missile *marr;
+	Particle *parr;
 	int nPlayerBullets;
 	int nEnemyBullets;
 	int nmissiles;
+	int nParticles;
 	Flt radius;
 	timespec missileTimer;
 	timespec thrustTimer;
@@ -176,8 +154,7 @@ class Game
 	int playerScore;
 	//-----------------------------
 	//Jackson
-	opForShip opFor[100];
-	int numOpFor;
+	Tank playerTank;
 	//------------------------------
     public:
 	Game();

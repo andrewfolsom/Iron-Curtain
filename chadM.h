@@ -38,7 +38,7 @@ class EnemyShip : public Ship {
 		Vec spawnPos;
 		float angle;
 		float angleSpd;
-		float t;
+		float t;  //Time for Bezier Curves
 		float destX, destY;
 		int speedMul = 1;
 		int initFlag = 0;

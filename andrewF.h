@@ -46,6 +46,7 @@ class Basic : public Weapon
 public:
 	Basic();
 	void fire();
+	void fire(float angle);
 };
 
 class Rapid : public Basic
@@ -152,10 +153,14 @@ class Shield
 		float radius;
 		float x, y;
 		float color[3];
+        float time;
 		bool status;
+        struct timespec shieldTimer;
 	public:
 		Shield();
 		void drawShield(float* pos);
+        void checkTime();
+        bool detectCollision(float dist);
 };
 
 class Digit
@@ -183,6 +188,17 @@ class Hud
 		Hud();
 		void genTextures();
 		void drawHud(int l, int w, int s);
+};
+
+class Particle
+{
+	public:
+		struct timespec pTimer;
+		float color[3];
+		float pos[3];
+		float vel[3];
+	public:
+		Particle();
 };
 
 #endif

@@ -19,6 +19,7 @@ typedef float Vec[3];
 
 const int MAX_BULLETS = 1000;
 const int MAX_MISSILES = 1;
+const int MAX_PARTICLES = 3000;
 extern Global& gl;
 
 /*
@@ -129,20 +130,17 @@ Ship::~Ship() {
     delete shield;
 }
 
-/*
- * OpFor Class
- *	Jackson
+/* 
+ * TANK CLASS
  */
-opForShip::opForShip() {
-
+ Tank::Tank() {
+	pos[0] = gl.xres/2;
+	pos[1] = gl.yres/4;
+	prm = new Basic;
+ }
+Tank::~Tank() {
+	delete prm;
 }
-/*
-opForShip::opForShip(const opForShip& target) {
-	memcpy(pos, target.pos, 3);
-	memcpy(vel, target.vel, 4);
-	memcpy(color, target.color, 3);
-}
-*/
 /*
  * Bullet Class
  */
@@ -159,6 +157,7 @@ Game::Game()
 	playerBarr = new Bullet[MAX_BULLETS];
 	enemyBarr = new Bullet[MAX_BULLETS];
 	marr = new Missile[MAX_MISSILES];
+	parr = new Particle[MAX_PARTICLES];
 	nPlayerBullets = nEnemyBullets= 0;
 	nmissiles = 0;
 	clock_gettime(CLOCK_REALTIME, &missileTimer);
@@ -168,7 +167,9 @@ Game::Game()
 Game::~Game()
 {
 	delete [] playerBarr;
+	delete [] enemyBarr;
 	delete [] marr;
+	delete [] parr;
 }
 
 /*

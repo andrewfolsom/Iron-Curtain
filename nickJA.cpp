@@ -10,11 +10,15 @@
 #include "fonts.h"
 #include "core.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "chadM.h"
+#include "nickJA.h"
+
 extern Game g;
 extern Global gl;
 extern EnemyShip *headShip;
+extern unsigned char *buildAlphaData(Image *img);
 //const int RUSH = 0;
 //const int STRAFE = 1;
 //const int CIRCLING = 2;
@@ -23,6 +27,10 @@ extern EnemyShip *headShip;
 const Flt PI = 3.141592653589793;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
+
+Image Sprites[1]{
+"./img/Phantom_1a.png"
+};
 
 //DISPLAY
 void displayNick(float x, float y, GLuint texture)
@@ -50,7 +58,42 @@ void displayNick(float x, float y, GLuint texture)
 	r.left = r.centerx - 50;
 	ggprint16(&r, 16, color, "Nick Jackson");
 }
-//MOVEMENT TYPES
+
+//***********SPRITES DISPLAY*****************
+SpriteList::SpriteList()  {
+	glGenTextures(1, &phantom);
+}
+
+void SpriteList::drawPhantom(float x, float y) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, phantom);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[0].width, Sprites[0].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 93.0;
+	float w = 57.0;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 1.0);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
+
+//************MOVEMENT TYPES*****************
 //Press 't' to test this mid game.
 //1 - Rush
 //Enemy begins at the top of the screen and rushes straight to the bottom.
@@ -186,14 +229,12 @@ void EnemyShip::configBank(float x, float y, float speed)
 }
 
 //5 - Diagonal Rush
-//Enemy will follow a diagonal line from its spawn to the bottom of the screen.
+//Enemy will follow a line following the angle from its current point to the specified point.
 //EnemyShip Compatible
 void EnemyShip::updateDiagRush()
 {
-	pos[1] += (speedMul * sin((3*PI/2) - angle));
-	pos[0] += (speedMul * cos((3*PI/2) - angle));
-
-	printf("Angle is %f, x is %f, y is %f\n", angle, pos[0], pos[1]);
+	pos[1] += (speedMul * sin(angle));
+	pos[0] += (speedMul * cos(angle));
 }
 
 
@@ -203,7 +244,12 @@ void EnemyShip::configDiagRush(float x, float y, float speed)
 
 	spawnPos[0] = pos[0];
 	spawnPos[1] = pos[1];
-	angle = atan((x-spawnPos[0]) / (y-spawnPos[1]));
+	angle = atan((y-pos[1]) / (x-pos[0]));
+	if (x - pos[0] > 0) 
+	angle = angle;
+	else
+	angle = PI + angle;
+
 	speedMul = speed;
 }
 
@@ -240,9 +286,7 @@ void EnemyShip::updatePosition()
 }
 
 
-//============================================
-//				TANK MOVEMENT
-//============================================
+//*************TANK MOVEMENT*****************
 
 void Tank::renderTurret()
 {
