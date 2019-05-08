@@ -98,6 +98,7 @@ extern void cannonFire();
 extern void explodeShip();
 extern void killSound();
 extern void scrollingBackground2();
+extern void shieldSound();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -352,7 +353,7 @@ int check_keys(XEvent *e)
 				if (gl.gameState == 8) {
 					//t->prm->fire((float)270.0);
 				}
-			
+				cannonFire();
 				break;
 
 			case XK_Escape:
@@ -395,6 +396,7 @@ int check_keys(XEvent *e)
 			case XK_b:
 				s->shield->status = !s->shield->status;
 			   	clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
+				shieldSound();
 				break;
 			case XK_Shift_R:
 				if (headShip != NULL) {
@@ -721,7 +723,7 @@ void physics()
 
 	if (gl.keys[XK_space]) {
 		s->wpn->fire();
-		cannonFire();
+		//cannonFire();
 	}
 
 	i = 0;
@@ -747,8 +749,8 @@ void physics()
     updateExplosion();
 
 	//scrolling physics
-	gl.tex.xc[0] -=0.0005;
-	gl.tex.xc[1] -=0.0005;
+	gl.tex.xc[0] -=0.0007;
+	gl.tex.xc[1] -=0.0007;
 
 	if (gl.gameState == 8) {
 		t->moveTank();
