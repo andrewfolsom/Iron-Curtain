@@ -840,43 +840,49 @@ void render()
         renderExplosion();
 
 		for (int i = 0; i < g.nPlayerBullets; i++) {
+            float resX = 2.0;
+            float resY = 5.0;
 			Bullet *b = &g.playerBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
 			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
 			glBegin(GL_QUADS);
-			glVertex2f(-5.0, -5.0);
-			glVertex2f(-5.0, 5.0);
-			glVertex2f(5.0, 5.0);
-			glVertex2f(5.0, -5.0);
+			glVertex2f(-resX, -resY);
+			glVertex2f(-resX, resY);
+			glVertex2f(resX, resY);
+			glVertex2f(resX, -resY);
 			glEnd();
 			glPopMatrix();
 		}
 
 		for (int i = 0; i < g.nEnemyBullets; i++) {
+            float resX = 2.0;
+            float resY = 5.0;
 			Bullet *b = &g.enemyBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
 			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
 			glBegin(GL_QUADS);
-			glVertex2f(-5.0, -5.0);
-			glVertex2f(-5.0, 5.0);
-			glVertex2f(5.0, 5.0);
-			glVertex2f(5.0, -5.0);
+			glVertex2f(-resX, -resY);
+			glVertex2f(-resX, resY);
+			glVertex2f(resX, resY);
+			glVertex2f(resX, -resY);
 			glEnd();
 			glPopMatrix();
 		}
 
 		for (int i = 0; i < g.nmissiles; i++) {
+            float resX = 3.0;
+            float resY = 6.0;
 			Missile *m = &g.marr[i];
 			glColor3fv(m->color);
 			glPushMatrix();
 			glTranslatef(m->pos[0], m->pos[1], m->pos[2]);
 			glBegin(GL_QUADS);
-			glVertex2f(-5.0, -5.0);
-			glVertex2f(-5.0, 5.0);
-			glVertex2f(5.0, 5.0);
-			glVertex2f(5.0, -5.0);
+			glVertex2f(-resX, -resY);
+			glVertex2f(-resX, resY);
+			glVertex2f(resX, resY);
+			glVertex2f(resX, -resY);
 			glEnd();
 			glPopMatrix();
 		}

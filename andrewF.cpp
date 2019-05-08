@@ -217,9 +217,7 @@ void Basic::fire(float angle)
             timeCopy(&b->time, &bt);
             setPosition(ship->pos, b->pos);
             setVelocity(b->vel);
-	    angularAdjustment(b->vel, angle);
-            //b->vel[0] *= cos(convertToRads(angle));
-            //b->vel[1] *= sin(convertToRads(angle));
+            angularAdjustment(b->vel, angle);
             setColor(b->color);
             g.nPlayerBullets++;
         }
@@ -377,16 +375,16 @@ void Reticle::drawReticle(bool lock)
     int x, y, x1, y1;
     if (!lock) {
         glPushMatrix();
-	    glTranslatef(pos[0], pos[1], pos[2]);
-	    glColor3f(seekColor[0],seekColor[1],seekColor[2]);
-	    glLineWidth(2.0f);
-	    glBegin(GL_LINE_LOOP);
-	    for (int i = 0; i < 120; i++) {
-		    x = 40 * cos(convertToRads(angle + (i*3)));
-		    y = 40 * sin(convertToRads(angle + (i*3)));
-		    glVertex3f(x, y, 0.0);
-	    }
-	    glEnd();
+		glTranslatef(pos[0], pos[1], pos[2]);
+		glColor3f(seekColor[0],seekColor[1],seekColor[2]);
+		glLineWidth(2.0f);
+		glBegin(GL_LINE_LOOP);
+		for (int i = 0; i < 120; i++) {
+			x = 40 * cos(convertToRads(angle + (i*3)));
+			y = 40 * sin(convertToRads(angle + (i*3)));
+			glVertex3f(x, y, 0.0);
+		}
+		glEnd();
         glBegin(GL_LINES);
         for (int i = 0; i < 4; i++) {
             x = 30 * cos(convertToRads(angle + (i*90)));
@@ -397,26 +395,26 @@ void Reticle::drawReticle(bool lock)
             glVertex3f(x1, y1, 0.0);
         }
         glEnd();
-	    glPopMatrix();
+		glPopMatrix();
 
-	    if (angle < 90) {
-		    angle += 5.0;
-	    } else {
-		    angle = 0.0;
-	    }
+		if (angle < 90) {
+			angle += 5.0;
+		} else {
+			angle = 0.0;
+		}
     } else {
         glPushMatrix();
-	    glTranslatef(pos[0], pos[1], pos[2]);
-	    glColor3f(lockColor[0],lockColor[1],lockColor[2]);
-	    glLineWidth(2.0f);
-	    glBegin(GL_LINE_LOOP);
+		glTranslatef(pos[0], pos[1], pos[2]);
+		glColor3f(lockColor[0],lockColor[1],lockColor[2]);
+		glLineWidth(2.0f);
+		glBegin(GL_LINE_LOOP);
         angle = 0.0;
-	    for (int i = 0; i < 120; i++) {
-		    x = 40 * cos(convertToRads(angle + (i*3)));
-		    y = 40 * sin(convertToRads(angle + (i*3)));
-		    glVertex3f(x, y, 0.0);
-	    }
-	    glEnd();
+		for (int i = 0; i < 120; i++) {
+			x = 40 * cos(convertToRads(angle + (i*3)));
+			y = 40 * sin(convertToRads(angle + (i*3)));
+			glVertex3f(x, y, 0.0);
+		}
+		glEnd();
         glBegin(GL_LINES);
         for (int i = 0; i < 4; i++) {
             x = 30 * cos(convertToRads(angle + (i*90)));
@@ -428,7 +426,7 @@ void Reticle::drawReticle(bool lock)
         }
         glEnd();
 	
-	    glPopMatrix();
+		glPopMatrix();
     }
 }
 
@@ -947,9 +945,9 @@ void updateExplosion()
                 p->color[j] = 0.0;
         }
 
-    	struct timespec pt;
-    	clock_gettime(CLOCK_REALTIME, &pt);
-    	double diff = timeDiff(&p->pTimer, &pt);
+		struct timespec pt;
+		clock_gettime(CLOCK_REALTIME, &pt);
+		double diff = timeDiff(&p->pTimer, &pt);
 
 		if (diff > 2.0) {
 			memcpy(p, &g.parr[g.nParticles-1], sizeof(Particle));
