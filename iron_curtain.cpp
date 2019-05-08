@@ -110,6 +110,7 @@ extern void serverConnect(int);
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
+extern void spawnTank();
 //--------------------------------------------------------------------------
 
 
@@ -138,6 +139,9 @@ Game g;
 
 SpriteList SPR;
 Tank playerTank;
+EnemyTank *headTank = NULL;
+EnemyTank *tailTank = NULL;
+EnemyTank *eTank = NULL;
 
 X11_wrapper x11;
 
@@ -169,6 +173,7 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timePause);
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
+
 
 #ifdef USE_OPENAL_SOUND
 
@@ -420,6 +425,10 @@ int check_keys(XEvent *e)
 				}
 				break;
 			case XK_t:
+			spawnTank();
+				break;
+			case XK_q:
+				delete tailTank;
 				break;
 		}
 	}
@@ -751,6 +760,11 @@ void physics()
 	gl.tex.xc[1] -=0.0005;
 
 	if (gl.gameState == 8) {
+		eTank =  headTank;
+		while (eTank != NULL) {
+		eTank->updateTarget(t->pos[0], t->pos[1]);
+		eTank = eTank->nextTank;
+		}
 		t->moveTank();
 	}
 	return;
@@ -975,7 +989,13 @@ void render()
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Tank
+		eTank = headTank;
+		while (eTank != NULL) {
+			eTank->renderTank(SPR);
+			eTank = eTank->nextTank;
+		}
 		t->renderTank(SPR);
+		//testTank->renderTank(SPR);
 
 		//Draw Upgrade
 		if (up != NULL) {

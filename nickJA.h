@@ -20,6 +20,7 @@ class SpriteList {
 		void drawM60Turret(float x, float y, float angle);
 		void drawM60Hull(float x, float y, float angle);
 };
+
 //Tank Class Declarations.
 class Tank
 {
@@ -45,12 +46,23 @@ class Tank
 		void moveTank();
 
 };
-//Enemy Tank Class Declarations.
 
+//Enemy Tank Class Declarations.
 class EnemyTank : public Tank {
 	public:
 		EnemyTank(float x, float y, int faction);
+		~EnemyTank();
 		EnemyTank *nextTank;
 		EnemyTank *prevTank;
+
+		int factFlag;
+		float aggression;
+		float movTgtAngle;
+		Vec movTgt;
+		Vec potentialMov[3];
+
+		void generatePositions();
+		void pickMovTgt();
+		void moveEnemyTank();
 
 };

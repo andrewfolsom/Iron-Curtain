@@ -14,10 +14,13 @@
 #include <math.h>
 #include "chadM.h"
 #include "nickJA.h"
+#include "andrewF.h"
 
 extern Game g;
 extern Global gl;
-extern EnemyShip *headShip;
+extern EnemyTank *headTank;
+extern EnemyTank *tailTank;
+extern EnemyTank *eTank;
 extern unsigned char *buildAlphaData(Image *img);
 //const int RUSH = 0;
 //const int STRAFE = 1;
@@ -28,11 +31,12 @@ const Flt PI = 3.141592653589793;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[4]{
+Image Sprites[5]{
 "./img/Phantom_1a.png",
 "./img/MiG-21_a.png",
 "./img/M60Hull.png",
-"./img/M60_Turret_2.png"
+"./img/M60_Turret_2.png",
+"./img/Boss.png"
 };
 
 //DISPLAY
@@ -130,7 +134,9 @@ void SpriteList::drawMig(float x, float y, float angle) {
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 }
-
+//Function to render our M60's turret.
+//The turret is placed above and separate from the hull.
+//x, y, and angle do what you think they do.
 void SpriteList::drawM60Turret(float x, float y, float angle) {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
@@ -161,7 +167,9 @@ void SpriteList::drawM60Turret(float x, float y, float angle) {
 
 
 }
-
+//Function to render our M60's hull.
+//The hull is below and separate from the turret.
+//x, y, and angle are still working the same old job.
 void SpriteList::drawM60Hull(float x, float y, float angle) {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
@@ -193,7 +201,7 @@ void SpriteList::drawM60Hull(float x, float y, float angle) {
 
 }
 
-//************MOVEMENT TYPES*****************
+//********MOVEMENT TYPES***********
 //Press 't' to test this mid game.
 //1 - Rush
 //Enemy begins at the top of the screen and rushes straight to the bottom.
@@ -385,15 +393,22 @@ void EnemyShip::updatePosition()
 		}
 }
 
+//********TANK CLASS********
+Tank::Tank() {
+	pos[0] = 450;
+	pos[1] = 250;
+	prm = new Basic;
+}
+
+Tank::~Tank() {
+	delete prm;
+}
+
 
 //*************TANK MOVEMENT*****************
 
 void Tank::renderTurret(SpriteList SPR)
 {
-	//Vec pt[50];
-	//float circAngle = 0;
-	//float angleInc = (2*PI)/50;
-
 	tPos[0] = pos[0];
 	tPos[1] = pos[1];
 	//tAngle is the current angle of the turret.
@@ -412,9 +427,13 @@ void Tank::renderTurret(SpriteList SPR)
 		else { 
 			tAngle += 0.25;
 		}
-		//printf("Called %i times", calledCount);
 	}
-	/*
+	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
+
+	/* **OLD CODE**
+	Vec pt[50];
+	float circAngle = 0;
+	float angleInc = (2*PI)/50;
 	//Draw Gun
 	glColor3f(0.0, 0.0, 0.1);
 	glPushMatrix();
@@ -452,9 +471,9 @@ void Tank::renderTurret(SpriteList SPR)
 		glVertex3f(pt[0][0], pt[0][1], 1.0);
 	glEnd();
 	glPopMatrix();*/
-	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
 	//printf("tgtAngle is %f, tAngle is %f\n", tgtAngle, tAngle);
 }
+
 //Function is fed an X, Y value to target.
 //Is suppled with cursor Coord in iron-curtain.cpp
 void Tank::updateTarget(int x, int y)
@@ -473,7 +492,11 @@ void Tank::updateTarget(int x, int y)
 
 void Tank::renderTank(SpriteList SPR) 
 {
-/*
+
+	SPR.drawM60Hull(pos[0], pos[1], angle);
+	renderTurret(SPR);
+
+/* **OLD CODE**
 	glColor3fv(color);
 	glPushMatrix();
 	glTranslatef(pos[0], pos[1], 0.1);
@@ -486,9 +509,6 @@ void Tank::renderTank(SpriteList SPR)
 	glEnd();
 	glPopMatrix();
 */
-	SPR.drawM60Hull(pos[0], pos[1], angle);
-	renderTurret(SPR);
-
 	//printf("Pos is (%f, %f)\n", tank.turret.tPos[0], tank.turret.tPos[1]);
 }
 
@@ -529,8 +549,65 @@ void Tank::moveTank()
 	updateTarget(tgt[0], tgt[1]);
 }
 
-
-//******** ENEMY TANK CLASS ********
-	EnemyTank::EnemyTank(float x, float y, int faction) {
-		
+//********ENEMY TANK CLASS********
+EnemyTank::EnemyTank(float x, float y, int faction) {
+	pos[0] = x;
+	pos[1] = y;
+	factFlag = faction;
+	angle = 180;
+	tAngle = 180;
+	aggression = rand()%100 /100;
+	if (headTank == NULL) {
+		headTank = tailTank = this;
+		prevTank = nextTank = NULL;
 	}
+	else {
+		prevTank = tailTank;
+		prevTank->nextTank = tailTank = this;
+	}
+	nextTank = NULL;
+}
+
+EnemyTank::~EnemyTank() {
+	if (prevTank != NULL) {
+		prevTank->nextTank = nextTank;
+	}
+	else {
+		headTank = nextTank;
+	}
+	if (nextTank != NULL) {
+		nextTank->prevTank = prevTank;
+	}
+	else {
+		tailTank = prevTank;
+	}
+}
+
+//********ENEMY TANK FUNCTIONS********
+void spawnTank() {
+	float x = rand()%500 + 200;
+	float y = rand()%500 + 200;
+	eTank = new EnemyTank(x, y, 1);
+}
+void EnemyTank::generatePositions() {
+	Vec generatedPos;
+
+}
+//Will pick a location to move to.
+//Location will be decided by the sum of variables
+//affected by each tank's 'aggression'
+void EnemyTank::pickMovTgt() {
+	float favor;
+}
+
+void EnemyTank::moveEnemyTank() {
+	float xdiff = movTgt[0] - pos[0];
+	float ydiff = movTgt[1] - pos[1];
+	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
+
+	if (distance >=5) {
+		vel[0]+= 0.8;
+		moving = 1;
+	}
+
+}
