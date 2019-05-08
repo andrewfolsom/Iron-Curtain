@@ -155,8 +155,16 @@ Grunt::Grunt(int x, int y, int movType) : EnemyShip(x, y, movType) {
     Helper function for mainLevel, gets x-coord that is within
         game bounds
 */
-int getRandSpawn() {
+int getRandXSpawn() {
     return rand() % 800 + 50;
+}
+
+/*
+    Helper function for mainLevel, gets x-coord that is within
+        game bounds
+*/
+int getRandYSpawn() {
+    return rand() % 900 + 20;
 }
 
 void resetSpawnTimer() {
@@ -170,22 +178,29 @@ void resetSpawnTimer() {
 */
 void mainLevel(double gameTime) {
     //gl.xres == 900
-    const int ySpawn = 1050;
-    int xSpawn = 0;
+    //g.yres == 1000
+    const int ySpawn = 1060;
     if (gameTime - lastSpawnTime > 2) {
-        xSpawn = getRandSpawn();
         lastSpawnTime = gameTime;
-        if ((int) gameTime % 5 == 0)
-            eShip = new Grunt(xSpawn, ySpawn, RUSH);
-        if (gameTime < 1.0) {
+        // if ((int) gameTime % 5 == 0)
+        //     eShip = new Grunt(getRandSpawn(), ySpawn, RUSH);
+        if (gameTime < 10.0) {
             eShip = new Grunt(100, ySpawn, DIAG_RUSH);
             tailShip->configDiagRush(gl.xres, 0, 1);
-            eShip = new Grunt(gl.xres, ySpawn, DIAG_RUSH);
+            eShip = new Grunt(gl.xres, ySpawn+10, DIAG_RUSH);
             tailShip->configDiagRush(0, 0, 1);
         }
-        else if (gameTime < 50) {
-            eShip = new Grunt(200, ySpawn, CIRCLING);
-            tailShip->configCircle(50, 90, 20, 1, -1);
+        else if ( gameTime > 20 && gameTime < 50) {
+            eShip = new Grunt(getRandXSpawn(), ySpawn, CIRCLING);
+            tailShip->configCircle(50, 90, 1, 1, -1);
+            eShip = new Grunt(getRandXSpawn(), ySpawn, CIRCLING);
+            tailShip->configCircle(100, 90, 1, 1, 1);
+            // eShip = new Grunt(getRandXSpawn(), ySpawn, CIRCLING);
+            // tailShip->configCircle(50, 90, 2, 1, -1);
+        }
+        else if (gameTime > 60 && gameTime < 100) {
+            eShip = new Grunt(-15, 600, DIAG_RUSH);
+            tailShip->configDiagRush(1000, -20, 2);
         }
     }
 }
