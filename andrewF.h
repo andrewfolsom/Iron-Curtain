@@ -102,12 +102,15 @@ class Secondary : public Basic
 {
 public:
 	Reticle reticle;
+    struct timespec sTimer;
+    bool ready;
     bool armed;
     bool locked;
 public:
 	Secondary();
 	void setVelocity(float*);
 	void fire();
+    void reload();
 };
 
 class Missile : public Secondary
@@ -187,7 +190,7 @@ class Hud
 	public:
 		Hud();
 		void genTextures();
-		void drawHud(int l, int w, int s);
+		void drawHud(int l, int w, int s, bool r);
 };
 
 class Particle
