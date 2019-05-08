@@ -208,6 +208,7 @@ bool mainLevel(double gameTime) {
     //g.yres == 1000
     const int ySpawn = 1060;
     static bool bossSpawned = false;
+    bool bossDefeated = false;
 
     if (gameTime - lastSpawnTime > 2) {
         lastSpawnTime = gameTime;
@@ -241,4 +242,6 @@ bool mainLevel(double gameTime) {
                 tailShip->configDiagRush(gl.xres / 3, 700, 1);
         }
     }
+
+    return bossDefeated;
 }

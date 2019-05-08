@@ -186,7 +186,8 @@ int main()
 		}
 		if (gl.gameState != 3 && gl.gameState !=8) {
 			clock_gettime(CLOCK_REALTIME, &timeStart);
-		} else {
+		}
+		else if (!done) {
 			clock_gettime(CLOCK_REALTIME, &timeCurrent);
 			timeSpan = timeDiff(&timeStart, &timeCurrent);
 			gameTime += timeSpan;
@@ -317,112 +318,112 @@ int check_keys(XEvent *e)
 		case XK_z:
 				gl.gameState = 7;
 				break;
-			//Movements and Gameplay
-			case XK_a:
-				//moveLeft();
-				if (gl.gameState == 3)
-					gl.keys[XK_a] = 1;
-				if (gl.gameState == 8 )
-					t->angle++;
-				break;
-			case XK_d:
-				//moveRight();
-				if (gl.gameState == 3)
-					gl.keys[XK_d] = 1;
-				if (gl.gameState == 8)
-					t->angle--;
-				break;
-			case XK_w:
-				if (gl.gameState == 3)
-					gl.keys[XK_w] = 1;
-				if (gl.gameState == 8) {
-					t->vel[0] += 0.5;
-					t->moving = true;
-				}
-				break;
-			case XK_s:
-				if (gl.gameState == 3)
-					gl.keys[XK_s] = 1;
-				if (gl.gameState == 8 ) {
-					t->vel[0] -= 0.5;
-					t->moving = true;
-				}
-				break;
-			case XK_space:
-				gl.keys[XK_space] = 1;
-				if (gl.gameState == 8) {
-					//t->prm->fire((float)270.0);
-				}
-				cannonFire();
-				break;
+		//Movements and Gameplay
+		case XK_a:
+			//moveLeft();
+			if (gl.gameState == 3)
+				gl.keys[XK_a] = 1;
+			if (gl.gameState == 8 )
+				t->angle++;
+			break;
+		case XK_d:
+			//moveRight();
+			if (gl.gameState == 3)
+				gl.keys[XK_d] = 1;
+			if (gl.gameState == 8)
+				t->angle--;
+			break;
+		case XK_w:
+			if (gl.gameState == 3)
+				gl.keys[XK_w] = 1;
+			if (gl.gameState == 8) {
+				t->vel[0] += 0.5;
+				t->moving = true;
+			}
+			break;
+		case XK_s:
+			if (gl.gameState == 3)
+				gl.keys[XK_s] = 1;
+			if (gl.gameState == 8 ) {
+				t->vel[0] -= 0.5;
+				t->moving = true;
+			}
+			break;
+		case XK_space:
+			gl.keys[XK_space] = 1;
+			if (gl.gameState == 8) {
+				//t->prm->fire((float)270.0);
+			}
+			cannonFire();
+			break;
 
-			case XK_Escape:
-				return 1;
-				break;
+		case XK_Escape:
+			return 1;
+			break;
 
-			case XK_m:
-				if (s->scnd->armed) {
-					s->scnd->locked = true;
-					gl.keys[XK_m] = 1;
-				}
-				break;
-			case XK_1:
-				delete s->wpn;
-				s->wpn = new Basic;
-				s->equiped = basic;
-				break;
-			case XK_2:
-				delete s->wpn;
-				s->wpn = new Rapid;
-				s->equiped = rapid;
-				break;
-			case XK_3:
-				delete s->wpn;
-				s->wpn = new Scatter;
-				s->equiped = scatter;
-				break;
-			case XK_4:
-				delete s->wpn;
-				s->wpn = new Ring;
-				break;
-			case XK_5:
-				delete s->wpn;
-				s->wpn = new Pinwheel;
-				break;
-			case XK_6:
-				delete s->wpn;
-				s->wpn = new EnemyStd;
-				break;
-			case XK_b:
-				s->shield->status = !s->shield->status;
-			   	clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
-				shieldSound();
-				break;
-			case XK_Shift_R:
-				if (headShip != NULL && s->scnd->ready) {
-					s->scnd->armed = true;
+		case XK_m:
+			if (s->scnd->armed) {
+				s->scnd->locked = true;
+				gl.keys[XK_m] = 1;
+			}
+			break;
+		case XK_1:
+			delete s->wpn;
+			s->wpn = new Basic;
+			s->equiped = basic;
+			break;
+		case XK_2:
+			delete s->wpn;
+			s->wpn = new Rapid;
+			s->equiped = rapid;
+			break;
+		case XK_3:
+			delete s->wpn;
+			s->wpn = new Scatter;
+			s->equiped = scatter;
+			break;
+		case XK_4:
+			delete s->wpn;
+			s->wpn = new Ring;
+			break;
+		case XK_5:
+			delete s->wpn;
+			s->wpn = new Pinwheel;
+			break;
+		case XK_6:
+			delete s->wpn;
+			s->wpn = new EnemyStd;
+			break;
+		case XK_b:
+			s->shield->status = !s->shield->status;
+			clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
+			shieldSound();
+			break;
+		case XK_Shift_R:
+			if (headShip != NULL && s->scnd->ready) {
+				s->scnd->armed = true;
+				s->scnd->reticle.e = headShip;
+				s->scnd->reticle.update();
+			}
+			break;
+		case XK_period:
+			if (s->scnd->locked != true && s->scnd->armed) {
+				if (s->scnd->reticle.e->nextShip != NULL)
+					s->scnd->reticle.e = s->scnd->reticle.e->nextShip;
+				else
 					s->scnd->reticle.e = headShip;
-					s->scnd->reticle.update();
-				}
-				break;
-			case XK_period:
-				if (s->scnd->locked != true && s->scnd->armed) {
-					if (s->scnd->reticle.e->nextShip != NULL)
-						s->scnd->reticle.e = s->scnd->reticle.e->nextShip;
-					else
-						s->scnd->reticle.e = headShip;
-				}
-				break;
-			case XK_comma:
-				if (s->scnd->locked != true && s->scnd->armed) {
-					if (s->scnd->reticle.e->prevShip != NULL)
-						s->scnd->reticle.e = s->scnd->reticle.e->prevShip;
-					else
-						s->scnd->reticle.e = tailShip;
-				}
-				break;
-			case XK_t:
-				break;
+			}
+			break;
+		case XK_comma:
+			if (s->scnd->locked != true && s->scnd->armed) {
+				if (s->scnd->reticle.e->prevShip != NULL)
+					s->scnd->reticle.e = s->scnd->reticle.e->prevShip;
+				else
+					s->scnd->reticle.e = tailShip;
+			}
+			break;
+		case XK_t:
+			break;
 		}
 	}
 
