@@ -31,7 +31,7 @@
 #ifdef USE_OPENAL_SOUND
 #include </usr/include/AL/alut.h>
 #endif //USE_OPENAL_SOUND
- 
+
 
 
 //defined types
@@ -79,7 +79,7 @@ extern void displayNick(float x, float y, GLuint texture);
 extern void renderShip(Ship* ship);
 extern void displayChad(float x, float y, GLuint texture);
 extern void resetSpawnTimer();
-extern void mainLevel(double time);
+extern bool mainLevel(double time);
 
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
@@ -192,7 +192,7 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			mainLevel(gameTime);
+			done = mainLevel(gameTime);
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -476,14 +476,10 @@ void physics()
 	e = headShip;
 	while(e != NULL){
 		e->updatePosition();
+		if (e->pos[1] < -30) {
+			e->destroyShip();
+		}
 		e = e->nextShip;
-	}
-
-	// Delete ships that go off screen
-	if (headShip != NULL && headShip->pos[1] < -20) {
-		e = headShip;
-		headShip = headShip->nextShip;
-		delete e;
 	}
 
 	// Update position of reticle
@@ -535,7 +531,7 @@ void physics()
 			if (dist < (radius * radius)) {
                 //Generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
-		
+
                 //Destroy enemy ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -574,14 +570,19 @@ void physics()
 				if(generateUpgrade() && up == NULL) {
 					up = new Upgrade(e->pos[0], e->pos[1]);
 				}
-                //generate explosion
-                createExplosion(e->pos[0], e->pos[1]);
-		explodeShip();
-				//delete the ship
-				g.playerScore += e->getDeathScore();
-				e->destroyShip();
+
+				e->takeDamage(1);
+				//If health is zero destroy ship
+				if (e->getHealth() < 1) {
+					e->destroyShip();
+					//generate explosion
+					createExplosion(e->pos[0], e->pos[1]);
+					explodeShip();
+					//delete the ship
+					g.playerScore += e->getDeathScore();
+				}
 				//delete the bullet
-				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets-1], sizeof(Bullet));
+				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
 				g.nPlayerBullets--;
 			}
 
@@ -633,36 +634,36 @@ void physics()
 
 	// Did the ship hit an upgrade container?
 	if (up != NULL) {
-	   int drop = up->detectCollision(s->pos[0], s->pos[1]);
-	   switch(drop) {
-		   case 0:
-			   break;
-		   case 1:
-			   delete s->wpn;
-			   s->wpn = new Rapid;
-			   s->equiped = rapid;
-			   delete up;
-			   up = NULL;
-			   break;
-		   case 2:
-			   delete s->wpn;
-			   s->wpn = new Scatter;
-			   s->equiped = scatter;
-			   delete up;
-			   up = NULL;
-			   break;
+		int drop = up->detectCollision(s->pos[0], s->pos[1]);
+		switch(drop) {
+			case 0:
+				break;
+			case 1:
+				delete s->wpn;
+				s->wpn = new Rapid;
+				s->equiped = rapid;
+				delete up;
+				up = NULL;
+				break;
+			case 2:
+				delete s->wpn;
+				s->wpn = new Scatter;
+				s->equiped = scatter;
+				delete up;
+				up = NULL;
+				break;
 		   case 3:
-			   s->shield->status = true;
-			   clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
-			   delete up;
-			   up = NULL;
-			   break;
-	   }
+				s->shield->status = true;
+				clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
+				delete up;
+				up = NULL;
+				break;
+		}
 	}
 
 	// Is shield out of power?
 	if (s->shield->status)
-	    s->shield->checkTime();
+		s->shield->checkTime();
 
 	if (gl.keys[XK_a]) {
 		s->pos[0] -= s->vel[0];
@@ -729,7 +730,7 @@ void physics()
 	i = 0;
 	e = headShip;
 	while (e != NULL) {
-		headShip->eWpn->fire(e, 270);
+		e->eWpn->fire();
 		e = e->nextShip;
 	}
 
@@ -801,12 +802,12 @@ void render()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
 
-		
+
 /*		glBindTexture(GL_TEXTURE_2D, gl.clouds);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[8].width,img[8].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
-*/		
+*/
 		scrollingBackground();
 		scrollingBackground2();
 		glDisable(GL_TEXTURE_2D);
@@ -836,8 +837,8 @@ void render()
 		if (s->scnd->armed)
 			s->scnd->reticle.drawReticle(s->scnd->locked);
 
-        //Render explosions
-        renderExplosion();
+		//Render explosions
+		renderExplosion();
 
 		for (int i = 0; i < g.nPlayerBullets; i++) {
 			Bullet *b = &g.playerBarr[i];
@@ -1019,30 +1020,29 @@ float convertToRads(float angle)
  * Resets the game back to starting conditions
 */
 void resetGame() {
-    gl.gameState = 0;
-    gameTime = 0.0;
-    resetSpawnTimer();
-    g.playerScore = 0;
+	gl.gameState = 0;
+	gameTime = 0.0;
+	resetSpawnTimer();
+	g.playerScore = 0;
 
-    e = headShip;
-    while (e != NULL) {
-        e->destroyShip();
-        e = e->nextShip;
-    }
+	e = headShip;
+	while (e != NULL) {
+		e->destroyShip();
+		e = e->nextShip;
+	}
 
-    while (g.nEnemyBullets > 0) {
-        --(g.nEnemyBullets);
-    }
+	while (g.nEnemyBullets > 0) {
+		--(g.nEnemyBullets);
+	}
 
-    while (g.nPlayerBullets > 0) {
-        --(g.nPlayerBullets);
-    }
+	while (g.nPlayerBullets > 0) {
+		--(g.nPlayerBullets);
+	}
 
-    g.ship.health = 3;
-    g.ship.pos[0] = gl.xres / 2;
-    g.ship.pos[1] = 100;
-    for (int i = 0; i < 4; i++) {
-        g.ship.vel[i] = 0.0;
-    }
-
+	g.ship.health = 3;
+	g.ship.pos[0] = gl.xres / 2;
+	g.ship.pos[1] = 100;
+	for (int i = 0; i < 4; i++) {
+		g.ship.vel[i] = 0.0;
+	}
 }
