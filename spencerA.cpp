@@ -262,7 +262,7 @@ void cannonFire()
 
 		if (alGetError() != AL_NO_ERROR) {
 
-		printf("ERROR: setting source\n");
+	//	printf("ERROR: setting source\n");
 
 		return ;
 
@@ -271,6 +271,7 @@ void cannonFire()
 	alSourcePlay(alSource[1]);
 	for (int i=0; i<1; i++) {
 		alSourcePlay(alSource[0]);
+		usleep(500);
 	}
 
 #endif //USE_OPENAL_SOUND
@@ -296,12 +297,39 @@ void explodeShip()
 	alSourcef(alSource[0], AL_PITCH, 1.0f);
 	alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
 
-		if (alGetError() != AL_NO_ERROR) {
-
-		printf("ERROR: setting source\n");
-
+	if (alGetError() != AL_NO_ERROR) {
 		return ;
+	}
 
+	alSourcePlay(alSource[1]);
+	for (int i=0; i<1; i++) {
+		alSourcePlay(alSource[0]);
+	}
+
+#endif //USE_OPENAL_SOUND
+	return;
+}
+
+void shieldSound() 
+{
+#ifdef USE_OPENAL_SOUND
+
+	alGetError();
+	float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
+	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+	alListenerfv(AL_ORIENTATION, vec);
+	alListenerf(AL_GAIN, 1.0f);
+	ALuint alBuffer[2];
+	alBuffer[0] = alutCreateBufferFromFile("./sounds/shield.wav");
+	ALuint alSource[1];
+	alGenSources(1, alSource);
+	alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
+	alSourcef(alSource[0], AL_GAIN, 1.0f);
+	alSourcef(alSource[0], AL_PITCH, 1.0f);
+	alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
+
+	if (alGetError() != AL_NO_ERROR) {
+		return ;
 	}
 
 	alSourcePlay(alSource[1]);

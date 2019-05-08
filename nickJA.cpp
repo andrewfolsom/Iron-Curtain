@@ -123,7 +123,7 @@ void SpriteList::drawMig(float x, float y, float angle) {
 	glPushMatrix();
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.0f);
-	glTranslatef(x, y, 1.0);
+	glTranslatef(x, y, 0.9);
 	glRotatef(angle, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
 		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);

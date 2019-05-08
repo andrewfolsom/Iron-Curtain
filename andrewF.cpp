@@ -241,9 +241,9 @@ Scatter::Scatter()
 {
     fireRate = 0.5;
     bulletSpeed = 15;
-    color[0] = 0.5;
-    color[1] = 1.0;
-    color[2] = 0.5;
+    color[0] = 1.0;
+    color[1] = 0.0;
+    color[2] = 0.0;
     shotsFired = 4;
     spread = 30.0;
     start = 90 - (spread / 2);
@@ -543,9 +543,8 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
             Bullet *b = &g.enemyBarr[g.nEnemyBullets];
             timeCopy(&b->time, &bt);
             setPosition(ship->pos, b->pos);
+            angularAdjustment(b->vel, angle);
             setVelocity(b->vel);
-            // b->vel[0] *= cos(convertToRads(angle));
-            // b->vel[1] *= sin(convertToRads(angle));
             setColor(b->color);
             g.nEnemyBullets++;
         }
@@ -565,6 +564,9 @@ Upgrade::Upgrade(float x, float y) {
     payload = rand() % 3 + 1;
 }
 
+/**
+ * Renders the Upgrade object
+ */
 void Upgrade::drawUpgrade() {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0,255.0,255.0,255.0);
@@ -589,6 +591,11 @@ void Upgrade::drawUpgrade() {
     pos[1] -= dropSpeed;
 }
 
+/**
+ * Collision detection for the Upgrade class.
+ * @param   float x     Position of approaching object in x direction
+ * @param   float y     Position of approaching object in y direction
+ */
 int Upgrade::detectCollision(float x, float y)
 {
     float distX = x - pos[0];
@@ -601,6 +608,9 @@ int Upgrade::detectCollision(float x, float y)
        return 0;
 }
 
+/**
+ * Constructor for the Shield class
+ */
 Shield::Shield()
 {
 	angle = 0.0;
@@ -613,7 +623,11 @@ Shield::Shield()
 	status = false;
 }
 
-// Render function for shield
+/**
+ * Renders the shield object
+ * param    float *pos  Pointer to an array of coordinates where the shield
+ *                      will be rendered.
+ */
 void Shield::drawShield(float *pos)
 {	
 	glPushMatrix();
@@ -636,7 +650,10 @@ void Shield::drawShield(float *pos)
 	}
 }
 
-// Function to check elapsed time since shield activation
+/**
+ * Checks to see if the players shield has reached it's time limit and, if so
+ * deactivates it.
+ */
 void Shield::checkTime()
 {
     struct timespec st;
@@ -646,7 +663,11 @@ void Shield::checkTime()
         status = false;
 }
 
-// Collision detection for shield
+/**
+ * Collision detection for the Shield class. Determines if a projectile has
+ * entered the area covered by the shield.
+ * @param   float dist    Distance of the currently evaluated projectile
+ */
 bool Shield::detectCollision(float dist)
 {
     float area = radius*radius;
@@ -660,6 +681,9 @@ bool Shield::detectCollision(float dist)
 //		DEFINITION OF THE DIGITS CLASS 
 //===========================================================
 
+/**
+ * Constructor for the Digit class.
+ */
 Digit::Digit()
 {
     resX = 10; 
@@ -668,8 +692,17 @@ Digit::Digit()
         glGenTextures(1, &digits[i]);
 }
 
+/**
+ * Default destructor for the Digit class
+ */
 Digit::~Digit() { }
 
+/**
+ * Renders the users score using the internal state of the Digit object
+ * @param   char ch  The numerical character (0-9) to be rendered
+ * @param   float x   The x coordinate of the render location
+ * @param   float y   The y coordinate of the render location
+ */
 void Digit::displayDigit(char ch, float x, float y) {
     int value = (int)ch - 48;
     glEnable(GL_TEXTURE_2D);
@@ -699,9 +732,14 @@ void Digit::displayDigit(char ch, float x, float y) {
 //		DEFINITION OF THE USER INTERFACE 
 //===========================================================
 
-// Hud class constructor
+/**
+ * Constructor for the HUD class
+ */
 Hud::Hud() { }
 
+/**
+ * Generates the textures used for rendering the HUD
+ */
 void Hud::genTextures()
 {
 	for (int i = 0; i < 4; i++)
@@ -713,6 +751,12 @@ void Hud::genTextures()
     glGenTextures(1, &display);
 }
 
+/**
+ * Renders the componenets of the HUD
+ * @param   int l   Players current lives
+ * @param   int w   Players currently equiped weapon
+ * @param   int s   Players currently equiped secondary weapon
+ */
 void Hud::drawHud(int l, int w, int s)
 {
 	float resX = 128.0f;
@@ -847,10 +891,16 @@ void Hud::drawHud(int l, int w, int s)
 	glDisable(GL_TEXTURE_2D);
 }
 
-// Particle Function
+/**
+ * Constructor for the Particle class
+ */
 Particle::Particle() { }
 
-// Explosion renderer
+/**
+ * Creates instances of the Particle object for use in explosions
+ * @param   float x     Spawn locations x-coordinate
+ * @param   float y     Spawn locations y-coordinate
+ */
 void createExplosion(float x, float y)
 {
 	int vel1, vel2, angle;
@@ -875,6 +925,9 @@ void createExplosion(float x, float y)
 	}
 }
 
+/**
+ * Moves the explosion particles outward from their origin and at random angles
+ */
 void updateExplosion()
 {
 	int i = 0;
@@ -906,6 +959,9 @@ void updateExplosion()
 	}
 }
 
+/**
+ * Draws the particles used to simulate an explosion
+ */
 void renderExplosion() {
     int i = 0;
     float resX = 1.0;
