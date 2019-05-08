@@ -95,6 +95,9 @@ extern void displayStartScreen();
 extern void displayGameControls();
 extern void scrollingBackground();
 extern void cannonFire();
+extern void explodeShip();
+extern void killSound();
+extern void scrollingBackground2();
 //Externs -- Benjamin
 extern void displayBenjamin(float x, float y);
 extern void displayStartScreen2();
@@ -110,7 +113,7 @@ extern void displayNick(float x, float y, GLuint texture);
 //--------------------------------------------------------------------------
 
 
-Image img[8] = {
+Image img[9] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -119,6 +122,8 @@ Image img[8] = {
 	"./img/ironImage.jpg",
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
+	"./img/clouds.jpg" ,
+
 };
 
 Particle p[MAX_PARTICLES];
@@ -352,6 +357,8 @@ int check_keys(XEvent *e)
 
 			case XK_Escape:
 				return 1;
+				break;
+
 			case XK_m:
 				if (s->scnd->armed) {
 					s->scnd->locked = true;
@@ -526,6 +533,7 @@ void physics()
 			if (dist < (radius * radius)) {
                 //Generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		
                 //Destroy enemy ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -566,6 +574,7 @@ void physics()
 				}
                 //generate explosion
                 createExplosion(e->pos[0], e->pos[1]);
+		explodeShip();
 				//delete the ship
 				g.playerScore += e->getDeathScore();
 				e->destroyShip();
@@ -580,6 +589,7 @@ void physics()
 			}
 		}
 		i++;
+
 	}
 
 	#ifndef DEBUG
@@ -788,7 +798,15 @@ void render()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
+
+		
+/*		glBindTexture(GL_TEXTURE_2D, gl.clouds);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[8].width,img[8].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[8].data);
+*/		
 		scrollingBackground();
+		scrollingBackground2();
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Upgrade
