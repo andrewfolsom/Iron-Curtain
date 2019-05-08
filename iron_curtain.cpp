@@ -132,6 +132,7 @@ Global& gl = Global::getInstance();
 Game g;
 
 SpriteList SPR;
+Tank playerTank;
 
 X11_wrapper x11;
 
@@ -257,7 +258,7 @@ void check_mouse(XEvent *e) {
 	static int savey = 0;
 	//static int lbuttonDown = 0;
 	//static int rbuttonDown = 0;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	//If mouse moves, save new position.
 	if (savex != e->xbutton.x || savey != e->xbutton.y) {
 			savex = e->xbutton.x;
@@ -271,7 +272,7 @@ void check_mouse(XEvent *e) {
 int check_keys(XEvent *e)
 {
 	Ship *s = &g.ship;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	if (e->type != KeyPress && e->type != KeyRelease)
 		return 0;
 	int key = XLookupKeysym(&e->xkey, 0);
@@ -451,7 +452,7 @@ void physics()
 {
 	//float spdLeft, spdRight, spdUp, spdDown;
 	Ship *s = &g.ship;
-	Tank *t = &g.playerTank;
+	Tank *t = &playerTank;
 	if (s->pos[0] < 20.0) {
 		s->pos[0] = 20.0;
 	} else if (s->pos[0] > gl.xres - 20.0) {
@@ -801,7 +802,7 @@ void render()
 		//Draw ships
 
 		//renderShip(s);
-		SPR.drawPhantom(s->pos[0], s->pos[1]);
+		SPR.drawPhantom(s->pos[0], s->pos[1], 0);
 		if (s->shield->status)
 			s->shield->drawShield(s->pos);
 
@@ -940,7 +941,7 @@ void render()
 	}
 	else if (gl.gameState == 8) {
 
-		Tank *t = &g.playerTank;
+		Tank *t = &playerTank;
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -956,7 +957,7 @@ void render()
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Tank
-		t->renderTank();
+		t->renderTank(SPR);
 
 		//Draw Upgrade
 		if (up != NULL) {

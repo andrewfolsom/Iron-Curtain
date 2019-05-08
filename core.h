@@ -7,7 +7,6 @@
 
 #include "andrewF.h"
 //#include "nickJA.h"
-
 typedef float Flt;
 typedef float Vec[3];
 
@@ -88,7 +87,7 @@ class Ship
 /*
  *Tank Class
  *	Jackson
- */
+ 
  class Tank
  {
 	public:
@@ -107,11 +106,11 @@ class Ship
 		Tank();
 		~Tank();
 
-		void renderTurret();
-		void renderTank();
+		void renderTurret(SpriteList SPR);
+		void renderTank(SpriteList SPR);
 		void updateTarget(int x, int y);
 		void moveTank();
- };
+ };*/
 
 /*
  * Bullet Class
@@ -151,7 +150,7 @@ class Game
 	int playerScore;
 	//-----------------------------
 	//Jackson
-	Tank playerTank;
+	//Tank playerTank;
 	//------------------------------
     public:
 	Game();

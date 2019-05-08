@@ -11,13 +11,41 @@ class SpriteList {
 		SpriteList();
 		GLuint phantom;
 		GLuint mig;
+		GLuint M60Hull;
+		GLuint M60Trt;
 
 
-		void drawPhantom(float x, float y);
+		void drawPhantom(float x, float y, float angle);
 		void drawMig(float x, float y, float angle);
+		void drawM60Turret(float x, float y, float angle);
+		void drawM60Hull(float x, float y, float angle);
 };
+//Tank Class Declarations.
+class Tank
+{
+	public:
+		bool moving;
+		float pos[3];
+		float tPos[3];
+		float color[3] = {0.33, 0.42, 0.18};
+		float angle;
+		float tAngle;
+		float tgtAngle;
+		float tColor[3] = {0.33, 0.5, 0.18};
+		float maxVel = 1.0;
+		Vec vel = {0, 0, 0};
+		Vec tgt;
+		Weapon *prm;
+		Tank();
+		~Tank();
 
-//Enemy Tank Class Def.
+		void renderTurret(SpriteList SPR);
+		void renderTank(SpriteList SPR);
+		void updateTarget(int x, int y);
+		void moveTank();
+
+};
+//Enemy Tank Class Declarations.
 
 class EnemyTank : public Tank {
 	public:
