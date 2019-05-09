@@ -101,8 +101,6 @@ EnemyShip::~EnemyShip() {
     } else {
         tailShip = prevShip;
     }
-
-	delete eWpn;
 }
 
 /*
@@ -208,7 +206,7 @@ void resetSpawnTimer() {
 bool mainLevel(double gameTime) {
     //gl.xres == 900
     //g.yres == 1000
-    const int ySpawn = 1060;
+    const int ySpawn = 1100;
     static bool bossSpawned = false;
     bool bossDefeated = false;
 
@@ -237,11 +235,23 @@ bool mainLevel(double gameTime) {
         else if (gameTime > 90) {
             if (!bossSpawned) {
                 eShip = new Boss(gl.xres / 2, ySpawn, DIAG_RUSH);
-                tailShip->configDiagRush(gl.xres / 2, 700, -1);
+                tailShip->configDiagRush(gl.xres / 2, 800, -1);
                 bossSpawned = true;
             }
-            if (tailShip->pos[1] < 400)
-                tailShip->configDiagRush(gl.xres / 3, 700, 1);
+
+            if (95 - gameTime < 0.01 && 95 - gameTime > 0) {
+                tailShip->configDiagRush(800, 800, 1);
+            }
+            else if (tailShip->pos[0] > 750) {
+                tailShip->configDiagRush(100, 800, 1);
+            }
+            else if (tailShip->pos[0] < 50){
+                tailShip->configDiagRush(600, 800, 1);
+            }
+            if (tailShip == NULL) {
+                bossDefeated = true;
+                bossSpawned = false;
+            }
         }
     }
 

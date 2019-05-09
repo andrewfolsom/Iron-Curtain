@@ -172,9 +172,15 @@ void Weapon::setColor(float *c)
     c[2] = color[2];
 }
 
-void Weapon::fire(float angle) { }
+void Weapon::fire(float angle) {
+    if (angle)
+	return;
+}
 
-void Weapon::fire(EnemyShip* e) { }
+void Weapon::fire(EnemyShip* e) {
+    if (e)
+	return;
+}
 
 /**
  * Basic weapon class constructor

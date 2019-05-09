@@ -503,7 +503,7 @@ void physics()
 	e = headShip;
 	while(e != NULL){
 		e->updatePosition();
-		if (e->pos[1] < -30) {
+		if (e->pos[1] < -60) {
 			e->destroyShip();
 		}
 		e = e->nextShip;
@@ -613,10 +613,10 @@ void physics()
 				g.nPlayerBullets--;
 			}
 
-			e = e->nextShip;
 			if (headShip == NULL) {
 				break;
 			}
+			e = e->nextShip;
 		}
 		i++;
 
@@ -642,9 +642,9 @@ void physics()
 				 sizeof(Bullet));
 				g.nEnemyBullets--;
 				if (s->health == 0) {
-					serverConnect(g.playerScore);
 					printf("Game Over!\n Score = %d\n", g.playerScore);
 					resetGame();
+					serverConnect(g.playerScore);
 				}
 
 			}
