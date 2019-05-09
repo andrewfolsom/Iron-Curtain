@@ -764,12 +764,21 @@ EnemyTank::~EnemyTank()
 }
 
 //********ENEMY TANK FUNCTIONS********
-void spawnTank() {
+void spawnTank() 
+{
 	//float x = rand()%500 + 200;
 	//float y = rand()%500 + 200;
 	int x = rand()%5;
 
 	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
+}
+void spawnTank(int spawnNum)
+{
+	int x;
+	for (int i = 0; i < spawnNum; i++) {
+		x = rand()%5;
+		eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
+	}
 }
 void EnemyTank::generatePositions() 
 {

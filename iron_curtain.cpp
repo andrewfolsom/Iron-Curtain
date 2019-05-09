@@ -112,6 +112,7 @@ extern void serverConnect(int);
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
 extern void spawnTank();
+extern void spawnTank(int spawnNum);
 extern void tankBackground();
 //--------------------------------------------------------------------------
 
@@ -567,7 +568,7 @@ void physics()
 				step = 0.0;
 			i++;
 		}
-	}
+	if (gl.gameState == 3) {}
 	//==================================
 	//	   ENEMY COLLISION DETECTION
 	//==================================
@@ -649,7 +650,7 @@ void physics()
 		}
 	}
 	#endif
-
+}
 	// Did the ship hit an upgrade container?
 	if (up != NULL) {
 		int drop = up->detectCollision(s->pos[0], s->pos[1]);
@@ -833,6 +834,11 @@ void physics()
 		}
 		//Move Player Tank
 		t->moveTank();
+		if (headTank == NULL)
+			{
+				spawnTank(g.tier);
+				g.tier++;
+			}
 	}
 	return;
 }
