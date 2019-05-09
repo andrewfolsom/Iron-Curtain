@@ -147,6 +147,7 @@ class Game
 	int nEnemyBullets;
 	int nmissiles;
 	int nParticles;
+	int tier = 1;
 	Flt radius;
 	timespec missileTimer;
 	timespec thrustTimer;
