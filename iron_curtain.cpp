@@ -313,10 +313,18 @@ int check_keys(XEvent *e)
 		gl.gameState = 1;
 		break;
 		case XK_l:
-			gl.gameState = 2;
+			if (gl.gameState == 2) 
+				gl.chosen = false;
+			else
+				gl.gameState = 2;
 			break;
 		case XK_g:
-			gl.gameState = 3;
+			if (gl.gameState == 1) {
+				checkTimer();
+				nextState();
+			}
+			else
+				gl.gameState = 3;
 			break;
 		case XK_o:
 			gl.gameState = 8;
@@ -382,7 +390,7 @@ int check_keys(XEvent *e)
 				return 1;
 			else {
 				resetGame();
-				gl.gameState = 1;
+				gl.gameState = 0;
 			}
 			break;
 

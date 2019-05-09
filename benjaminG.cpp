@@ -319,9 +319,9 @@ void nextState() {
 			break;
 		case 2:
 			if (gl.chosen)
-				gl.gameState = 8;
+				gl.gameState = 3;
 			else               
-				gl.gameState = 4;
+				gl.gameState = 8;
 			break;
 		case 3:
 			gl.gameState = 6;
@@ -348,6 +348,7 @@ void checkTimer() {
 	static time_t Timer = time(NULL);
 	switch (gl.gameState) {
 		case 0:
+        case 2:
 		case 6:
 		case 5:
 			if (abs(difftime(Timer, time(NULL))) >= 5) {
@@ -357,7 +358,7 @@ void checkTimer() {
 			} 
 			break;
 		case 1:
-		case 2:
+            gl.chosen = true;
 		case 3:
 		case 4:
 		case 8:
@@ -386,5 +387,6 @@ void displayTheDuck() {
 	r.left = 30;
 	r.center = 0;
 	ggprint16(&r, 30,c,"Loading...");
+    ggprint16(&r, 20,c,"TANKS? HELL YEAH! (Press L)");
 }
 
