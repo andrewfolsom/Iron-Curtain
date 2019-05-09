@@ -100,6 +100,7 @@ void displayGameControls()
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
 
+    ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"O/o - Play Game- Tank Mode");
     ggprint16(&r, 16,c," ");
 
