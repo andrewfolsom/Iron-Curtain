@@ -598,12 +598,10 @@ void spawnTank() {
 }
 void EnemyTank::generatePositions() {
 	//for (int i = 0; i < 3; i++) {
-	int i = 0;
-	do {
+	for (int i = 0; i < 3; i++) {
 		potentialMov[i][0] = rand()%9 * 100;
 		potentialMov[i][1] = rand()%10 * 100;
-		if ( potentialMov[i][0] > 40 && potentialMov[i][1] 
-	} while (i < 3)
+		}
 }
 
 //Will pick a location to move to.

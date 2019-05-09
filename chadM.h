@@ -12,7 +12,13 @@ class EnemyShip : public Ship {
 		double getTimeSlice(timespec *bt);
 		float getRadius();
 		int getDeathScore();
+		int getHealth();
 		void destroyShip();
+		void takeDamage(int damageTaken);
+		EnemyShip *nextShip;
+		EnemyShip *prevShip;
+		Weapon *eWpn;
+
 		//By JACKSON
 		void updateStrafe();
 		void configStrafe(float radius, float angleSet, float angleSpeed, float speed, int dir);
@@ -26,13 +32,11 @@ class EnemyShip : public Ship {
 		void configDiagRush(float x, float y, float speed);
 		void updatePosition();
 		//
-		EnemyShip *nextShip;
-		EnemyShip *prevShip;
-		EnemyStd *eWpn;
+
 	protected :
 		int deathScore;
-	private :
 		int health;
+	private:
 		// By Jackson
 		enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH };
 		Vec spawnPos;
@@ -52,5 +56,10 @@ class EnemyShip : public Ship {
 class Grunt : public EnemyShip {
 	public:
 		Grunt(int x, int y, int movType);
+};
+
+class Boss : public Grunt {
+   public:
+    Boss(int x, int y, int movType);
 };
 #endif

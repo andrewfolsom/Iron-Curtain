@@ -27,7 +27,7 @@ extern Global& gl;
  * Image Class
  */
 
-Image::Image(const char *fname) 
+Image::Image(const char *fname)
 {
 	if (fname[0] == '\0')
 		return;
@@ -63,8 +63,8 @@ Image::Image(const char *fname)
 		sscanf(line, "%i %i", &width, &height);
 		fgets(line, 200, fpi);
 		//get pixel data
-		int n = width * height * 3;			
-		data = new unsigned char[n];			
+		int n = width * height * 3;
+		data = new unsigned char[n];
 		for (int i=0; i<n; i++)
 			data[i] = fgetc(fpi);
 		fclose(fpi);
@@ -84,12 +84,12 @@ Image::~Image()
 /*
  * Global Class
  */
-Texture::Texture() {}    
+Texture::Texture() {}
 
 
 Global::Global()
 {
-	
+
     xres = 900;
 	yres = 1000;
 	memset(keys, 0, 65536);
@@ -131,7 +131,7 @@ Ship::~Ship() {
     delete shield;
 }
 
-/* 
+/*
  * TANK CLASS
  
  Tank::Tank() {
@@ -179,7 +179,7 @@ Game::~Game()
 
 X11_wrapper::X11_wrapper()
 {
-	GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, 
+	GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER,
 		None};
 	XSetWindowAttributes swa;
 	setup_screen_res(gl.xres, gl.yres);
@@ -199,8 +199,8 @@ X11_wrapper::X11_wrapper()
 	}
 	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 	swa.colormap = cmap;
-	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |      
-		PointerMotionMask | MotionNotify | ButtonPress | ButtonRelease | 
+	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
+		PointerMotionMask | MotionNotify | ButtonPress | ButtonRelease |
 		StructureNotifyMask | SubstructureNotifyMask;
 	unsigned int winops = CWBorderPixel | CWColormap | CWEventMask;
 	win = XCreateWindow(dpy, root, 0, 0, gl.xres, gl.yres, 0, vi->depth,
@@ -219,7 +219,7 @@ X11_wrapper::~X11_wrapper()
 void X11_wrapper::set_title()
 {
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "Test Game");
+	XStoreName(dpy, win, "Iron Curtain");
 }
 
 void X11_wrapper::setup_screen_res(const int w, const int h)
