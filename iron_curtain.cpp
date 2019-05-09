@@ -198,7 +198,7 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			done = mainLevel(gameTime);
+			//done = mainLevel(gameTime);
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -362,9 +362,10 @@ int check_keys(XEvent *e)
 			if (gl.gameState == 3)
 				gl.keys[XK_space] = 1;
 			if (gl.gameState == 8) {
-				//t->prm->fire(t, t->tAngle);
+				t->prm->fire(t);
+				printf("%i\n",g.nPlayerBullets);
 			}
-			cannonFire();
+			//cannonFire();
 			break;
 
 		case XK_Escape:

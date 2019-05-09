@@ -37,7 +37,7 @@ class Tank
 		Vec vel = {0, 0, 0};
 		Vec tgt;
 		Vec gunPos;
-		Weapon *prm;
+		TankWeapon *prm;
 		Tank();
 		virtual ~Tank();
 		struct timespec bulletTimer;
@@ -72,4 +72,18 @@ class EnemyTank : public Tank {
 
 };
 
+class TankWeapon
+{
+	public:
+		float fireRate;
+		float bulletSpeed;
+		float color[3];
 
+		TankWeapon();
+		~TankWeapon();
+
+		void setPosition(float*, float*);
+		void setVelocity(float*);
+		void setColor(float*);
+		void fire(Tank *tank);
+};

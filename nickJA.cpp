@@ -7,6 +7,7 @@
 //
 
 #include <GL/glx.h>
+#include <unistd.h>
 #include "fonts.h"
 #include "core.h"
 #include <stdio.h>
@@ -16,6 +17,9 @@
 #include "chadM.h"
 #include "nickJA.h"
 #include "andrewF.h"
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif
 
 extern Game g;
 extern Global gl;
@@ -24,6 +28,7 @@ extern EnemyTank *tailTank;
 extern EnemyTank *eTank;
 extern void angularAdjustment(float *vel, float angle);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
+extern void cannonFire();
 extern double timeDiff(struct timespec *start, struct timespec *end);
 extern double getTimeSlice(Tank*, timespec*);
 extern unsigned char *buildAlphaData(Image *img);
@@ -408,13 +413,60 @@ void EnemyShip::updatePosition()
 Tank::Tank() {
 	pos[0] = 450;
 	pos[1] = 250;
-	//prm = new Basic;
+	prm = new TankWeapon;
 }
 
 Tank::~Tank() {
 	delete prm;
 }
 
+//********TANK WEAPON CLASS********
+TankWeapon::TankWeapon() {
+	fireRate = 2.0;
+	bulletSpeed = 15.0;
+	color[0] = 0.75;
+	color[1] = 0.5;
+	color[2] = 0;
+}
+
+TankWeapon::~TankWeapon() {
+
+}
+
+void TankWeapon::setPosition(float *t,float *b) {
+	b[0] = t[0];
+	b[1] = t[1];
+	b[2] = 1;
+}
+
+void TankWeapon::setVelocity(float *vel) {
+	vel[0] = 0.0;
+	vel[1] = bulletSpeed;
+}
+
+void TankWeapon::setColor(float *c) {
+	c[0] = color[0];
+	c[1] = color[1];
+	c[2] = color[2];
+}
+
+void TankWeapon::fire(Tank *tank) {
+	struct timespec bt;
+	double time = getTimeSlice(tank, &bt);
+	if (time > fireRate) {
+		timeCopy(&tank->bulletTimer, &bt);
+		if (g.nPlayerBullets < 1000) {
+			Bullet *b = &g.playerBarr[g.nPlayerBullets];
+			timeCopy(&b->time, &bt);
+			setPosition(tank->gunPos, b->pos);
+			setVelocity(b->vel);
+			angularAdjustment(b->vel, tank->tAngle+90);
+			setColor(b->color);
+			g.nPlayerBullets++;
+			cannonFire();
+		}
+	}
+}
 //*************TANK MOVEMENT*****************
 
 void Tank::renderTurret(SpriteList SPR)
@@ -440,7 +492,10 @@ void Tank::renderTurret(SpriteList SPR)
 	}
 	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
 
-	/* **OLD CODE**
+	gunPos[0] = tPos[0];
+	gunPos[1] = tPos[1];
+
+/* **OLD CODE**
 	Vec pt[50];
 	float circAngle = 0;
 	float angleInc = (2*PI)/50;
@@ -497,8 +552,7 @@ void Tank::updateTarget(int x, int y)
 	else {
 		tgtAngle = 180 - (tgtAngle * 180) /PI;
 	}
-		gunPos[0] = tPos[0];
-		gunPos[1] = tPos[1];
+
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
 

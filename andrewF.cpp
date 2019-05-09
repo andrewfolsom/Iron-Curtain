@@ -19,6 +19,7 @@ const int MAX_MISSILES = 1;
 const int MAX_PARTICLES = 3000;
 extern float convertToRads(float angle);
 extern double getTimeSlice(Ship*, timespec*);
+extern void cannonFire();
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 extern double timeDiff(struct timespec *start, struct timespec *end);
 extern Game g;
@@ -202,6 +203,7 @@ void Basic::fire()
             setVelocity(b->vel);
             setColor(b->color);
             g.nPlayerBullets++;
+            cannonFire();
         }
     }
 }
@@ -285,6 +287,7 @@ void Scatter::fire()
                 setColor(b->color);
                 temp += increment;
                 g.nPlayerBullets++;
+                cannonFire();
             }
         }
     }
