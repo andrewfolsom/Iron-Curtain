@@ -497,6 +497,7 @@ void EnemyShip::updatePosition()
 Tank::Tank() {
 	pos[0] = 450;
 	pos[1] = 250;
+	health = 3;
 	prm = new TankWeapon;
 	factFlag = 0;
 }
@@ -512,6 +513,7 @@ TankWeapon::TankWeapon() {
 	color[0] = 0;
 	color[1] = 0;
 	color[2] = 0;
+
 }
 
 TankWeapon::~TankWeapon() {

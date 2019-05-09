@@ -819,6 +819,38 @@ void physics()
 			i++;
 		}
 
+#ifndef DEBUG
+	//Check player tank collisions
+	i = 0;
+	while(i < g.nEnemyBullets){
+			Bullet *b = &g.enemyBarr[i];
+			Flt d0 = b->pos[0] - t->pos[0];
+			Flt d1 = b->pos[1] - t->pos[1];
+			Flt dist = (d0*d0 + d1*d1);
+			if (dist < (s->detRadius*t->playerRad)) {
+				//take damage
+				(t->health)--;
+				//delete the bullet
+				memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+				 sizeof(Bullet));
+				g.nEnemyBullets--;
+				if (t->health == 0) {
+					serverConnect(g.playerScore);
+					printf("Game Over!\n Score = %d\n", g.playerScore);
+					resetGame();
+				}
+
+			}
+			//if (s->shield->status && s->shield->detectCollision(dist)) {
+			//	memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+			//	 sizeof(Bullet));
+			//	g.nEnemyBullets--;
+
+			i++;
+		}
+
+	#endif
+
 		//Move Enemy Tanks
 		eTank =  headTank;
 		while (eTank != NULL) {

@@ -31,6 +31,8 @@ class Tank
 	public:
 		bool moving;
 		int factFlag;
+		int health;
+		float playerRad = 30;
 		float pos[3];
 		float tPos[3];
 		float color[3] = {0.33, 0.42, 0.18};
