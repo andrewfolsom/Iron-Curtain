@@ -58,6 +58,7 @@ class EnemyTank : public Tank {
 		EnemyTank *prevTank;
 
 		int factFlag;
+		int enterFlag;
 		int needNewDirection = 1;
 		float aggression;
 		float movTgtAngle;

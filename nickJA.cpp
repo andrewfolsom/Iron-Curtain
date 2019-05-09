@@ -668,6 +668,12 @@ void EnemyTank::moveEnemyTank()
 	float ydiff = movTgt[1] - pos[1];
 	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
 
+	//Set whether tank has entered the arena
+	if (pos[0] > 20 && pos[0] < 880) {
+		if (pos[1] < 1000)
+			enterFlag = 1;
+	}
+
 	//Increase velocity while tank is not whwere it wants to be.
 	if (distance >=100 && moving) {
 		vel[0]+= 0.8;
@@ -676,6 +682,17 @@ void EnemyTank::moveEnemyTank()
 	else {
 		moving = 0;
 		needNewDirection = 1;
+	}
+
+	if (enterFlag) {
+		if (pos[0] < 20)
+			pos[0] = 20;
+		if (pos[0] > 880)
+			pos[0] = 880;
+		if (pos[1] > 980)
+			pos[1] = 980;
+		if (pos[1] < 20)
+			pos[1] = 20;
 	}
 	//printf("Dist = %f\n", distance);
 	//Rotate tank to point to destination
