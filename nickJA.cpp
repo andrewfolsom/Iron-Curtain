@@ -42,11 +42,13 @@ const int MAX_BULLETS = 1000;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[4]{
+Image Sprites[6]{
 "./img/Phantom_1a.png",
 "./img/MiG-21_a.png",
 "./img/M60Hull.png",
-"./img/M60_Turret_2.png"
+"./img/M60_Turret_2.png",
+"./img/T-62_Base.png",
+"./img/T-62_Turret.png"
 };
 
 Vec spawnPoints[5] = {{-100,1200,0},
@@ -216,6 +218,70 @@ void SpriteList::drawM60Hull(float x, float y, float angle) {
 
 
 }
+
+//Function to draw T-62 Hull
+//Our old friends X, Y, and angle are at it again!
+void SpriteList::drawT62Hull(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, T62Hull);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[4]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[4].width, Sprites[4].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 90;
+	float w = 68;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 0.8);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+void SpriteList::drawT62Turret(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, T62Trt);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[5]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[5].width, Sprites[5].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 120;
+	float w = 95;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 1.0);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+
 //Function to render tank background image
 void tankBackground() 
 {
@@ -432,6 +498,7 @@ Tank::Tank() {
 	pos[0] = 450;
 	pos[1] = 250;
 	prm = new TankWeapon;
+	factFlag = 0;
 }
 
 Tank::~Tank() {
@@ -485,6 +552,26 @@ void TankWeapon::fire(Tank *tank) {
 		}
 	}
 }
+
+void TankWeapon::enemyFire(Tank *tank) {
+	struct timespec bt;
+	double time = getTimeSlice(tank, &bt);
+	if (time > fireRate) {
+		timeCopy(&tank->bulletTimer, &bt);
+		if (g.nEnemyBullets < 1000) {
+			Bullet *b = &g.enemyBarr[g.nEnemyBullets];
+			timeCopy(&b->time, &bt);
+			setVelocity(b->vel);
+			setPosition(tank->tPos, b->pos);
+			angularAdjustment(b->vel, tank->tAngle+90);
+			//setColor(b->color);
+			b->color[0] = 1;
+			//b->color[1] = b->color[2] = 0;
+			g.nEnemyBullets++;
+			cannonFire();
+		}
+	}
+}
 //*************TANK MOVEMENT*****************
 
 void Tank::renderTurret(SpriteList SPR)
@@ -508,7 +595,10 @@ void Tank::renderTurret(SpriteList SPR)
 			tAngle += 0.25;
 		}
 	}
-	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
+	if (factFlag == 1)
+		SPR.drawT62Turret(tPos[0], tPos[1], tAngle);
+	else if (factFlag == 0)
+		SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
 
 	gunPos[0] = tPos[0];
 	gunPos[1] = tPos[1];
@@ -576,8 +666,11 @@ void Tank::updateTarget(int x, int y)
 
 void Tank::renderTank(SpriteList SPR) 
 {
+	if (factFlag == 1 )
+		SPR.drawT62Hull(pos[0], pos[1], angle);
+	else if (factFlag == 0 )
+		SPR.drawM60Hull(pos[0], pos[1], angle);
 
-	SPR.drawM60Hull(pos[0], pos[1], angle);
 	renderTurret(SPR);
 
 /* **OLD CODE**
@@ -639,6 +732,7 @@ EnemyTank::EnemyTank(float x, float y, int faction)
 	pos[0] = x;
 	pos[1] = y;
 	factFlag = faction;
+	prm = new TankWeapon;
 	angle = 180;
 	tAngle = 180;
 	aggression = rand()%100 /100;
@@ -780,7 +874,6 @@ void EnemyTank::moveEnemyTank()
 			angle += 0.25;
 		}
 	}
-
 	moveTank();
 
 }

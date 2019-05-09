@@ -13,12 +13,16 @@ class SpriteList {
 		GLuint mig;
 		GLuint M60Hull;
 		GLuint M60Trt;
+		GLuint T62Hull;
+		GLuint T62Trt;
 
 
 		void drawPhantom(float x, float y, float angle);
 		void drawMig(float x, float y, float angle);
 		void drawM60Turret(float x, float y, float angle);
 		void drawM60Hull(float x, float y, float angle);
+		void drawT62Turret(float x, float y, float angle);
+		void drawT62Hull(float x, float y, float angle);
 };
 
 //Tank Class Declarations.
@@ -26,6 +30,7 @@ class Tank
 {
 	public:
 		bool moving;
+		int factFlag;
 		float pos[3];
 		float tPos[3];
 		float color[3] = {0.33, 0.42, 0.18};
@@ -57,7 +62,6 @@ class EnemyTank : public Tank {
 		EnemyTank *nextTank;
 		EnemyTank *prevTank;
 
-		int factFlag;
 		int enterFlag;
 		int needNewDirection = 1;
 		float aggression;
@@ -87,4 +91,5 @@ class TankWeapon
 		void setVelocity(float*);
 		void setColor(float*);
 		void fire(Tank *tank);
+		void enemyFire(Tank *tank);
 };

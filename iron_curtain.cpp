@@ -825,6 +825,7 @@ void physics()
 				eTank->generatePositions();
 				eTank->pickMovTgt();
 			}
+			eTank->prm->enemyFire(eTank);
 			eTank->updateAngle();
 			eTank->updateTarget(t->pos[0], t->pos[1]);
 			eTank->moveEnemyTank();
@@ -1086,6 +1087,24 @@ void render()
 		glEnd();
 		glPopMatrix();
 	}
+
+		//draw Enemy Bullets
+		for (int i = 0; i < g.nEnemyBullets; i++) {
+            float resX = 2.0;
+            float resY = 5.0;
+			Bullet *b = &g.enemyBarr[i];
+			glColor3fv(b->color);
+			glPushMatrix();
+			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glBegin(GL_QUADS);
+			glVertex2f(-resX, -resY);
+			glVertex2f(-resX, resY);
+			glVertex2f(resX, resY);
+			glVertex2f(resX, -resY);
+			glEnd();
+			glPopMatrix();
+		}
+
 
 		//Draw Explosions
 		renderExplosion();
