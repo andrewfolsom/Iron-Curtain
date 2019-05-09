@@ -381,8 +381,8 @@ int check_keys(XEvent *e)
 			if (gl.gameState == 1)
 				return 1;
 			else {
-				gl.gameState = 1;
 				resetGame();
+				gl.gameState = 1;
 			}
 			break;
 
