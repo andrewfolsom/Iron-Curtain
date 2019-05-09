@@ -108,6 +108,9 @@ extern void displayPauseMenu();
 extern void displayHiddenWorld();
 extern void displayErrorScreen();
 extern void serverConnect(int);
+extern void checkTimer();
+extern void nextState();
+extern void displayTheDuck();
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
@@ -117,7 +120,7 @@ extern void tankBackground();
 //--------------------------------------------------------------------------
 
 
-Image img[10] = {
+Image img[11] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -127,8 +130,8 @@ Image img[10] = {
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
 	"./img/clouds.jpg" ,
-	"./img/tankBackground.png"
-
+	"./img/tankBackground.png",
+	"./img/CommandoDuck.jpg"
 };
 
 Particle p[MAX_PARTICLES];
@@ -194,6 +197,7 @@ int main()
 		}
 		if (gl.gameState != 3 && gl.gameState !=8) {
 			clock_gettime(CLOCK_REALTIME, &timeStart);
+			checkTimer();
 		}
 		else if (!done) {
 			clock_gettime(CLOCK_REALTIME, &timeCurrent);
@@ -497,7 +501,7 @@ void physics()
 	e = headShip;
 	while(e != NULL){
 		e->updatePosition();
-		if (e->pos[1] < -60) {
+		if (e->pos[1] < -30) {
 			e->destroyShip();
 		}
 		e = e->nextShip;
@@ -636,9 +640,9 @@ void physics()
 				 sizeof(Bullet));
 				g.nEnemyBullets--;
 				if (s->health == 0) {
+					serverConnect(g.playerScore);
 					printf("Game Over!\n Score = %d\n", g.playerScore);
 					resetGame();
-					serverConnect(g.playerScore);
 				}
 
 			}
@@ -908,6 +912,15 @@ void render()
 	} else if (gl.gameState == 2){ //Loading
 
 		// displayLoadingScreen();
+		//init regular background
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, gl.theDuck);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[10].width,img[10].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[10].data);
+
+		displayTheDuck();
+		glDisable(GL_TEXTURE_2D);
 
 	} else if (gl.gameState == 3) { //Gameplay
 		Ship* s = &g.ship;

@@ -41,6 +41,7 @@ class Global
     int xres, yres;
 	char keys[65536];
 	int gameState;
+	bool chosen;
 	GLuint nickImage;
 	GLuint andrewImage;
 	GLuint spencerImage;
@@ -56,6 +57,8 @@ class Global
 	GLuint startScreen;
 	GLuint loadingScreen;
     GLuint gameControls;
+	GLuint theDuck;
+	GLuint mainMenu;
 	static Global& getInstance();
     private:
 	Global();
