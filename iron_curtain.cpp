@@ -590,11 +590,11 @@ void physics()
 				e->takeDamage(1);
 				//If health is zero destroy ship
 				if (e->getHealth() < 1) {
-					e->destroyShip();
 					//generate explosion
 					createExplosion(e->pos[0], e->pos[1]);
 					explodeShip();
 					//delete the ship
+					e->destroyShip();
 					g.playerScore += e->getDeathScore();
 				}
 				//delete the bullet
@@ -746,7 +746,7 @@ void physics()
 	i = 0;
 	e = headShip;
 	while (e != NULL) {
-		e->eWpn->fire();
+		e->eWpn->fire(e);
 		e = e->nextShip;
 	}
 
@@ -880,7 +880,7 @@ void render()
 			Bullet *b = &g.playerBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
-			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glTranslatef(b->pos[0], b->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
@@ -896,7 +896,7 @@ void render()
 			Bullet *b = &g.enemyBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
-			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glTranslatef(b->pos[0], b->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
@@ -912,7 +912,7 @@ void render()
 			Missile *m = &g.marr[i];
 			glColor3fv(m->color);
 			glPushMatrix();
-			glTranslatef(m->pos[0], m->pos[1], m->pos[2]);
+			glTranslatef(m->pos[0], m->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
