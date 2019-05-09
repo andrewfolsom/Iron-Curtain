@@ -96,9 +96,12 @@ void displayGameControls()
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c, "C - Credits Screen");
     ggprint16(&r, 16,c," ");
-    ggprint16(&r, 16,c,"G/g - Play Game");
+    ggprint16(&r, 16,c,"G/g - Play Game-MiG Fighter Mode");
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
+
+    ggprint16(&r, 16,c,"O/o - Play Game- Tank Mode");
+    ggprint16(&r, 16,c," ");
 
     Rect r3;
     unsigned int d = 0x00000000;
@@ -124,7 +127,22 @@ void displayGameControls()
     ggprint16(&r2, 16,e," ");
     ggprint16(&r2, 16,e,"X/x ------ Move down");
     ggprint16(&r2, 16,e," ");
+   
+    ggprint16(&r2, 16,e," ");
+
+    ggprint16(&r2, 16,e,"---Basic Tank Movement---");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"A/a ------ Rotate Tank");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"D/d ------ Rotate Tank");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"W/w ------ Move up");
+    ggprint16(&r2, 16,e," ");
+    ggprint16(&r2, 16,e,"X/x ------ Move down");
+    ggprint16(&r2, 16,e," ");
     
+
+
     Rect r4;
     unsigned int f = 0x00000000;
     r4.bot = gl.yres-500;
@@ -144,6 +162,14 @@ void displayGameControls()
     ggprint16(&r4, 16,f," ");
     ggprint16(&r4, 16,f,"5 ----------- Pinwhell Fire");
 
+
+    ggprint16(&r4, 16,f," ");
+    ggprint16(&r4, 16,f,"--- How to Shoot Tank---");
+    ggprint16(&r4, 16,f," ");
+
+    ggprint16(&r4, 16,f,"Spacebar ------ Shoot");
+    ggprint16(&r4, 16,f," ");
+    
     Rect r5;
     unsigned int g = 0x00000000;
     r5.bot = gl.yres-500;
