@@ -32,6 +32,7 @@ class Tank
 		bool moving;
 		int factFlag;
 		int health;
+		int fireFlag;
 		float playerRad = 30;
 		float pos[3];
 		float tPos[3];
@@ -66,6 +67,7 @@ class EnemyTank : public Tank {
 
 		int enterFlag;
 		int needNewDirection = 1;
+		int killScore = 10;
 		float aggression;
 		float movTgtAngle;
 		float radius = 50;

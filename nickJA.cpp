@@ -541,6 +541,7 @@ void TankWeapon::fire(Tank *tank) {
 	struct timespec bt;
 	double time = getTimeSlice(tank, &bt);
 	if (time > fireRate) {
+		tank->fireFlag = 1;
 		timeCopy(&tank->bulletTimer, &bt);
 		if (g.nPlayerBullets < 1000) {
 			Bullet *b = &g.playerBarr[g.nPlayerBullets];
@@ -551,6 +552,7 @@ void TankWeapon::fire(Tank *tank) {
 			setColor(b->color);
 			g.nPlayerBullets++;
 			cannonFire();
+			tank->fireFlag = 0;
 		}
 	}
 }

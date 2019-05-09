@@ -809,7 +809,7 @@ void physics()
 					explodeShip();
 					//delete the ship
 					delete eTank;;
-					//g.playerScore += e->getDeathScore();
+					g.playerScore += eTank->killScore;
 				//delete the bullet
 				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
 				g.nPlayerBullets--;
@@ -1103,6 +1103,8 @@ void render()
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[9].width,img[9].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[9].data);
 		tankBackground();
 		glDisable(GL_TEXTURE_2D);
+
+		hud.drawHud(t->health, 1, g.playerScore, 0);
 
 		//Draw Tank
 		eTank = headTank;
