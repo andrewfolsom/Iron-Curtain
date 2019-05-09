@@ -773,9 +773,11 @@ void physics()
         s->scnd->reload();
     }
 
-	//scrolling physics
-	gl.tex.xc[0] -=0.0007;
-	gl.tex.xc[1] -=0.0007;
+	if (gl.gameState != 8) {
+		//scrolling physics
+		gl.tex.xc[0] -=0.0007;
+		gl.tex.xc[1] -=0.0007;
+	}
 
 	if (gl.gameState == 8) {
 		eTank =  headTank;
