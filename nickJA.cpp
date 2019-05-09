@@ -216,7 +216,25 @@ void SpriteList::drawM60Hull(float x, float y, float angle) {
 
 
 }
+//Function to render tank background image
+void tankBackground() 
+{
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, gl.tankBackground);
 
+	float w = 900;
+	float h = 1000;
+	glBegin(GL_QUADS);
+		glTexCoord2f(2.0f, 2.0f); glVertex2f( w, -h);
+		glTexCoord2f(2.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 2.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
 //********MOVEMENT TYPES***********
 //Press 't' to test this mid game.
 //1 - Rush
@@ -424,8 +442,8 @@ Tank::~Tank() {
 TankWeapon::TankWeapon() {
 	fireRate = 2.0;
 	bulletSpeed = 15.0;
-	color[0] = 0.75;
-	color[1] = 0.5;
+	color[0] = 0;
+	color[1] = 0;
 	color[2] = 0;
 }
 

@@ -112,10 +112,11 @@ extern void serverConnect(int);
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
 extern void spawnTank();
+extern void tankBackground();
 //--------------------------------------------------------------------------
 
 
-Image img[9] = {
+Image img[10] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -125,6 +126,7 @@ Image img[9] = {
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
 	"./img/clouds.jpg" ,
+	"./img/tankBackground.png"
 
 };
 
@@ -363,7 +365,6 @@ int check_keys(XEvent *e)
 				gl.keys[XK_space] = 1;
 			if (gl.gameState == 8) {
 				t->prm->fire(t);
-				printf("%i\n",g.nPlayerBullets);
 			}
 			//cannonFire();
 			break;
@@ -1004,8 +1005,9 @@ void render()
 		displayGameControls();
 		glDisable(GL_TEXTURE_2D);
 	}
-	else if (gl.gameState == 8) {
 
+	else if (gl.gameState == 8) {
+		//TANK GAMEPLAY RENDER
 		Tank *t = &playerTank;
 
 
@@ -1017,8 +1019,8 @@ void render()
 		glBindTexture(GL_TEXTURE_2D, gl.verticalBackground);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
-		scrollingBackground();
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[9].width,img[9].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[9].data);
+		tankBackground();
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Tank
