@@ -328,15 +328,19 @@ int check_keys(XEvent *e)
 			//moveLeft();
 			if (gl.gameState == 3)
 				gl.keys[XK_a] = 1;
-			if (gl.gameState == 8 )
+			if (gl.gameState == 8 ) {
 				t->angle++;
+				t->tAngle++;
+				}
 			break;
 		case XK_d:
 			//moveRight();
 			if (gl.gameState == 3)
 				gl.keys[XK_d] = 1;
-			if (gl.gameState == 8)
+			if (gl.gameState == 8) {
 				t->angle--;
+				t->tAngle--;
+				}
 			break;
 		case XK_w:
 			if (gl.gameState == 3)
@@ -355,9 +359,10 @@ int check_keys(XEvent *e)
 			}
 			break;
 		case XK_space:
-			gl.keys[XK_space] = 1;
+			if (gl.gameState == 3)
+				gl.keys[XK_space] = 1;
 			if (gl.gameState == 8) {
-				//t->prm->fire((float)270.0);
+				//t->prm->fire(t, t->tAngle);
 			}
 			cannonFire();
 			break;
@@ -1021,6 +1026,24 @@ void render()
 		t->renderTank(SPR);
 		//testTank->renderTank(SPR);
 
+		//Draw PLayer Bullets
+		for (int i = 0; i < g.nPlayerBullets; i++) {
+		float resX = 2.0;
+		float resY = 5.0;
+		Bullet *b = &g.playerBarr[i];
+		glColor3fv(b->color);
+		glPushMatrix();
+		glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+		glBegin(GL_QUADS);
+		glVertex2f(-resX, -resY);
+		glVertex2f(-resX, resY);
+		glVertex2f(resX, resY);
+		glVertex2f(resX, -resY);
+		glEnd();
+		glPopMatrix();
+	}
+
+
 		//Draw Upgrade
 		if (up != NULL) {
 			up->drawUpgrade();
@@ -1043,6 +1066,13 @@ double getTimeSlice(Ship *ship, timespec *bt)
 {
 	clock_gettime(CLOCK_REALTIME, bt);
 	double ts = timeDiff(&ship->bulletTimer, bt);
+	return ts;
+}
+//Tank Version
+double getTimeSlice(Tank *tank, timespec *bt)
+{
+	clock_gettime(CLOCK_REALTIME, bt);
+	double ts = timeDiff(&tank->bulletTimer, bt);
 	return ts;
 }
 

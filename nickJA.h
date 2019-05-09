@@ -2,7 +2,7 @@
 //May 3rd, 2019
 
 
-
+class TankWeapon;
 
 //Sprite Class Declarations
 
@@ -36,9 +36,11 @@ class Tank
 		float maxVel = 1.0;
 		Vec vel = {0, 0, 0};
 		Vec tgt;
+		Vec gunPos;
 		Weapon *prm;
 		Tank();
-		~Tank();
+		virtual ~Tank();
+		struct timespec bulletTimer;
 
 		void renderTurret(SpriteList SPR);
 		void renderTank(SpriteList SPR);
@@ -68,3 +70,5 @@ class EnemyTank : public Tank {
 		void updateAngle();
 
 };
+
+

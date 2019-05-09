@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "chadM.h"
 #include "nickJA.h"
 #include "andrewF.h"
@@ -21,6 +22,10 @@ extern Global gl;
 extern EnemyTank *headTank;
 extern EnemyTank *tailTank;
 extern EnemyTank *eTank;
+extern void angularAdjustment(float *vel, float angle);
+extern void timeCopy(struct timespec *dest, struct timespec *source);
+extern double timeDiff(struct timespec *start, struct timespec *end);
+extern double getTimeSlice(Tank*, timespec*);
 extern unsigned char *buildAlphaData(Image *img);
 //const int RUSH = 0;
 //const int STRAFE = 1;
@@ -28,6 +33,7 @@ extern unsigned char *buildAlphaData(Image *img);
 //const int BANK = 3;
 
 const Flt PI = 3.141592653589793;
+const int MAX_BULLETS = 1000;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
@@ -402,13 +408,12 @@ void EnemyShip::updatePosition()
 Tank::Tank() {
 	pos[0] = 450;
 	pos[1] = 250;
-	prm = new Basic;
+	//prm = new Basic;
 }
 
 Tank::~Tank() {
 	delete prm;
 }
-
 
 //*************TANK MOVEMENT*****************
 
@@ -489,9 +494,11 @@ void Tank::updateTarget(int x, int y)
 	
 	if (tgt[1] - tPos[1] > 0)
 		tgtAngle = -(tgtAngle * 180) /PI;
-	else
+	else {
 		tgtAngle = 180 - (tgtAngle * 180) /PI;
-
+	}
+		gunPos[0] = tPos[0];
+		gunPos[1] = tPos[1];
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
 
@@ -555,7 +562,8 @@ void Tank::moveTank()
 }
 
 //********ENEMY TANK CLASS********
-EnemyTank::EnemyTank(float x, float y, int faction) {
+EnemyTank::EnemyTank(float x, float y, int faction) 
+{
 	pos[0] = x;
 	pos[1] = y;
 	factFlag = faction;
@@ -573,7 +581,8 @@ EnemyTank::EnemyTank(float x, float y, int faction) {
 	nextTank = NULL;
 }
 
-EnemyTank::~EnemyTank() {
+EnemyTank::~EnemyTank() 
+{
 	if (prevTank != NULL) {
 		prevTank->nextTank = nextTank;
 	}
@@ -596,7 +605,8 @@ void spawnTank() {
 
 	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
 }
-void EnemyTank::generatePositions() {
+void EnemyTank::generatePositions() 
+{
 	//for (int i = 0; i < 3; i++) {
 	for (int i = 0; i < 3; i++) {
 		potentialMov[i][0] = rand()%9 * 100;
@@ -607,7 +617,8 @@ void EnemyTank::generatePositions() {
 //Will pick a location to move to.
 //Location will be decided by the sum of variables
 //affected by each tank's 'aggression'
-void EnemyTank::pickMovTgt() {
+void EnemyTank::pickMovTgt() 
+{
 	float favor = 0;
 	int greatest;
 	float xDiff, yDiff;
@@ -638,7 +649,8 @@ void EnemyTank::pickMovTgt() {
 	moving = 1;
 }
 
-void EnemyTank::updateAngle() {
+void EnemyTank::updateAngle() 
+{
 	movTgtAngle = atan((movTgt[0] - pos[0])/(movTgt[1] - pos[1]));
 
 	if (movTgt[1] - pos[1] > 0)
@@ -650,7 +662,8 @@ void EnemyTank::updateAngle() {
 
 }
 
-void EnemyTank::moveEnemyTank() {
+void EnemyTank::moveEnemyTank()
+{
 	float xdiff = movTgt[0] - pos[0];
 	float ydiff = movTgt[1] - pos[1];
 	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
