@@ -782,17 +782,55 @@ void physics()
 	}
 
 	if (gl.gameState == 8) {
+
+	//Check for collisions with enemy tanks
+	i = 0;
+	while (i < g.nPlayerBullets) {
+		//is there a bullet within its radius?
+		eTank = headTank;
+		while (eTank != NULL) {
+			Bullet *b = &g.playerBarr[i];
+			d0 = b->pos[0] - eTank->pos[0];
+			d1 = b->pos[1] - eTank->pos[1];
+			dist = (d0*d0 + d1*d1);
+			if (dist < (eTank->radius * eTank->radius)) {
+				//determine if upgrade drops
+				//if(generateUpgrade() && up == NULL) {
+				//	up = new Upgrade(e->pos[0], e->pos[1]);
+				//}
+
+				//If health is zero destroy ship
+				//if (e->getHealth() < 1) {
+					//generate explosion
+					createExplosion(eTank->pos[0], eTank->pos[1]);
+					explodeShip();
+					//delete the ship
+					delete eTank;;
+					//g.playerScore += e->getDeathScore();
+				//delete the bullet
+				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
+				g.nPlayerBullets--;
+			}
+			eTank = eTank->nextTank;
+			if (headTank == NULL)
+				break;
+			}
+			i++;
+		}
+
+		//Move Enemy Tanks
 		eTank =  headTank;
 		while (eTank != NULL) {
-		if (eTank->needNewDirection) {
-			eTank->generatePositions();
-			eTank->pickMovTgt();
+			if (eTank->needNewDirection) {
+				eTank->generatePositions();
+				eTank->pickMovTgt();
+			}
+			eTank->updateAngle();
+			eTank->updateTarget(t->pos[0], t->pos[1]);
+			eTank->moveEnemyTank();
+			eTank = eTank->nextTank;
 		}
-		eTank->updateAngle();
-		eTank->updateTarget(t->pos[0], t->pos[1]);
-		eTank->moveEnemyTank();
-		eTank = eTank->nextTank;
-		}
+		//Move Player Tank
 		t->moveTank();
 	}
 	return;
@@ -1049,6 +1087,8 @@ void render()
 		glPopMatrix();
 	}
 
+		//Draw Explosions
+		renderExplosion();
 
 		//Draw Upgrade
 		if (up != NULL) {

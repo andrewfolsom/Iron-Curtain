@@ -62,6 +62,7 @@ class EnemyTank : public Tank {
 		int needNewDirection = 1;
 		float aggression;
 		float movTgtAngle;
+		float radius = 50;
 		Vec movTgt;
 		Vec potentialMov[3];
 
