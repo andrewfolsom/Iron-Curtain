@@ -197,7 +197,7 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			mainLevel(gameTime);
+			//mainLevel(gameTime);
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -764,7 +764,13 @@ void physics()
 	if (gl.gameState == 8) {
 		eTank =  headTank;
 		while (eTank != NULL) {
+		if (eTank->needNewDirection) {
+			eTank->generatePositions();
+			eTank->pickMovTgt();
+		}
+		eTank->updateAngle();
 		eTank->updateTarget(t->pos[0], t->pos[1]);
+		eTank->moveEnemyTank();
 		eTank = eTank->nextTank;
 		}
 		t->moveTank();

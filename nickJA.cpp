@@ -31,13 +31,18 @@ const Flt PI = 3.141592653589793;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[5]{
+Image Sprites[4]{
 "./img/Phantom_1a.png",
 "./img/MiG-21_a.png",
 "./img/M60Hull.png",
-"./img/M60_Turret_2.png",
-"./img/Boss.png"
+"./img/M60_Turret_2.png"
 };
+
+Vec spawnPoints[5] = {{-100,1200,0},
+					  {450, 1200, 0},
+					  {1000, 1200, 0},
+					  {-100, 800, 0},
+					  {1000, 800, 0}};
 
 //DISPLAY
 void displayNick(float x, float y, GLuint texture)
@@ -585,19 +590,66 @@ EnemyTank::~EnemyTank() {
 
 //********ENEMY TANK FUNCTIONS********
 void spawnTank() {
-	float x = rand()%500 + 200;
-	float y = rand()%500 + 200;
-	eTank = new EnemyTank(x, y, 1);
+	//float x = rand()%500 + 200;
+	//float y = rand()%500 + 200;
+	int x = rand()%5;
+
+	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
 }
 void EnemyTank::generatePositions() {
-	Vec generatedPos;
-
+	//for (int i = 0; i < 3; i++) {
+	int i = 0;
+	do {
+		potentialMov[i][0] = rand()%9 * 100;
+		potentialMov[i][1] = rand()%10 * 100;
+		if ( potentialMov[i][0] > 40 && potentialMov[i][1] 
+	} while (i < 3)
 }
+
 //Will pick a location to move to.
 //Location will be decided by the sum of variables
 //affected by each tank's 'aggression'
 void EnemyTank::pickMovTgt() {
-	float favor;
+	float favor = 0;
+	int greatest;
+	float xDiff, yDiff;
+
+	//Parameters to determine favor
+	float distToPlayer;
+	float distFromStart;
+	//Loop to evalutate each potential spot.
+	for (int i = 0; i < 3; i++) {
+		xDiff = tgt[0] - potentialMov[i][0];
+		yDiff = tgt[1] - potentialMov[i][1];
+		distToPlayer = sqrt((xDiff*xDiff) + (yDiff*yDiff));
+		xDiff = pos[0] - potentialMov[i][0];
+		yDiff = pos[1] - potentialMov[i][1];
+		distFromStart = sqrt((xDiff*xDiff) + (yDiff*yDiff));
+
+		if ( (distFromStart * aggression) + (distToPlayer/aggression)  > favor) {
+			favor = (distFromStart * aggression) + (distToPlayer/aggression);
+			greatest = i;
+		}
+	}
+	movTgt[0] = potentialMov[greatest][0];
+	movTgt[1] = potentialMov[greatest][1];
+	//movTgt[0] = 500;
+	//movTgt[1] = 500;
+
+	needNewDirection = 0;
+	moving = 1;
+}
+
+void EnemyTank::updateAngle() {
+	movTgtAngle = atan((movTgt[0] - pos[0])/(movTgt[1] - pos[1]));
+
+	if (movTgt[1] - pos[1] > 0)
+		movTgtAngle = -(movTgtAngle * 180) /PI;
+	else
+		movTgtAngle = 180 - (movTgtAngle * 180) /PI;
+	//printf("Position: (%f, %f), Target: (%f, %f), Angle Target/Current: %f/%f\n", pos[0], pos[1],
+	//		movTgt[0], movTgt[1], movTgtAngle, angle);
+
 }
 
 void EnemyTank::moveEnemyTank() {
@@ -605,9 +657,30 @@ void EnemyTank::moveEnemyTank() {
 	float ydiff = movTgt[1] - pos[1];
 	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
 
-	if (distance >=5) {
+	//Increase velocity while tank is not whwere it wants to be.
+	if (distance >=100 && moving) {
 		vel[0]+= 0.8;
 		moving = 1;
 	}
+	else {
+		moving = 0;
+		needNewDirection = 1;
+	}
+	//printf("Dist = %f\n", distance);
+	//Rotate tank to point to destination
+	if (angle != movTgtAngle && moving) {
+		if (angle > 135 && movTgtAngle < 0)
+			angle -=360;
+		if (angle < 0 && movTgtAngle > 135)
+			angle +=360;
+		if (angle > movTgtAngle) {
+			angle -= 0.25;
+		}
+		else { 
+			angle += 0.25;
+		}
+	}
+
+	moveTank();
 
 }

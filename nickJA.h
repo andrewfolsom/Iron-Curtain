@@ -56,6 +56,7 @@ class EnemyTank : public Tank {
 		EnemyTank *prevTank;
 
 		int factFlag;
+		int needNewDirection = 1;
 		float aggression;
 		float movTgtAngle;
 		Vec movTgt;
@@ -64,5 +65,6 @@ class EnemyTank : public Tank {
 		void generatePositions();
 		void pickMovTgt();
 		void moveEnemyTank();
+		void updateAngle();
 
 };
