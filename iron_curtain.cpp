@@ -670,6 +670,7 @@ void physics()
 				break;
 		   case 3:
 				s->shield->status = true;
+				shieldSound();
 				clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
 				delete up;
 				up = NULL;
