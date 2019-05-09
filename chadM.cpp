@@ -238,8 +238,16 @@ bool mainLevel(double gameTime) {
                 tailShip->configDiagRush(gl.xres / 2, 700, -1);
                 bossSpawned = true;
             }
-            if (tailShip->pos[1] < 400)
+            else if (tailShip->pos[1] < 400)
                 tailShip->configDiagRush(gl.xres / 3, 700, 1);
+            else if (tailShip->pos[0] < 200)
+                tailShip->configDiagRush(500, 500, -1);
+            else
+                tailShip->configDiagRush(getRandXSpawn(), 500, -1);
+            if (tailShip == NULL) {
+                bossDefeated = true;
+                bossSpawned = false;
+            }
         }
     }
 
