@@ -497,6 +497,7 @@ void EnemyShip::updatePosition()
 Tank::Tank() {
 	pos[0] = 450;
 	pos[1] = 250;
+	health = 3;
 	prm = new TankWeapon;
 	factFlag = 0;
 }
@@ -512,6 +513,7 @@ TankWeapon::TankWeapon() {
 	color[0] = 0;
 	color[1] = 0;
 	color[2] = 0;
+
 }
 
 TankWeapon::~TankWeapon() {
@@ -539,6 +541,7 @@ void TankWeapon::fire(Tank *tank) {
 	struct timespec bt;
 	double time = getTimeSlice(tank, &bt);
 	if (time > fireRate) {
+		tank->fireFlag = 1;
 		timeCopy(&tank->bulletTimer, &bt);
 		if (g.nPlayerBullets < 1000) {
 			Bullet *b = &g.playerBarr[g.nPlayerBullets];
@@ -549,6 +552,7 @@ void TankWeapon::fire(Tank *tank) {
 			setColor(b->color);
 			g.nPlayerBullets++;
 			cannonFire();
+			tank->fireFlag = 0;
 		}
 	}
 }
@@ -764,12 +768,21 @@ EnemyTank::~EnemyTank()
 }
 
 //********ENEMY TANK FUNCTIONS********
-void spawnTank() {
+void spawnTank() 
+{
 	//float x = rand()%500 + 200;
 	//float y = rand()%500 + 200;
 	int x = rand()%5;
 
 	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
+}
+void spawnTank(int spawnNum)
+{
+	int x;
+	for (int i = 0; i < spawnNum; i++) {
+		x = rand()%5;
+		eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
+	}
 }
 void EnemyTank::generatePositions() 
 {

@@ -112,6 +112,7 @@ extern void serverConnect(int);
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
 extern void spawnTank();
+extern void spawnTank(int spawnNum);
 extern void tankBackground();
 //--------------------------------------------------------------------------
 
@@ -200,7 +201,9 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			done = mainLevel(gameTime);
+			if (gl.gameState == 3) {
+				done = mainLevel(gameTime);
+			}
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -567,7 +570,7 @@ void physics()
 				step = 0.0;
 			i++;
 		}
-	}
+	if (gl.gameState == 3) {}
 	//==================================
 	//	   ENEMY COLLISION DETECTION
 	//==================================
@@ -649,7 +652,7 @@ void physics()
 		}
 	}
 	#endif
-
+}
 	// Did the ship hit an upgrade container?
 	if (up != NULL) {
 		int drop = up->detectCollision(s->pos[0], s->pos[1]);
@@ -806,7 +809,7 @@ void physics()
 					explodeShip();
 					//delete the ship
 					delete eTank;;
-					//g.playerScore += e->getDeathScore();
+					g.playerScore += eTank->killScore;
 				//delete the bullet
 				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
 				g.nPlayerBullets--;
@@ -817,6 +820,40 @@ void physics()
 			}
 			i++;
 		}
+
+#ifndef DEBUG
+	//Check player tank collisions
+	i = 0;
+	while(i < g.nEnemyBullets){
+			Bullet *b = &g.enemyBarr[i];
+			Flt d0 = b->pos[0] - t->pos[0];
+			Flt d1 = b->pos[1] - t->pos[1];
+			Flt dist = (d0*d0 + d1*d1);
+			if (dist < (s->detRadius*t->playerRad)) {
+				//take damage
+				(t->health)--;
+				//delete the bullet
+				memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+				 sizeof(Bullet));
+				g.nEnemyBullets--;
+				if (t->health == 0) {
+					createExplosion(t->pos[0], t->pos[1]);
+					explodeShip();
+					serverConnect(g.playerScore);
+					printf("Game Over!\n Score = %d\n", g.playerScore);
+					resetGame();
+				}
+
+			}
+			//if (s->shield->status && s->shield->detectCollision(dist)) {
+			//	memcpy(&g.enemyBarr[i], &g.enemyBarr[g.nEnemyBullets-1],
+			//	 sizeof(Bullet));
+			//	g.nEnemyBullets--;
+
+			i++;
+		}
+
+	#endif
 
 		//Move Enemy Tanks
 		eTank =  headTank;
@@ -833,6 +870,11 @@ void physics()
 		}
 		//Move Player Tank
 		t->moveTank();
+		if (headTank == NULL)
+			{
+				spawnTank(g.tier);
+				g.tier++;
+			}
 	}
 	return;
 }
@@ -1061,6 +1103,8 @@ void render()
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[9].width,img[9].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[9].data);
 		tankBackground();
 		glDisable(GL_TEXTURE_2D);
+
+		hud.drawHud(t->health, 1, g.playerScore, 0);
 
 		//Draw Tank
 		eTank = headTank;
