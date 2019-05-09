@@ -80,6 +80,7 @@ extern void renderShip(Ship* ship);
 extern void displayChad(float x, float y, GLuint texture);
 extern void resetSpawnTimer();
 extern bool mainLevel(double time);
+void resetGame();
 
 //Externs -- Andrew
 extern void displayAndrew(float x, float y, GLuint texture);
@@ -312,7 +313,7 @@ int check_keys(XEvent *e)
 		gl.gameState = 1;
 		break;
 		case XK_l:
-		gl.gameState = 2;
+			gl.gameState = 2;
 			break;
 		case XK_g:
 			gl.gameState = 3;
@@ -377,7 +378,12 @@ int check_keys(XEvent *e)
 			break;
 
 		case XK_Escape:
-			return 1;
+			if (gl.gameState == 1)
+				return 1;
+			else {
+				gl.gameState = 1;
+				resetGame();
+			}
 			break;
 
 		case XK_m:
