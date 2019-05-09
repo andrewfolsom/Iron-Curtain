@@ -89,7 +89,7 @@ Texture::Texture() {}
 
 Global::Global()
 {
-
+	chosen = true;
     xres = 900;
 	yres = 1000;
 	memset(keys, 0, 65536);

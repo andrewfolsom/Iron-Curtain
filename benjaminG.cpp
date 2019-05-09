@@ -309,3 +309,81 @@ void serverConnect(int score) {
     return;
 }
 
+void nextState() {
+    switch (gl.gameState) {
+        case 0:
+            gl.gameState++;
+            break;
+        case 1:
+            gl.gameState++;
+            break;
+        case 2:
+            if (gl.chosen)
+                gl.gameState = 8;
+            else               
+                gl.gameState = 4;
+            break;
+        case 3:
+            gl.gameState = 6;
+            break;
+        case 4:
+            gl.gameState--;
+            break;
+        case 5:
+            gl.gameState--;
+            break;
+        case 6:
+            gl.gameState = 0;
+            break;
+        case 7: 
+            gl.gameState = 0;
+            break;
+        case 8:
+            gl.gameState = 3;
+            break; 
+    }
+}
+
+void checkTimer() {
+    static time_t Timer = time(NULL);
+    switch (gl.gameState) {
+        case 0:
+        case 6:
+        case 5:
+            if (abs(difftime(Timer, time(NULL))) >= 5) {
+                nextState();
+                cout << "Change state\n";
+                time(&Timer);
+            } 
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 8:
+            time(&Timer);
+            break;
+    }
+}
+
+
+
+void displayTheDuck() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0,1.0,1.0);
+
+    glBindTexture(GL_TEXTURE_2D, gl.theDuck);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f,1.0f);glVertex2i(0,0);
+    glTexCoord2f(0.0f,0.0f); glVertex2i(0,gl.yres);
+    glTexCoord2f(1.0f,0.0f); glVertex2i(gl.xres,gl.yres);
+    glTexCoord2f(1.0f,1.0f); glVertex2i(gl.xres,0);
+    glEnd();
+
+    Rect r;
+    unsigned int c = 0x0000fff;
+    r.bot = 100;
+    r.left = 30;
+    r.center = 0;
+    ggprint16(&r, 30,c,"Loading...");
+}
