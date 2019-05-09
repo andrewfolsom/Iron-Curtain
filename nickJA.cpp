@@ -7,17 +7,30 @@
 //
 
 #include <GL/glx.h>
+#include <unistd.h>
 #include "fonts.h"
 #include "core.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "chadM.h"
 #include "nickJA.h"
+#include "andrewF.h"
+#ifdef USE_OPENAL_SOUND
+#include </usr/include/AL/alut.h>
+#endif
 
 extern Game g;
 extern Global gl;
-extern EnemyShip *headShip;
+extern EnemyTank *headTank;
+extern EnemyTank *tailTank;
+extern EnemyTank *eTank;
+extern void angularAdjustment(float *vel, float angle);
+extern void timeCopy(struct timespec *dest, struct timespec *source);
+extern void cannonFire();
+extern double timeDiff(struct timespec *start, struct timespec *end);
+extern double getTimeSlice(Tank*, timespec*);
 extern unsigned char *buildAlphaData(Image *img);
 //const int RUSH = 0;
 //const int STRAFE = 1;
@@ -25,15 +38,24 @@ extern unsigned char *buildAlphaData(Image *img);
 //const int BANK = 3;
 
 const Flt PI = 3.141592653589793;
+const int MAX_BULLETS = 1000;
 
 enum MOVETYPE { RUSH, STRAFE, CIRCLING, BANK, DIAG_RUSH};
 
-Image Sprites[4]{
+Image Sprites[6]{
 "./img/Phantom_1a.png",
 "./img/MiG-21_a.png",
 "./img/M60Hull.png",
-"./img/M60_Turret_2.png"
+"./img/M60_Turret_2.png",
+"./img/T-62_Base.png",
+"./img/T-62_Turret.png"
 };
+
+Vec spawnPoints[5] = {{-100,1200,0},
+					  {450, 1200, 0},
+					  {1000, 1200, 0},
+					  {-100, 800, 0},
+					  {1000, 800, 0}};
 
 //DISPLAY
 void displayNick(float x, float y, GLuint texture)
@@ -130,7 +152,9 @@ void SpriteList::drawMig(float x, float y, float angle) {
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 }
-
+//Function to render our M60's turret.
+//The turret is placed above and separate from the hull.
+//x, y, and angle do what you think they do.
 void SpriteList::drawM60Turret(float x, float y, float angle) {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
@@ -161,7 +185,9 @@ void SpriteList::drawM60Turret(float x, float y, float angle) {
 
 
 }
-
+//Function to render our M60's hull.
+//The hull is below and separate from the turret.
+//x, y, and angle are still working the same old job.
 void SpriteList::drawM60Hull(float x, float y, float angle) {
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
@@ -193,7 +219,89 @@ void SpriteList::drawM60Hull(float x, float y, float angle) {
 
 }
 
-//************MOVEMENT TYPES*****************
+//Function to draw T-62 Hull
+//Our old friends X, Y, and angle are at it again!
+void SpriteList::drawT62Hull(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, T62Hull);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[4]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[4].width, Sprites[4].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 90;
+	float w = 68;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 0.8);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+void SpriteList::drawT62Turret(float x, float y, float angle) {
+	glEnable(GL_TEXTURE_2D);
+	glColor4ub(255.0, 255.0, 255.0, 255.0);
+	glBindTexture(GL_TEXTURE_2D, T62Trt);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	unsigned char *alphaData = buildAlphaData(&Sprites[5]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Sprites[5].width, Sprites[5].height, 0, GL_RGBA, 
+				 GL_UNSIGNED_BYTE, alphaData);
+	free(alphaData);
+
+	float h = 120;
+	float w = 95;
+
+	glPushMatrix();
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.0f);
+	glTranslatef(x, y, 1.0);
+	glRotatef(angle, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_QUADS);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f( w, -h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+
+//Function to render tank background image
+void tankBackground() 
+{
+	glColor3f(1.0, 1.0, 1.0);
+	glBindTexture(GL_TEXTURE_2D, gl.tankBackground);
+
+	float w = 900;
+	float h = 1000;
+	glBegin(GL_QUADS);
+		glTexCoord2f(2.0f, 2.0f); glVertex2f( w, -h);
+		glTexCoord2f(2.0f, 0.0f); glVertex2f( w,  h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(-w, h);
+		glTexCoord2f(0.0f, 2.0f); glVertex2f( -w, -h);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+
+}
+//********MOVEMENT TYPES***********
 //Press 't' to test this mid game.
 //1 - Rush
 //Enemy begins at the top of the screen and rushes straight to the bottom.
@@ -385,15 +493,89 @@ void EnemyShip::updatePosition()
 		}
 }
 
+//********TANK CLASS********
+Tank::Tank() {
+	pos[0] = 450;
+	pos[1] = 250;
+	prm = new TankWeapon;
+	factFlag = 0;
+}
 
+Tank::~Tank() {
+	delete prm;
+}
+
+//********TANK WEAPON CLASS********
+TankWeapon::TankWeapon() {
+	fireRate = 2.0;
+	bulletSpeed = 15.0;
+	color[0] = 0;
+	color[1] = 0;
+	color[2] = 0;
+}
+
+TankWeapon::~TankWeapon() {
+
+}
+
+void TankWeapon::setPosition(float *t,float *b) {
+	b[0] = t[0];
+	b[1] = t[1];
+	b[2] = 1;
+}
+
+void TankWeapon::setVelocity(float *vel) {
+	vel[0] = 0.0;
+	vel[1] = bulletSpeed;
+}
+
+void TankWeapon::setColor(float *c) {
+	c[0] = color[0];
+	c[1] = color[1];
+	c[2] = color[2];
+}
+
+void TankWeapon::fire(Tank *tank) {
+	struct timespec bt;
+	double time = getTimeSlice(tank, &bt);
+	if (time > fireRate) {
+		timeCopy(&tank->bulletTimer, &bt);
+		if (g.nPlayerBullets < 1000) {
+			Bullet *b = &g.playerBarr[g.nPlayerBullets];
+			timeCopy(&b->time, &bt);
+			setPosition(tank->gunPos, b->pos);
+			setVelocity(b->vel);
+			angularAdjustment(b->vel, tank->tAngle+90);
+			setColor(b->color);
+			g.nPlayerBullets++;
+			cannonFire();
+		}
+	}
+}
+
+void TankWeapon::enemyFire(Tank *tank) {
+	struct timespec bt;
+	double time = getTimeSlice(tank, &bt);
+	if (time > fireRate) {
+		timeCopy(&tank->bulletTimer, &bt);
+		if (g.nEnemyBullets < 1000) {
+			Bullet *b = &g.enemyBarr[g.nEnemyBullets];
+			timeCopy(&b->time, &bt);
+			setVelocity(b->vel);
+			setPosition(tank->tPos, b->pos);
+			angularAdjustment(b->vel, tank->tAngle+90);
+			//setColor(b->color);
+			b->color[0] = 1;
+			//b->color[1] = b->color[2] = 0;
+			g.nEnemyBullets++;
+			cannonFire();
+		}
+	}
+}
 //*************TANK MOVEMENT*****************
 
 void Tank::renderTurret(SpriteList SPR)
 {
-	//Vec pt[50];
-	//float circAngle = 0;
-	//float angleInc = (2*PI)/50;
-
 	tPos[0] = pos[0];
 	tPos[1] = pos[1];
 	//tAngle is the current angle of the turret.
@@ -412,9 +594,19 @@ void Tank::renderTurret(SpriteList SPR)
 		else { 
 			tAngle += 0.25;
 		}
-		//printf("Called %i times", calledCount);
 	}
-	/*
+	if (factFlag == 1)
+		SPR.drawT62Turret(tPos[0], tPos[1], tAngle);
+	else if (factFlag == 0)
+		SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
+
+	gunPos[0] = tPos[0];
+	gunPos[1] = tPos[1];
+
+/* **OLD CODE**
+	Vec pt[50];
+	float circAngle = 0;
+	float angleInc = (2*PI)/50;
 	//Draw Gun
 	glColor3f(0.0, 0.0, 0.1);
 	glPushMatrix();
@@ -452,9 +644,9 @@ void Tank::renderTurret(SpriteList SPR)
 		glVertex3f(pt[0][0], pt[0][1], 1.0);
 	glEnd();
 	glPopMatrix();*/
-	SPR.drawM60Turret(tPos[0], tPos[1], tAngle);
 	//printf("tgtAngle is %f, tAngle is %f\n", tgtAngle, tAngle);
 }
+
 //Function is fed an X, Y value to target.
 //Is suppled with cursor Coord in iron-curtain.cpp
 void Tank::updateTarget(int x, int y)
@@ -465,15 +657,23 @@ void Tank::updateTarget(int x, int y)
 	
 	if (tgt[1] - tPos[1] > 0)
 		tgtAngle = -(tgtAngle * 180) /PI;
-	else
+	else {
 		tgtAngle = 180 - (tgtAngle * 180) /PI;
+	}
 
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
 
 void Tank::renderTank(SpriteList SPR) 
 {
-/*
+	if (factFlag == 1 )
+		SPR.drawT62Hull(pos[0], pos[1], angle);
+	else if (factFlag == 0 )
+		SPR.drawM60Hull(pos[0], pos[1], angle);
+
+	renderTurret(SPR);
+
+/* **OLD CODE**
 	glColor3fv(color);
 	glPushMatrix();
 	glTranslatef(pos[0], pos[1], 0.1);
@@ -486,9 +686,6 @@ void Tank::renderTank(SpriteList SPR)
 	glEnd();
 	glPopMatrix();
 */
-	SPR.drawM60Hull(pos[0], pos[1], angle);
-	renderTurret(SPR);
-
 	//printf("Pos is (%f, %f)\n", tank.turret.tPos[0], tank.turret.tPos[1]);
 }
 
@@ -529,8 +726,154 @@ void Tank::moveTank()
 	updateTarget(tgt[0], tgt[1]);
 }
 
-
-//******** ENEMY TANK CLASS ********
-	EnemyTank::EnemyTank(float x, float y, int faction) {
-		
+//********ENEMY TANK CLASS********
+EnemyTank::EnemyTank(float x, float y, int faction) 
+{
+	pos[0] = x;
+	pos[1] = y;
+	factFlag = faction;
+	prm = new TankWeapon;
+	angle = 180;
+	tAngle = 180;
+	aggression = rand()%100 /100;
+	if (headTank == NULL) {
+		headTank = tailTank = this;
+		prevTank = nextTank = NULL;
 	}
+	else {
+		prevTank = tailTank;
+		prevTank->nextTank = tailTank = this;
+	}
+	nextTank = NULL;
+}
+
+EnemyTank::~EnemyTank() 
+{
+	if (prevTank != NULL) {
+		prevTank->nextTank = nextTank;
+	}
+	else {
+		headTank = nextTank;
+	}
+	if (nextTank != NULL) {
+		nextTank->prevTank = prevTank;
+	}
+	else {
+		tailTank = prevTank;
+	}
+}
+
+//********ENEMY TANK FUNCTIONS********
+void spawnTank() {
+	//float x = rand()%500 + 200;
+	//float y = rand()%500 + 200;
+	int x = rand()%5;
+
+	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
+}
+void EnemyTank::generatePositions() 
+{
+	//for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
+		potentialMov[i][0] = rand()%9 * 100;
+		potentialMov[i][1] = rand()%10 * 100;
+		}
+}
+
+//Will pick a location to move to.
+//Location will be decided by the sum of variables
+//affected by each tank's 'aggression'
+void EnemyTank::pickMovTgt() 
+{
+	float favor = 0;
+	int greatest;
+	float xDiff, yDiff;
+
+	//Parameters to determine favor
+	float distToPlayer;
+	float distFromStart;
+	//Loop to evalutate each potential spot.
+	for (int i = 0; i < 3; i++) {
+		xDiff = tgt[0] - potentialMov[i][0];
+		yDiff = tgt[1] - potentialMov[i][1];
+		distToPlayer = sqrt((xDiff*xDiff) + (yDiff*yDiff));
+		xDiff = pos[0] - potentialMov[i][0];
+		yDiff = pos[1] - potentialMov[i][1];
+		distFromStart = sqrt((xDiff*xDiff) + (yDiff*yDiff));
+
+		if ( (distFromStart * aggression) + (distToPlayer/aggression)  > favor) {
+			favor = (distFromStart * aggression) + (distToPlayer/aggression);
+			greatest = i;
+		}
+	}
+	movTgt[0] = potentialMov[greatest][0];
+	movTgt[1] = potentialMov[greatest][1];
+	//movTgt[0] = 500;
+	//movTgt[1] = 500;
+
+	needNewDirection = 0;
+	moving = 1;
+}
+
+void EnemyTank::updateAngle() 
+{
+	movTgtAngle = atan((movTgt[0] - pos[0])/(movTgt[1] - pos[1]));
+
+	if (movTgt[1] - pos[1] > 0)
+		movTgtAngle = -(movTgtAngle * 180) /PI;
+	else
+		movTgtAngle = 180 - (movTgtAngle * 180) /PI;
+	//printf("Position: (%f, %f), Target: (%f, %f), Angle Target/Current: %f/%f\n", pos[0], pos[1],
+	//		movTgt[0], movTgt[1], movTgtAngle, angle);
+
+}
+
+void EnemyTank::moveEnemyTank()
+{
+	float xdiff = movTgt[0] - pos[0];
+	float ydiff = movTgt[1] - pos[1];
+	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
+
+	//Set whether tank has entered the arena
+	if (pos[0] > 20 && pos[0] < 880) {
+		if (pos[1] < 1000)
+			enterFlag = 1;
+	}
+
+	//Increase velocity while tank is not whwere it wants to be.
+	if (distance >=100 && moving) {
+		vel[0]+= 0.8;
+		moving = 1;
+	}
+	else {
+		moving = 0;
+		needNewDirection = 1;
+	}
+
+	if (enterFlag) {
+		if (pos[0] < 20)
+			pos[0] = 20;
+		if (pos[0] > 880)
+			pos[0] = 880;
+		if (pos[1] > 980)
+			pos[1] = 980;
+		if (pos[1] < 20)
+			pos[1] = 20;
+	}
+	//printf("Dist = %f\n", distance);
+	//Rotate tank to point to destination
+	if (angle != movTgtAngle && moving) {
+		if (angle > 135 && movTgtAngle < 0)
+			angle -=360;
+		if (angle < 0 && movTgtAngle > 135)
+			angle +=360;
+		if (angle > movTgtAngle) {
+			angle -= 0.25;
+		}
+		else { 
+			angle += 0.25;
+		}
+	}
+	moveTank();
+
+}

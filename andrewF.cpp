@@ -19,6 +19,7 @@ const int MAX_MISSILES = 1;
 const int MAX_PARTICLES = 3000;
 extern float convertToRads(float angle);
 extern double getTimeSlice(Ship*, timespec*);
+extern void cannonFire();
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 extern double timeDiff(struct timespec *start, struct timespec *end);
 extern Game g;
@@ -171,6 +172,10 @@ void Weapon::setColor(float *c)
     c[2] = color[2];
 }
 
+void Weapon::fire(float angle) { }
+
+void Weapon::fire(EnemyShip* e) { }
+
 /**
  * Basic weapon class constructor
  */
@@ -198,6 +203,7 @@ void Basic::fire()
             setVelocity(b->vel);
             setColor(b->color);
             g.nPlayerBullets++;
+            cannonFire();
         }
     }
 }
@@ -281,6 +287,7 @@ void Scatter::fire()
                 setColor(b->color);
                 temp += increment;
                 g.nPlayerBullets++;
+                cannonFire();
             }
         }
     }
@@ -323,22 +330,22 @@ Pinwheel::Pinwheel()
  * incrementing their angle of fire to create a pinwheel
  * like effect.
  */
-void Pinwheel::fire()
+void Pinwheel::fire(EnemyShip* e)
 {
     struct timespec bt;
-    if (getTimeSlice(&g.ship, &bt) > fireRate) {
-        timeCopy(&g.ship.bulletTimer, &bt);
+    if (getTimeSlice(e, &bt) > fireRate) {
+        timeCopy(&e->bulletTimer, &bt);
         for (int i = 0; i < shotsFired; i++) {
-            if(g.nPlayerBullets < MAX_BULLETS) {
-                Bullet *b = &g.playerBarr[g.nPlayerBullets];
+            if(g.nEnemyBullets < MAX_BULLETS) {
+                Bullet *b = &g.enemyBarr[g.nEnemyBullets];
                 timeCopy(&b->time, &bt);
-                setPosition(g.ship.pos, b->pos);
+                setPosition(e->pos, b->pos);
                 b->vel[0] = b->vel[1] = bulletSpeed;
                 b->vel[0] *= cos(convertToRads(spread));
                 b->vel[1] *= sin(convertToRads(spread));
                 setColor(b->color);
                 spread += 90.0;
-                g.nPlayerBullets++;
+                g.nEnemyBullets++;
             }
         }
     }
@@ -542,17 +549,17 @@ EnemyStd::EnemyStd()
  * movement.
  * @param float angle   Angle determining weapon's firing direction
  */
-void EnemyStd::fire(EnemyShip *ship, float angle)
+void EnemyStd::fire(EnemyShip* e)
 {
     struct timespec bt;
-    double time = getTimeSlice(ship, &bt);
+    double time = getTimeSlice(e, &bt);
     if (time > fireRate) {
-        timeCopy(&ship->bulletTimer, &bt);
+        timeCopy(&e->bulletTimer, &bt);
         if (g.nEnemyBullets < MAX_BULLETS) {
             Bullet *b = &g.enemyBarr[g.nEnemyBullets];
             timeCopy(&b->time, &bt);
-            setPosition(ship->pos, b->pos);
-            angularAdjustment(b->vel, angle);
+            setPosition(e->pos, b->pos);
+            //angularAdjustment(b->vel, angle);
             setVelocity(b->vel);
             setColor(b->color);
             g.nEnemyBullets++;
@@ -564,7 +571,7 @@ void EnemyStd::fire(EnemyShip *ship, float angle)
  * Upgrade class constructor
  */
 Upgrade::Upgrade(float x, float y) {
-	dropSpeed = 0.5;
+	dropSpeed = 8.0;
 	w = 50.0;
 	h = 50.0;
     pos[0] = x;
@@ -975,8 +982,8 @@ void updateExplosion()
  */
 void renderExplosion() {
     int i = 0;
-    float resX = 1.0;
-    float resY = 1.0;
+    float resX = 2.0;
+    float resY = 2.0;
     Particle* p;
     while (i < g.nParticles) {
         p = &g.parr[i];

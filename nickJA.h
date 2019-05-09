@@ -2,7 +2,7 @@
 //May 3rd, 2019
 
 
-
+class TankWeapon;
 
 //Sprite Class Declarations
 
@@ -13,18 +13,24 @@ class SpriteList {
 		GLuint mig;
 		GLuint M60Hull;
 		GLuint M60Trt;
+		GLuint T62Hull;
+		GLuint T62Trt;
 
 
 		void drawPhantom(float x, float y, float angle);
 		void drawMig(float x, float y, float angle);
 		void drawM60Turret(float x, float y, float angle);
 		void drawM60Hull(float x, float y, float angle);
+		void drawT62Turret(float x, float y, float angle);
+		void drawT62Hull(float x, float y, float angle);
 };
+
 //Tank Class Declarations.
 class Tank
 {
 	public:
 		bool moving;
+		int factFlag;
 		float pos[3];
 		float tPos[3];
 		float color[3] = {0.33, 0.42, 0.18};
@@ -35,9 +41,11 @@ class Tank
 		float maxVel = 1.0;
 		Vec vel = {0, 0, 0};
 		Vec tgt;
-		Weapon *prm;
+		Vec gunPos;
+		TankWeapon *prm;
 		Tank();
-		~Tank();
+		virtual ~Tank();
+		struct timespec bulletTimer;
 
 		void renderTurret(SpriteList SPR);
 		void renderTank(SpriteList SPR);
@@ -45,12 +53,43 @@ class Tank
 		void moveTank();
 
 };
-//Enemy Tank Class Declarations.
 
+//Enemy Tank Class Declarations.
 class EnemyTank : public Tank {
 	public:
 		EnemyTank(float x, float y, int faction);
+		~EnemyTank();
 		EnemyTank *nextTank;
 		EnemyTank *prevTank;
 
+		int enterFlag;
+		int needNewDirection = 1;
+		float aggression;
+		float movTgtAngle;
+		float radius = 50;
+		Vec movTgt;
+		Vec potentialMov[3];
+
+		void generatePositions();
+		void pickMovTgt();
+		void moveEnemyTank();
+		void updateAngle();
+
+};
+
+class TankWeapon
+{
+	public:
+		float fireRate;
+		float bulletSpeed;
+		float color[3];
+
+		TankWeapon();
+		~TankWeapon();
+
+		void setPosition(float*, float*);
+		void setVelocity(float*);
+		void setColor(float*);
+		void fire(Tank *tank);
+		void enemyFire(Tank *tank);
 };

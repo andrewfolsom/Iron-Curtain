@@ -111,10 +111,12 @@ extern void serverConnect(int);
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
+extern void spawnTank();
+extern void tankBackground();
 //--------------------------------------------------------------------------
 
 
-Image img[9] = {
+Image img[10] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -124,6 +126,7 @@ Image img[9] = {
 	"./img/verticalBackground.jpg",
 	"./img/gameControls.jpg",
 	"./img/clouds.jpg" ,
+	"./img/tankBackground.png"
 
 };
 
@@ -139,6 +142,9 @@ Game g;
 
 SpriteList SPR;
 Tank playerTank;
+EnemyTank *headTank = NULL;
+EnemyTank *tailTank = NULL;
+EnemyTank *eTank = NULL;
 
 X11_wrapper x11;
 
@@ -171,6 +177,7 @@ int main()
 	clock_gettime(CLOCK_REALTIME, &timeStart);
 	int done = 0;
 
+
 #ifdef USE_OPENAL_SOUND
 
 	alutInit(0, NULL);
@@ -193,7 +200,7 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			done = mainLevel(gameTime);
+			//done = mainLevel(gameTime);
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -323,15 +330,19 @@ int check_keys(XEvent *e)
 			//moveLeft();
 			if (gl.gameState == 3)
 				gl.keys[XK_a] = 1;
-			if (gl.gameState == 8 )
+			if (gl.gameState == 8 ) {
 				t->angle++;
+				t->tAngle++;
+				}
 			break;
 		case XK_d:
 			//moveRight();
 			if (gl.gameState == 3)
 				gl.keys[XK_d] = 1;
-			if (gl.gameState == 8)
+			if (gl.gameState == 8) {
 				t->angle--;
+				t->tAngle--;
+				}
 			break;
 		case XK_w:
 			if (gl.gameState == 3)
@@ -350,11 +361,12 @@ int check_keys(XEvent *e)
 			}
 			break;
 		case XK_space:
-			gl.keys[XK_space] = 1;
+			if (gl.gameState == 3)
+				gl.keys[XK_space] = 1;
 			if (gl.gameState == 8) {
-				//t->prm->fire((float)270.0);
+				t->prm->fire(t);
 			}
-			cannonFire();
+			//cannonFire();
 			break;
 
 		case XK_Escape:
@@ -423,6 +435,11 @@ int check_keys(XEvent *e)
 			}
 			break;
 		case XK_t:
+			if (gl.gameState == 8)
+				spawnTank();
+			break;
+		case XK_q:
+			delete tailTank;
 			break;
 		}
 	}
@@ -575,11 +592,11 @@ void physics()
 				e->takeDamage(1);
 				//If health is zero destroy ship
 				if (e->getHealth() < 1) {
-					e->destroyShip();
 					//generate explosion
 					createExplosion(e->pos[0], e->pos[1]);
 					explodeShip();
 					//delete the ship
+					e->destroyShip();
 					g.playerScore += e->getDeathScore();
 				}
 				//delete the bullet
@@ -655,6 +672,7 @@ void physics()
 				break;
 		   case 3:
 				s->shield->status = true;
+				shieldSound();
 				clock_gettime(CLOCK_REALTIME, &s->shield->shieldTimer);
 				delete up;
 				up = NULL;
@@ -731,7 +749,7 @@ void physics()
 	i = 0;
 	e = headShip;
 	while (e != NULL) {
-		e->eWpn->fire();
+		e->eWpn->fire(e);
 		e = e->nextShip;
 	}
 
@@ -757,11 +775,63 @@ void physics()
         s->scnd->reload();
     }
 
-	//scrolling physics
-	gl.tex.xc[0] -=0.0007;
-	gl.tex.xc[1] -=0.0007;
+	if (gl.gameState != 8) {
+		//scrolling physics
+		gl.tex.xc[0] -=0.0007;
+		gl.tex.xc[1] -=0.0007;
+	}
 
 	if (gl.gameState == 8) {
+
+	//Check for collisions with enemy tanks
+	i = 0;
+	while (i < g.nPlayerBullets) {
+		//is there a bullet within its radius?
+		eTank = headTank;
+		while (eTank != NULL) {
+			Bullet *b = &g.playerBarr[i];
+			d0 = b->pos[0] - eTank->pos[0];
+			d1 = b->pos[1] - eTank->pos[1];
+			dist = (d0*d0 + d1*d1);
+			if (dist < (eTank->radius * eTank->radius)) {
+				//determine if upgrade drops
+				//if(generateUpgrade() && up == NULL) {
+				//	up = new Upgrade(e->pos[0], e->pos[1]);
+				//}
+
+				//If health is zero destroy ship
+				//if (e->getHealth() < 1) {
+					//generate explosion
+					createExplosion(eTank->pos[0], eTank->pos[1]);
+					explodeShip();
+					//delete the ship
+					delete eTank;;
+					//g.playerScore += e->getDeathScore();
+				//delete the bullet
+				memcpy(&g.playerBarr[i], &g.playerBarr[g.nPlayerBullets - 1], sizeof(Bullet));
+				g.nPlayerBullets--;
+			}
+			eTank = eTank->nextTank;
+			if (headTank == NULL)
+				break;
+			}
+			i++;
+		}
+
+		//Move Enemy Tanks
+		eTank =  headTank;
+		while (eTank != NULL) {
+			if (eTank->needNewDirection) {
+				eTank->generatePositions();
+				eTank->pickMovTgt();
+			}
+			eTank->prm->enemyFire(eTank);
+			eTank->updateAngle();
+			eTank->updateTarget(t->pos[0], t->pos[1]);
+			eTank->moveEnemyTank();
+			eTank = eTank->nextTank;
+		}
+		//Move Player Tank
 		t->moveTank();
 	}
 	return;
@@ -854,7 +924,7 @@ void render()
 			Bullet *b = &g.playerBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
-			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glTranslatef(b->pos[0], b->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
@@ -870,7 +940,7 @@ void render()
 			Bullet *b = &g.enemyBarr[i];
 			glColor3fv(b->color);
 			glPushMatrix();
-			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glTranslatef(b->pos[0], b->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
@@ -886,7 +956,7 @@ void render()
 			Missile *m = &g.marr[i];
 			glColor3fv(m->color);
 			glPushMatrix();
-			glTranslatef(m->pos[0], m->pos[1], m->pos[2]);
+			glTranslatef(m->pos[0], m->pos[1], 0.8);
 			glBegin(GL_QUADS);
 			glVertex2f(-resX, -resY);
 			glVertex2f(-resX, resY);
@@ -974,8 +1044,9 @@ void render()
 		displayGameControls();
 		glDisable(GL_TEXTURE_2D);
 	}
-	else if (gl.gameState == 8) {
 
+	else if (gl.gameState == 8) {
+		//TANK GAMEPLAY RENDER
 		Tank *t = &playerTank;
 
 
@@ -987,12 +1058,56 @@ void render()
 		glBindTexture(GL_TEXTURE_2D, gl.verticalBackground);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[6].width,img[6].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[6].data);
-		scrollingBackground();
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[9].width,img[9].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[9].data);
+		tankBackground();
 		glDisable(GL_TEXTURE_2D);
 
 		//Draw Tank
+		eTank = headTank;
+		while (eTank != NULL) {
+			eTank->renderTank(SPR);
+			eTank = eTank->nextTank;
+		}
 		t->renderTank(SPR);
+		//testTank->renderTank(SPR);
+
+		//Draw PLayer Bullets
+		for (int i = 0; i < g.nPlayerBullets; i++) {
+		float resX = 2.0;
+		float resY = 5.0;
+		Bullet *b = &g.playerBarr[i];
+		glColor3fv(b->color);
+		glPushMatrix();
+		glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+		glBegin(GL_QUADS);
+		glVertex2f(-resX, -resY);
+		glVertex2f(-resX, resY);
+		glVertex2f(resX, resY);
+		glVertex2f(resX, -resY);
+		glEnd();
+		glPopMatrix();
+	}
+
+		//draw Enemy Bullets
+		for (int i = 0; i < g.nEnemyBullets; i++) {
+            float resX = 2.0;
+            float resY = 5.0;
+			Bullet *b = &g.enemyBarr[i];
+			glColor3fv(b->color);
+			glPushMatrix();
+			glTranslatef(b->pos[0], b->pos[1], b->pos[2]);
+			glBegin(GL_QUADS);
+			glVertex2f(-resX, -resY);
+			glVertex2f(-resX, resY);
+			glVertex2f(resX, resY);
+			glVertex2f(resX, -resY);
+			glEnd();
+			glPopMatrix();
+		}
+
+
+		//Draw Explosions
+		renderExplosion();
 
 		//Draw Upgrade
 		if (up != NULL) {
@@ -1016,6 +1131,13 @@ double getTimeSlice(Ship *ship, timespec *bt)
 {
 	clock_gettime(CLOCK_REALTIME, bt);
 	double ts = timeDiff(&ship->bulletTimer, bt);
+	return ts;
+}
+//Tank Version
+double getTimeSlice(Tank *tank, timespec *bt)
+{
+	clock_gettime(CLOCK_REALTIME, bt);
+	double ts = timeDiff(&tank->bulletTimer, bt);
 	return ts;
 }
 

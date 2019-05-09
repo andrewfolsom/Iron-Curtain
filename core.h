@@ -48,6 +48,7 @@ class Global
 	GLuint benImg;
 	GLuint ironImage;
         GLuint verticalBackground;
+	GLuint tankBackground;
 	GLuint clouds;
 	GLuint pauseScreen;
 	GLuint hiddenWorld;

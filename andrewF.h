@@ -24,6 +24,8 @@ enum scndType {
     missile = 0
 };
 
+class EnemyShip;
+
 // Player Weapon Declarations
 
 class Weapon
@@ -39,6 +41,8 @@ public:
 	virtual void setVelocity(float*);
 	void setColor(float*);
 	virtual void fire() =0;
+	virtual void fire(float angle);
+	virtual void fire(EnemyShip*);
 };
 
 class Basic : public Weapon
@@ -79,10 +83,8 @@ class Pinwheel : public Scatter
 {
 public:
 	Pinwheel();
-	void fire();
+	void fire(EnemyShip* e);
 };
-
-class EnemyShip;
 
 struct Reticle
 {
@@ -130,7 +132,7 @@ class EnemyStd : public Basic
 {
     public:
         EnemyStd();
-        void fire(EnemyShip *ship, float angle);
+        void fire(EnemyShip* e);
 };
 
 // Upgrade Declarations
