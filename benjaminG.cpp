@@ -359,6 +359,8 @@ void checkTimer() {
 			break;
 		case 1:
             gl.chosen = true;
+            time(&Timer);
+            break;
 		case 3:
 		case 4:
 		case 8:
