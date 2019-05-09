@@ -238,7 +238,7 @@ bool mainLevel(double gameTime) {
                 tailShip->configDiagRush(gl.xres / 2, 700, -1);
                 bossSpawned = true;
             }
-            else if (tailShip->pos[1] < 400)
+            else if (gameTime > 95)
                 tailShip->configDiagRush(gl.xres / 3, 700, 1);
             else if (tailShip->pos[0] < 200)
                 tailShip->configDiagRush(500, 500, -1);
