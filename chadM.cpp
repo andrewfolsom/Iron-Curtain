@@ -239,16 +239,16 @@ bool mainLevel(double gameTime) {
                 bossSpawned = true;
             }
 
-            if (95 - gameTime < 0.01 && 95 - gameTime > 0) {
+            if (tailShip->pos[1] < 750) {
                 tailShip->configDiagRush(800, 800, 1);
             }
             else if (tailShip->pos[0] > 750) {
                 tailShip->configDiagRush(100, 800, 1);
             }
-            else if (tailShip->pos[0] < 50){
+            else if (tailShip->pos[0] < 100){
                 tailShip->configDiagRush(600, 800, 1);
             }
-            if (tailShip == NULL) {
+            if (headShip == NULL) {
                 bossDefeated = true;
                 bossSpawned = false;
             }

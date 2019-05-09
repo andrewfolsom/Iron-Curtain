@@ -201,9 +201,9 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			if (gl.gameState == 3) {
-				done = mainLevel(gameTime);
-			}
+			done = mainLevel(gameTime);
+			if (gameTime > 115)
+				resetGame();
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -607,10 +607,10 @@ void physics()
 				g.nPlayerBullets--;
 			}
 
+			e = e->nextShip;
 			if (headShip == NULL) {
 				break;
 			}
-			e = e->nextShip;
 		}
 		i++;
 
