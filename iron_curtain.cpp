@@ -201,7 +201,9 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			//done = mainLevel(gameTime);
+			if (gl.gameState == 3) {
+				done = mainLevel(gameTime);
+			}
 			while (physicsCountdown >= physicsRate) {
 				physics();
 				physicsCountdown -= physicsRate;
@@ -835,6 +837,8 @@ void physics()
 				 sizeof(Bullet));
 				g.nEnemyBullets--;
 				if (t->health == 0) {
+					createExplosion(t->pos[0], t->pos[1]);
+					explodeShip();
 					serverConnect(g.playerScore);
 					printf("Game Over!\n Score = %d\n", g.playerScore);
 					resetGame();
