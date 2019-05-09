@@ -207,7 +207,7 @@ int main()
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
 			done = mainLevel(gameTime);
-			if (gameTime > 115)
+			if (gameTime > 145)
 				resetGame();
 			while (physicsCountdown >= physicsRate) {
 				physics();
