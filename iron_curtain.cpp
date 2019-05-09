@@ -111,6 +111,7 @@ extern void serverConnect(int);
 extern void checkTimer();
 extern void nextState();
 extern void displayTheDuck();
+extern void displayMainMenu7000();
 
 //Externs -- Jackson
 extern void displayNick(float x, float y, GLuint texture);
@@ -120,7 +121,7 @@ extern void tankBackground();
 //--------------------------------------------------------------------------
 
 
-Image img[11] = {
+Image img[12] = {
 	"./img/NICKJA.jpg",
 	"./img/andrewimg.png",
 	"./img/spencerA.jpg",
@@ -131,7 +132,8 @@ Image img[11] = {
 	"./img/gameControls.jpg",
 	"./img/clouds.jpg" ,
 	"./img/tankBackground.png",
-	"./img/CommandoDuck.jpg"
+	"./img/CommandoDuck.jpg",
+	"./img/theIronCurtain.jpg"
 };
 
 Particle p[MAX_PARTICLES];
@@ -889,12 +891,12 @@ void render()
 	if (gl.gameState == 0){ //Startup
 		//init regular background
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, gl.gameControls);
+		glBindTexture(GL_TEXTURE_2D, gl.mainMenu);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[11].width,img[11].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[11].data);
+		displayMainMenu7000();
 
-		displayStartScreen();
 		glDisable(GL_TEXTURE_2D);
 
 	} else if (gl.gameState == 1){ //Menu
@@ -905,8 +907,8 @@ void render()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, 3,img[7].width,img[7].height, 0, GL_RGB, GL_UNSIGNED_BYTE, img[7].data);
+		displayStartScreen();
 
-		displayMenu();
 		glDisable(GL_TEXTURE_2D);
 
 	} else if (gl.gameState == 2){ //Loading

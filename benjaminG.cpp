@@ -387,3 +387,28 @@ void displayTheDuck() {
     r.center = 0;
     ggprint16(&r, 30,c,"Loading...");
 }
+
+void displayMainMenu7000() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0,1.0,1.0);
+
+    glBindTexture(GL_TEXTURE_2D, gl.mainMenu);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f,1.0f);glVertex2i(0,0);
+    glTexCoord2f(0.0f,0.0f); glVertex2i(0,gl.yres);
+    glTexCoord2f(1.0f,0.0f); glVertex2i(gl.xres,gl.yres);
+    glTexCoord2f(1.0f,1.0f); glVertex2i(gl.xres,0);
+    glEnd();
+
+    Rect r;
+    unsigned int c = 0x00ffff44;
+    r.bot = gl.yres - 60;
+    r.left = 10;
+    r.center = 0; 
+    ggprint16(&r, 16,c, " ");
+    ggprint16(&r, 16,c, "G - Play Game");
+    ggprint16(&r, 16,c, " ");
+    ggprint16(&r, 16,c, "Z  - Game Controls");
+    ggprint16(&r, 16,c, " ");
+    ggprint16(&r, 16,c, "C - Credits Screen");
+}

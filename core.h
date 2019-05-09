@@ -58,6 +58,7 @@ class Global
 	GLuint loadingScreen;
     GLuint gameControls;
 	GLuint theDuck;
+	GLuint mainMenu;
 	static Global& getInstance();
     private:
 	Global();
