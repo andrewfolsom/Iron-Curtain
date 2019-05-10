@@ -206,7 +206,11 @@ int main()
 			gameTime += timeSpan;
 			timeCopy(&timeStart, &timeCurrent);
 			physicsCountdown += timeSpan;
-			done = mainLevel(gameTime);
+			//If statement prevents mainLevel from running 
+			//simultaneously with tank mode.
+			if (gl.gameState == 3) {
+				done = mainLevel(gameTime);
+			}
 			if (gameTime > 145)
 				resetGame();
 			while (physicsCountdown >= physicsRate) {
