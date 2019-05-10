@@ -22,4 +22,6 @@ iron_curtain : iron_curtain.cpp timers.cpp nickJA.cpp benjaminG.cpp chadM.cpp an
 
 clean:
 	rm -f test
+	rm -f testdbg
+	rm -f Iron_Curtain
 	rm -f *.o
