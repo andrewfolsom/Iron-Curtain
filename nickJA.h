@@ -66,6 +66,7 @@ class EnemyTank : public Tank {
 		EnemyTank *prevTank;
 
 		int enterFlag;
+		int movFlag;
 		int needNewDirection = 1;
 		int killScore = 10;
 		float aggression;

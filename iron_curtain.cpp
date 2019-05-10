@@ -117,6 +117,7 @@ extern void displayTheDuck();
 extern void displayNick(float x, float y, GLuint texture);
 extern void spawnTank();
 extern void spawnTank(int spawnNum);
+extern void spawnTank(float x, float y);
 extern void tankBackground();
 //--------------------------------------------------------------------------
 
@@ -188,7 +189,9 @@ int main()
 	alutInit(0, NULL);
 #endif
 	soundTrack();
-
+#ifdef DEBUG
+	spawnTank(gl.xres/2, gl.yres/2);
+#endif
 
 	while (!done) {
 		while (x11.getXPending()) {

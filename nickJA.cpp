@@ -85,7 +85,8 @@ void displayNick(float x, float y, GLuint texture)
 }
 
 //***********SPRITES DISPLAY*****************
-SpriteList::SpriteList()  {
+SpriteList::SpriteList()  
+{
 	glGenTextures(1, &phantom);
 	glGenTextures(1, &mig);
 	glGenTextures(1, &M60Hull);
@@ -93,7 +94,8 @@ SpriteList::SpriteList()  {
 }
 //Function to render our F-4 Phantom image
 //X & Y are position components, angle determines rotation.
-void SpriteList::drawPhantom(float x, float y, float angle) {
+void SpriteList::drawPhantom(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, phantom);
@@ -124,7 +126,8 @@ void SpriteList::drawPhantom(float x, float y, float angle) {
 
 //Function to render our MiG-21 image
 //X & Y are position components, angle determines rotation.
-void SpriteList::drawMig(float x, float y, float angle) {
+void SpriteList::drawMig(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, mig);
@@ -155,7 +158,8 @@ void SpriteList::drawMig(float x, float y, float angle) {
 //Function to render our M60's turret.
 //The turret is placed above and separate from the hull.
 //x, y, and angle do what you think they do.
-void SpriteList::drawM60Turret(float x, float y, float angle) {
+void SpriteList::drawM60Turret(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, M60Trt);
@@ -188,7 +192,8 @@ void SpriteList::drawM60Turret(float x, float y, float angle) {
 //Function to render our M60's hull.
 //The hull is below and separate from the turret.
 //x, y, and angle are still working the same old job.
-void SpriteList::drawM60Hull(float x, float y, float angle) {
+void SpriteList::drawM60Hull(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, M60Hull);
@@ -221,7 +226,8 @@ void SpriteList::drawM60Hull(float x, float y, float angle) {
 
 //Function to draw T-62 Hull
 //Our old friends X, Y, and angle are at it again!
-void SpriteList::drawT62Hull(float x, float y, float angle) {
+void SpriteList::drawT62Hull(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, T62Hull);
@@ -251,7 +257,8 @@ void SpriteList::drawT62Hull(float x, float y, float angle) {
 
 
 }
-void SpriteList::drawT62Turret(float x, float y, float angle) {
+void SpriteList::drawT62Turret(float x, float y, float angle) 
+{
 	glEnable(GL_TEXTURE_2D);
 	glColor4ub(255.0, 255.0, 255.0, 255.0);
 	glBindTexture(GL_TEXTURE_2D, T62Trt);
@@ -494,7 +501,8 @@ void EnemyShip::updatePosition()
 }
 
 //********TANK CLASS********
-Tank::Tank() {
+Tank::Tank() 
+{
 	pos[0] = 450;
 	pos[1] = 250;
 	health = 3;
@@ -502,12 +510,14 @@ Tank::Tank() {
 	factFlag = 0;
 }
 
-Tank::~Tank() {
+Tank::~Tank() 
+{
 	delete prm;
 }
 
 //********TANK WEAPON CLASS********
-TankWeapon::TankWeapon() {
+TankWeapon::TankWeapon() 
+{
 	fireRate = 2.0;
 	bulletSpeed = 15.0;
 	color[0] = 0;
@@ -516,28 +526,33 @@ TankWeapon::TankWeapon() {
 
 }
 
-TankWeapon::~TankWeapon() {
+TankWeapon::~TankWeapon() 
+{
 
 }
 
-void TankWeapon::setPosition(float *t,float *b) {
+void TankWeapon::setPosition(float *t,float *b) 
+{
 	b[0] = t[0];
 	b[1] = t[1];
 	b[2] = 1;
 }
 
-void TankWeapon::setVelocity(float *vel) {
+void TankWeapon::setVelocity(float *vel) 
+{
 	vel[0] = 0.0;
 	vel[1] = bulletSpeed;
 }
 
-void TankWeapon::setColor(float *c) {
+void TankWeapon::setColor(float *c) 
+{
 	c[0] = color[0];
 	c[1] = color[1];
 	c[2] = color[2];
 }
 
-void TankWeapon::fire(Tank *tank) {
+void TankWeapon::fire(Tank *tank) 
+{
 	struct timespec bt;
 	double time = getTimeSlice(tank, &bt);
 	if (time > fireRate) {
@@ -557,7 +572,8 @@ void TankWeapon::fire(Tank *tank) {
 	}
 }
 
-void TankWeapon::enemyFire(Tank *tank) {
+void TankWeapon::enemyFire(Tank *tank) 
+{
 	struct timespec bt;
 	double time = getTimeSlice(tank, &bt);
 	if (time > fireRate) {
@@ -737,6 +753,8 @@ EnemyTank::EnemyTank(float x, float y, int faction)
 	pos[1] = y;
 	factFlag = faction;
 	prm = new TankWeapon;
+	prm->fireRate = 5.0;
+	prm->bulletSpeed = 6.0;
 	angle = 180;
 	tAngle = 180;
 	aggression = rand()%100 /100;
@@ -784,6 +802,11 @@ void spawnTank(int spawnNum)
 		eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
 	}
 }
+void spawnTank(float x, float y) 
+{
+	eTank = new EnemyTank(x, y, 1);	
+	eTank->movFlag = 5;
+}
 void EnemyTank::generatePositions() 
 {
 	//for (int i = 0; i < 3; i++) {
@@ -830,12 +853,13 @@ void EnemyTank::pickMovTgt()
 
 void EnemyTank::updateAngle() 
 {
+	//Find the angle and convert it to degrees.
 	movTgtAngle = atan((movTgt[0] - pos[0])/(movTgt[1] - pos[1]));
-
+	movTgtAngle = (movTgtAngle * 180) / PI;
 	if (movTgt[1] - pos[1] > 0)
-		movTgtAngle = -(movTgtAngle * 180) /PI;
+		movTgtAngle = movTgtAngle;
 	else
-		movTgtAngle = 180 - (movTgtAngle * 180) /PI;
+		movTgtAngle = 180 - movTgtAngle;
 	//printf("Position: (%f, %f), Target: (%f, %f), Angle Target/Current: %f/%f\n", pos[0], pos[1],
 	//		movTgt[0], movTgt[1], movTgtAngle, angle);
 
@@ -846,6 +870,9 @@ void EnemyTank::moveEnemyTank()
 	float xdiff = movTgt[0] - pos[0];
 	float ydiff = movTgt[1] - pos[1];
 	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
+
+	if (movFlag == 5)
+	    return;
 
 	//Set whether tank has entered the arena
 	if (pos[0] > 20 && pos[0] < 880) {
