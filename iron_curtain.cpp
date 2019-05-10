@@ -351,37 +351,21 @@ int check_keys(XEvent *e)
 		//Movements and Gameplay
 		case XK_a:
 			//moveLeft();
-			if (gl.gameState == 3)
+			if (gl.gameState == 3 || gl.gameState == 8)
 				gl.keys[XK_a] = 1;
-			if (gl.gameState == 8 ) {
-				t->angle++;
-				t->tAngle++;
-				}
 			break;
 		case XK_d:
 			//moveRight();
-			if (gl.gameState == 3)
+			if (gl.gameState == 3 || gl.gameState == 8)
 				gl.keys[XK_d] = 1;
-			if (gl.gameState == 8) {
-				t->angle--;
-				t->tAngle--;
-				}
 			break;
 		case XK_w:
-			if (gl.gameState == 3)
+			if (gl.gameState == 3 || gl.gameState == 8)
 				gl.keys[XK_w] = 1;
-			if (gl.gameState == 8) {
-				t->vel[0] += 0.5;
-				t->moving = true;
-			}
 			break;
 		case XK_s:
-			if (gl.gameState == 3)
+			if (gl.gameState == 3 || gl.gameState == 8)
 				gl.keys[XK_s] = 1;
-			if (gl.gameState == 8 ) {
-				t->vel[0] -= 0.5;
-				t->moving = true;
-			}
 			break;
 		case XK_space:
 			if (gl.gameState == 3)
@@ -712,7 +696,7 @@ void physics()
 	if (s->shield->status)
 		s->shield->checkTime();
 
-	if (gl.keys[XK_a]) {
+	if (gl.keys[XK_a] && gl.gameState == 3) {
 		s->pos[0] -= s->vel[0];
 		s->vel[0] += s->speed;
 		if (s->vel[0] > MAX_VELOCITY)
@@ -726,8 +710,12 @@ void physics()
 		}
 	}
 
+    if (gl.keys[XK_a] && gl.gameState == 8) {
+		t->angle++;
+		t->tAngle++;
+    }
 
-	if (gl.keys[XK_d]) {
+	if (gl.keys[XK_d] && gl.gameState == 3) {
 		s->pos[0] += s->vel[1];
 		s->vel[1] += s->speed;
 		if (s->vel[1] > MAX_VELOCITY)
@@ -741,7 +729,12 @@ void physics()
 		}
 	}
 
-	if (gl.keys[XK_w]) {
+    if (gl.keys[XK_d] && gl.gameState == 8) {
+		t->angle--;
+		t->tAngle--;
+    }
+
+	if (gl.keys[XK_w] && gl.gameState == 3) {
 		s->pos[1] += s->vel[2];
 		s->vel[2] += s->speed;
 		if (s->vel[2] > MAX_VELOCITY)
@@ -755,7 +748,12 @@ void physics()
 		}
 	}
 
-	if (gl.keys[XK_s]) {
+	if (gl.keys[XK_w] && gl.gameState == 8) {
+		t->vel[0] += 0.5;
+		t->moving = true;
+	}
+
+	if (gl.keys[XK_s] && gl.gameState == 3) {
 		s->pos[1] -= s->vel[3];
 		s->vel[3] += s->speed;
 		if (s->vel[3] > MAX_VELOCITY)
@@ -767,6 +765,11 @@ void physics()
 		} else {
 			s->vel[3] = 0.0;
 		}
+	}
+
+	if (gl.keys[XK_s] && gl.gameState == 8) {
+		t->vel[0] -= 0.5;
+		t->moving = true;
 	}
 
 	if (gl.keys[XK_space]) {
