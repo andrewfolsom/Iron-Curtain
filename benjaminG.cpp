@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <cmath>
 #include <GL/glx.h>
 #include "fonts.h"
 #include "core.h"
@@ -351,7 +352,7 @@ void checkTimer() {
         case 2:
 		case 6:
 		case 5:
-			if (abs(difftime(Timer, time(NULL))) >= 5) {
+			if (abs(difftime(Timer, time(NULL))) >= 5.0) {
 				nextState();
 				cout << "Change state\n";
 				time(&Timer);
