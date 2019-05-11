@@ -99,7 +99,6 @@ void displayGameControls()
     ggprint16(&r, 16,c,"G/g - Play Game-MiG Fighter Mode");
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"Y/y - Return to Main Screen");
-
     ggprint16(&r, 16,c," ");
     ggprint16(&r, 16,c,"O/o - Play Game- Tank Mode");
     ggprint16(&r, 16,c," ");
@@ -116,7 +115,6 @@ void displayGameControls()
     unsigned int e = 0x00000000;
     r2.bot = gl.yres-500;
     r2.left = 10;
-
     r2.center = 0;
     ggprint16(&r2, 16,e,"---Basic Ship Movement---");
     ggprint16(&r2, 16,e," ");
@@ -128,9 +126,7 @@ void displayGameControls()
     ggprint16(&r2, 16,e," ");
     ggprint16(&r2, 16,e,"X/x ------ Move down");
     ggprint16(&r2, 16,e," ");
-   
     ggprint16(&r2, 16,e," ");
-
     ggprint16(&r2, 16,e,"---Basic Tank Movement---");
     ggprint16(&r2, 16,e," ");
     ggprint16(&r2, 16,e,"A/a ------ Rotate Tank");
@@ -142,8 +138,6 @@ void displayGameControls()
     ggprint16(&r2, 16,e,"X/x ------ Move down");
     ggprint16(&r2, 16,e," ");
     
-
-
     Rect r4;
     unsigned int f = 0x00000000;
     r4.bot = gl.yres-500;
@@ -162,15 +156,12 @@ void displayGameControls()
     ggprint16(&r4, 16,f,"4 ----------- Ring Spatial Fire");
     ggprint16(&r4, 16,f," ");
     ggprint16(&r4, 16,f,"5 ----------- Pinwhell Fire");
-
-
     ggprint16(&r4, 16,f," ");
     ggprint16(&r4, 16,f,"--- How to Shoot Tank---");
     ggprint16(&r4, 16,f," ");
-
     ggprint16(&r4, 16,f,"Spacebar ------ Shoot");
     ggprint16(&r4, 16,f," ");
-    
+
     Rect r5;
     unsigned int g = 0x00000000;
     r5.bot = gl.yres-500;
@@ -190,83 +181,71 @@ void scrollingBackground()
       
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
-
     glBindTexture(GL_TEXTURE_2D, gl.verticalBackground);
     glBegin(GL_QUADS);
 		glTexCoord2f(gl.tex.xc[1], gl.tex.yc[0]); glVertex2i(0, 0);
 		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[0]); glVertex2i(0, gl.yres);
 		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[1]); glVertex2i(gl.xres, gl.yres);
 		glTexCoord2f(gl.tex.xc[1], gl.tex.yc[1]); glVertex2i(gl.xres, 0);
-
 	glEnd();
 
 }
-
 
 void scrollingBackground2()
 {  
    // glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1.0,1.0);
-    	
-
     glBindTexture(GL_TEXTURE_2D, gl.clouds);
     glBegin(GL_QUADS);
 		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[0]); glVertex2i(0, 0);
 		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[0]); glVertex2i(0, gl.yres);
 		glTexCoord2f(gl.tex.xc[0], gl.tex.yc[1]); glVertex2i(gl.xres, gl.yres);
 		glTexCoord2f(gl.tex.xc[1], gl.tex.yc[1]); glVertex2i(gl.xres, 0);
-
 	glEnd();
-
 }
-
 
 void soundTrack() 
 {	
 	#ifdef USE_OPENAL_SOUND
 
        //alutInit(0, NULL);
-        if (alGetError() != AL_NO_ERROR) {
-                
+        if (alGetError() != AL_NO_ERROR) {                
                 return ;
         }
 
-        alGetError();
-        float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
-        alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-        alListenerfv(AL_ORIENTATION, vec);
-        alListenerf(AL_GAIN, 1.0f);
-        ALuint alBuffer[2];
-	alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
-        alBuffer[1] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
-        ALuint alSource[2];
-	alGenSources(2, alSource);
-        alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
-        alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
-        alSourcef(alSource[0], AL_GAIN, 1.0f);
-        alSourcef(alSource[0],AL_PITCH, 1.0f);
-	alSourcei(alSource[0], AL_LOOPING, AL_TRUE);
-        	if (alGetError() != AL_NO_ERROR) {
-                	printf("ERROR: setting source\n");
-                	return;
-        	}
-
-	alSourcef(alSource[1], AL_GAIN, 0.5f);
-        alSourcef(alSource[1], AL_PITCH, 1.0f);
-        alSourcei(alSource[1], AL_LOOPING, AL_TRUE);
-        	if (alGetError() != AL_NO_ERROR) {
-                	printf("ERROR: setting source\n");
-                	return ;
-        	}
-
-	alSourcePlay(alSource[1]);
-        for (int i=0; i<42; i++) {
-                alSourcePlay(alSource[0]);
-               // usleep(250000);
+   alGetError();
+   float vec[6] = {0.0f,0.0f,1.0f, 0.0f,1.0f,0.0f};
+   alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+   alListenerfv(AL_ORIENTATION, vec);
+   alListenerf(AL_GAIN, 1.0f);
+   ALuint alBuffer[2];
+   alBuffer[0] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
+   alBuffer[1] = alutCreateBufferFromFile("./sounds/Battlefield 1942(2).wav");
+   ALuint alSource[2];
+  
+   alGenSources(2, alSource);
+   alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
+   alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
+   alSourcef(alSource[0], AL_GAIN, 1.0f);
+   alSourcef(alSource[0],AL_PITCH, 1.0f);
+   alSourcei(alSource[0], AL_LOOPING, AL_TRUE);
+       if (alGetError() != AL_NO_ERROR) {
+           printf("ERROR: setting source\n");
+           return;
+       }
+   alSourcef(alSource[1], AL_GAIN, 0.5f);
+   alSourcef(alSource[1], AL_PITCH, 1.0f);
+   alSourcei(alSource[1], AL_LOOPING, AL_TRUE);
+       if (alGetError() != AL_NO_ERROR) {
+           printf("ERROR: setting source\n");
+           return ;
+       }
+   alSourcePlay(alSource[1]);
+       for (int i=0; i<42; i++) {
+           alSourcePlay(alSource[0]);
         }
         	
 #endif //USE_OPENAL_SOUND
-  
 }
 
 void cannonFire() 
@@ -286,19 +265,15 @@ void cannonFire()
 	alSourcef(alSource[0], AL_GAIN, 1.0f);
 	alSourcef(alSource[0], AL_PITCH, 1.0f);
 	alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
-
-		if (alGetError() != AL_NO_ERROR) {
-
-	//	printf("ERROR: setting source\n");
-
+        if (alGetError() != AL_NO_ERROR) {
 		return ;
-
-	}
+    }
 
 	alSourcePlay(alSource[1]);
-	for (int i=0; i<1; i++) {
-		alSourcePlay(alSource[0]);
-		usleep(500);
+	    
+    for (int i=0; i<1; i++) {
+        alSourcePlay(alSource[0]);
+        usleep(500);
 	}
 
 #endif //USE_OPENAL_SOUND
@@ -329,7 +304,8 @@ void explodeShip()
 	}
 
 	alSourcePlay(alSource[1]);
-	for (int i=0; i<1; i++) {
+	
+    for (int i=0; i<1; i++) {
 		alSourcePlay(alSource[0]);
 	}
 
@@ -360,7 +336,8 @@ void shieldSound()
 	}
 
 	alSourcePlay(alSource[1]);
-	for (int i=0; i<1; i++) {
+	
+    for (int i=0; i<1; i++) {
 		alSourcePlay(alSource[0]);
 	}
 
