@@ -51,6 +51,7 @@ Image Sprites[6]{
 "./img/T-62_Turret.png"
 };
 
+//Set of spawnpoints for spawnTank function.
 Vec spawnPoints[5] = {{-100,1200,0},
 					  {450, 1200, 0},
 					  {1000, 1200, 0},
@@ -92,6 +93,7 @@ SpriteList::SpriteList()
 	glGenTextures(1, &M60Hull);
 	glGenTextures(1, &M60Trt);
 }
+
 //Function to render our F-4 Phantom image
 //X & Y are position components, angle determines rotation.
 void SpriteList::drawPhantom(float x, float y, float angle) 
@@ -155,6 +157,7 @@ void SpriteList::drawMig(float x, float y, float angle)
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 }
+
 //Function to render our M60's turret.
 //The turret is placed above and separate from the hull.
 //x, y, and angle do what you think they do.
@@ -186,9 +189,8 @@ void SpriteList::drawM60Turret(float x, float y, float angle)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-
 }
+
 //Function to render our M60's hull.
 //The hull is below and separate from the turret.
 //x, y, and angle are still working the same old job.
@@ -220,8 +222,6 @@ void SpriteList::drawM60Hull(float x, float y, float angle)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-
 }
 
 //Function to draw T-62 Hull
@@ -254,9 +254,10 @@ void SpriteList::drawT62Hull(float x, float y, float angle)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-
 }
+
+//Function to draw T-62 turret
+//X, Y, and angle really need to learn a new trick.
 void SpriteList::drawT62Turret(float x, float y, float angle) 
 {
 	glEnable(GL_TEXTURE_2D);
@@ -285,8 +286,6 @@ void SpriteList::drawT62Turret(float x, float y, float angle)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-
 }
 
 //Function to render tank background image
@@ -305,9 +304,8 @@ void tankBackground()
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-
-
 }
+
 //********MOVEMENT TYPES***********
 //Press 't' to test this mid game.
 //1 - Rush
@@ -318,7 +316,6 @@ void EnemyShip::updateRush()
 {
 	pos[1] += (speedMul * moveFlag);
 }
-
 
 //Speed affects movement speed of an object.
 //dir = Controls direction of vertical movement.
@@ -426,8 +423,8 @@ void EnemyShip::updateBank()
 
 	if (t > 1.0)
 		t = 0;
-
 }
+
 //destX/destY = The target coordinates for object's path.
 //speed = speed at which object follows curve.
 //SPEED IS ITERATED FROM A RANGE OF 0-1
@@ -523,13 +520,10 @@ TankWeapon::TankWeapon()
 	color[0] = 0;
 	color[1] = 0;
 	color[2] = 0;
-
 }
 
 TankWeapon::~TankWeapon() 
-{
-
-}
+{}
 
 void TankWeapon::setPosition(float *t,float *b) 
 {
@@ -592,8 +586,8 @@ void TankWeapon::enemyFire(Tank *tank)
 		}
 	}
 }
-//*************TANK MOVEMENT*****************
 
+//*************TANK MOVEMENT*****************
 void Tank::renderTurret(SpriteList SPR)
 {
 	tPos[0] = pos[0];
@@ -614,6 +608,7 @@ void Tank::renderTurret(SpriteList SPR)
 			tAngle += 0.25;
 		}
 	}
+	//Swaps Sprite based on player faction
 	if (factFlag == 1)
 		SPR.drawT62Turret(tPos[0], tPos[1], tAngle);
 	else if (factFlag == 0)
@@ -622,7 +617,7 @@ void Tank::renderTurret(SpriteList SPR)
 	gunPos[0] = tPos[0];
 	gunPos[1] = tPos[1];
 
-/* **OLD CODE**
+/* **OLD CODE** Kept in place to show pre-Sprite method
 	Vec pt[50];
 	float circAngle = 0;
 	float angleInc = (2*PI)/50;
@@ -685,6 +680,7 @@ void Tank::updateTarget(int x, int y)
 
 void Tank::renderTank(SpriteList SPR) 
 {
+	//Change Sprite based on player faction
 	if (factFlag == 1 )
 		SPR.drawT62Hull(pos[0], pos[1], angle);
 	else if (factFlag == 0 )
@@ -692,7 +688,7 @@ void Tank::renderTank(SpriteList SPR)
 
 	renderTurret(SPR);
 
-/* **OLD CODE**
+/* **OLD CODE** Kept in place to show pre-Sprite method
 	glColor3fv(color);
 	glPushMatrix();
 	glTranslatef(pos[0], pos[1], 0.1);
@@ -734,12 +730,8 @@ void Tank::moveTank()
 		if (abs(vel[0]) - 0 <= 0.01)
 			vel[0]=0;
 	}
-	/*
-	if (vel[1] > 0)
-		vel[1] -= decelVal;
-	if (vel[1] < 0)
-		vel[1] += decelVal;
-	*/
+
+	//Update turret location and angle
 	tPos[0] = pos[0];
 	tPos[1] = pos[1];
 	updateTarget(tgt[0], tgt[1]);
@@ -785,14 +777,17 @@ EnemyTank::~EnemyTank()
 }
 
 //********ENEMY TANK FUNCTIONS********
+//Original spawnTank function. Still used for debugging
+//or for when I want to punish my CPU.
 void spawnTank() 
 {
-	//float x = rand()%500 + 200;
-	//float y = rand()%500 + 200;
 	int x = rand()%5;
 
 	eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
 }
+
+//Overloaded spawnTank to spawn a set number of enemy tanks 
+//at randomly selected spawns
 void spawnTank(int spawnNum)
 {
 	int x;
@@ -801,18 +796,22 @@ void spawnTank(int spawnNum)
 		eTank = new EnemyTank(spawnPoints[x][0], spawnPoints[x][1], 1);
 	}
 }
+
+//Overloaded spawnTank for debugging.
 void spawnTank(float x, float y) 
 {
 	eTank = new EnemyTank(x, y, 1);	
 	eTank->movFlag = 5;
 }
+
+//Generate 3 random positions for pick function to select from
 void EnemyTank::generatePositions() 
 {
 	//for (int i = 0; i < 3; i++) {
 	for (int i = 0; i < 3; i++) {
 		potentialMov[i][0] = rand()%9 * 100;
 		potentialMov[i][1] = rand()%10 * 100;
-		}
+	}
 }
 
 //Will pick a location to move to.
@@ -835,7 +834,7 @@ void EnemyTank::pickMovTgt()
 		xDiff = pos[0] - potentialMov[i][0];
 		yDiff = pos[1] - potentialMov[i][1];
 		distFromStart = sqrt((xDiff*xDiff) + (yDiff*yDiff));
-
+		//Evaluate and select best target.
 		if ( (distFromStart * aggression) + (distToPlayer/aggression)  > favor) {
 			favor = (distFromStart * aggression) + (distToPlayer/aggression);
 			greatest = i;
@@ -843,9 +842,7 @@ void EnemyTank::pickMovTgt()
 	}
 	movTgt[0] = potentialMov[greatest][0];
 	movTgt[1] = potentialMov[greatest][1];
-	//movTgt[0] = 500;
-	//movTgt[1] = 500;
-
+	//Set tank to move and reset direction flag.
 	needNewDirection = 0;
 	moving = 1;
 }
@@ -859,8 +856,6 @@ void EnemyTank::updateAngle()
 		movTgtAngle = movTgtAngle;
 	else
 		movTgtAngle = 180 - movTgtAngle;
-	//printf("Position: (%f, %f), Target: (%f, %f), Angle Target/Current: %f/%f\n", pos[0], pos[1],
-	//		movTgt[0], movTgt[1], movTgtAngle, angle);
 
 }
 
@@ -869,15 +864,11 @@ void EnemyTank::moveEnemyTank()
 	float xdiff = movTgt[0] - pos[0];
 	float ydiff = movTgt[1] - pos[1];
 	float distance = sqrt((xdiff * xdiff) + (ydiff * ydiff)); 
-
+	//Used for debugging, if a tank has a movFlag of 5
+	//it will not be moved.
 	if (movFlag == 5)
-	    return;
+		return;
 
-	//Set whether tank has entered the arena
-	if (pos[0] > 20 && pos[0] < 880) {
-		if (pos[1] < 1000)
-			enterFlag = 1;
-	}
 
 	//Increase velocity while tank is not whwere it wants to be.
 	if (distance >=100 && moving) {
@@ -887,17 +878,12 @@ void EnemyTank::moveEnemyTank()
 		moving = 0;
 		needNewDirection = 1;
 	}
+		//Cleans up runaway tanks
+		if (pos[0] < -200 || pos[0] > 1200)
+			delete this;
+		if (pos[1] > 1400 || pos[1] < -100)
+			delete this;
 
-	if (enterFlag) {
-		if (pos[0] < 20)
-			pos[0] = 20;
-		if (pos[0] > 880)
-			pos[0] = 880;
-		if (pos[1] > 980)
-			pos[1] = 980;
-		if (pos[1] < 20)
-			pos[1] = 20;
-	}
 	//printf("Dist = %f\n", distance);
 	//Rotate tank to point to destination
 	if (angle != movTgtAngle && moving) {
@@ -911,6 +897,10 @@ void EnemyTank::moveEnemyTank()
 			angle += 0.25;
 		}
 	}
-	moveTank();
+	//Causes tanks to rotate in place if the angle to target is to great.
+	if (abs(movTgtAngle-angle) > 12)
+		vel[0] = vel[1] = 0;
 
+	//Calls Tank::moveTank() to handle actual position updating.
+	moveTank();
 }
