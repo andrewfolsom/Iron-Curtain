@@ -610,8 +610,7 @@ void Tank::renderTurret(SpriteList SPR)
 			tAngle +=360;
 		if (tAngle > tgtAngle) {
 			tAngle -= 0.25;
-		}
-		else { 
+		}	else { 
 			tAngle += 0.25;
 		}
 	}
@@ -677,9 +676,9 @@ void Tank::updateTarget(int x, int y)
 	
 	if (tgt[1] - tPos[1] > 0)
 		tgtAngle = -(tgtAngle * 180) /PI;
-	else {
+	else 
 		tgtAngle = 180 - (tgtAngle * 180) /PI;
-	}
+
 
 	//printf("Target Location is (%f, %f)\n", turret.tgt[0], turret.tgt[1]);
 }
@@ -884,8 +883,7 @@ void EnemyTank::moveEnemyTank()
 	if (distance >=100 && moving) {
 		vel[0]+= 0.8;
 		moving = 1;
-	}
-	else {
+	}	else {
 		moving = 0;
 		needNewDirection = 1;
 	}
@@ -909,8 +907,7 @@ void EnemyTank::moveEnemyTank()
 			angle +=360;
 		if (angle > movTgtAngle) {
 			angle -= 0.25;
-		}
-		else { 
+		}	else { 
 			angle += 0.25;
 		}
 	}
